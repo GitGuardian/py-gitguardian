@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pygitguardian = {editable = true,path = "."}
+marshmallow = "~=3.5"
+requests = ">=2.21.0"
+
+[dev-packages]
+black = "==19.10b0"
+flake8 = "*"
+ipython = "*"
+pre-commit = "*"
+coverage = "*"
+flake8-isort = "*"
+isort = "*"
+nose = "*"
