@@ -4,16 +4,21 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pygitguardian = {editable = true,path = "."}
 marshmallow = "~=3.5"
+pygitguardian = {editable = true,path = "."}
 requests = ">=2.21.0"
 
 [dev-packages]
 black = "==19.10b0"
-flake8 = "*"
-ipython = "*"
-pre-commit = "*"
 coverage = "*"
+flake8 = "*"
 flake8-isort = "*"
+ipython = "*"
 isort = "*"
 nose = "*"
+pre-commit = "*"
+vcrpy = "*"
+vcrpy-unittest = "*"
+
+[pipenv]
+allow_prereleases = true

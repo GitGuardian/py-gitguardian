@@ -2,6 +2,8 @@ import os
 import sys
 import traceback
 
+from requests import codes
+
 from pygitguardian import GGClient
 
 
@@ -17,9 +19,9 @@ DOCUMENT = """
 client = GGClient(token=API_KEY)
 
 # Check the health of the API and the token used.
-health_obj = client.health_check()
+health_obj, status = client.health_check()
 
-if health_obj.success:
+if status == codes[r"\o/"]:  # this is 200 but cooler
     try:
         scan_result = client.content_scan(filename=FILENAME, document=DOCUMENT)
     except Exception as exc:

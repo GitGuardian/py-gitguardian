@@ -4,7 +4,8 @@ from .models import Detail, Match, PolicyBreak, ScanResult
 from .schemas import DetailSchema, DocumentSchema, ScanResultSchema
 
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
+GGClient._version = __version__
 
 __all__ = [
     "Detail",

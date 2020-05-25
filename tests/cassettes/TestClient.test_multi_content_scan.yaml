@@ -1,0 +1,58 @@
+interactions:
+  - request:
+      body:
+        '[{"filename": ".env", "document": "\n    import urllib.request\n    url
+        = ''http://jen_barber:correcthorsebatterystaple@cake.gitguardian.com/isreal.json''\n    response
+        = urllib.request.urlopen(url)\n    consume(response.read())\"\n"}, {"document":
+        "\n    import urllib.request\n    url = ''http://jen_barber:correcthorsebatterystaple@cake.gitguardian.com/isreal.json''\n    response
+        = urllib.request.urlopen(url)\n    consume(response.read())\"\n"}, {"filename":
+        "normal", "document": "normal"}]'
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "492"
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.0.1 (Linux;py3.8.2)
+        authorization:
+          - Token XXX
+      method: POST
+      uri: https://api.gitguardian.com/v1/multiscan
+    response:
+      body:
+        string:
+          '[{"policy_break_count":2,"policies":["Secrets detection","File extensions","Filenames"],"policy_breaks":[{"type":"Basic
+          Auth String","policy":"Secrets detection","matches":[{"type":"username","match":"jen_barber","index_start":40,"index_end":49,"line_start":2,"line_end":2},{"type":"password","match":"correcthorsebatterystaple","index_start":51,"index_end":75,"line_start":2,"line_end":2},{"type":"host","match":"cake.gitguardian.com","index_start":77,"index_end":96,"line_start":2,"line_end":2}]},{"type":".env","policy":"Filenames","matches":[{"type":"filename","match":".env"}]}]},{"policy_break_count":1,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[{"type":"Basic
+          Auth String","policy":"Secrets detection","matches":[{"type":"username","match":"jen_barber","index_start":40,"index_end":49,"line_start":2,"line_end":2},{"type":"password","match":"correcthorsebatterystaple","index_start":51,"index_end":75,"line_start":2,"line_end":2},{"type":"host","match":"cake.gitguardian.com","index_start":77,"index_end":96,"line_start":2,"line_end":2}]}]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]}]'
+      headers:
+        Allow:
+          - POST, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 06 May 2020 09:37:59 GMT
+        Server:
+          - nginx
+        Transfer-Encoding:
+          - chunked
+        Vary:
+          - Accept-Encoding
+          - Cookie
+        X-Frame-Options:
+          - SAMEORIGIN
+        content-length:
+          - "1192"
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -1,0 +1,40 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.0.1 (Linux;py3.8.2)
+        authorization:
+          - Token XXX
+      method: GET
+      uri: https://api.gitguardian.com/v1/health
+    response:
+      body:
+        string: '{"detail":"Valid API key."}'
+      headers:
+        Allow:
+          - GET, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "27"
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 06 May 2020 09:37:58 GMT
+        Server:
+          - nginx
+        Vary:
+          - Cookie
+        X-Frame-Options:
+          - SAMEORIGIN
+      status:
+        code: 200
+        message: OK
+version: 1
