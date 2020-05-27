@@ -18,7 +18,7 @@ class Detail:
         return "{0}:{1}".format(self.status_code, self.detail)
 
     def __bool__(self):
-        return self.success
+        return self.status_code == 200
 
 
 class Match:

@@ -16,7 +16,7 @@ interactions:
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.0.1 (Linux;py3.8.2)
+          - pygitguardian/1.0.1 (Linux;py3.8.3)
         authorization:
           - Token XXX
       method: POST
@@ -24,11 +24,11 @@ interactions:
     response:
       body:
         string:
-          '{"policy_break_count":2,"policies":["Secrets detection","File extensions","Filenames"],"policy_breaks":[{"type":"Basic
+          '{"policy_break_count":2,"policies":["File extensions","Secrets detection","Filenames"],"policy_breaks":[{"type":"Basic
           Auth String","policy":"Secrets detection","matches":[{"type":"username","match":"jen_barber","index_start":40,"index_end":49,"line_start":2,"line_end":2},{"type":"password","match":"correcthorsebatterystaple","index_start":51,"index_end":75,"line_start":2,"line_end":2},{"type":"host","match":"cake.gitguardian.com","index_start":77,"index_end":96,"line_start":2,"line_end":2}]},{"type":".env","policy":"Filenames","matches":[{"type":"filename","match":".env"}]}]}'
       headers:
         Allow:
-          - POST, OPTIONS
+          - OPTIONS, POST
         Connection:
           - keep-alive
         Content-Length:
@@ -36,7 +36,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 06 May 2020 09:37:57 GMT
+          - Wed, 27 May 2020 12:39:26 GMT
         Server:
           - nginx
         Vary:

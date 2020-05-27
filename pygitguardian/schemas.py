@@ -21,8 +21,8 @@ class DocumentSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    filename = fields.String(validate=validate.Length(max=256))
-    document = fields.String(required=True)
+    filename = fields.Str(validate=validate.Length(max=256))
+    document = fields.Str(required=True)
 
     @validates("document")
     def validate_document(self, document: str) -> str:

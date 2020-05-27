@@ -9,11 +9,11 @@ interactions:
         Connection:
           - keep-alive
         User-Agent:
-          - pygitguardian/1.0.1 (Linux;py3.8.2)
+          - pygitguardian/1.0.2 (Linux;py3.8.3)
         authorization:
           - Token XXX
       method: GET
-      uri: https://api.gitguardian.com/doc/static/logo.png
+      uri: https://api.gitguardian.com/docs/static/logo.png
     response:
       body:
         string: !!binary |
@@ -298,11 +298,11 @@ interactions:
         Content-Type:
           - image/png
         Date:
-          - Wed, 06 May 2020 09:37:56 GMT
+          - Wed, 27 May 2020 12:47:58 GMT
         ETag:
-          - '"5eb02fec-3c28"'
+          - '"5ec3eca6-3c28"'
         Last-Modified:
-          - Mon, 04 May 2020 15:08:28 GMT
+          - Tue, 19 May 2020 14:26:46 GMT
         Server:
           - nginx
       status:

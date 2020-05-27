@@ -6,7 +6,12 @@ import requests
 from marshmallow import Schema
 from requests import Response, Session, codes
 
-from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
+from .config import (
+    DEFAULT_API_VERSION,
+    DEFAULT_BASE_URI,
+    DEFAULT_TIMEOUT,
+    MULTI_DOCUMENT_LIMIT,
+)
 from .models import Detail, ScanResult
 from .schemas import DetailSchema, DocumentSchema, ScanResultSchema
 
@@ -154,10 +159,16 @@ class GGClient:
         multi_content_scan handles the /multiscan endpoint of the API
 
         :param documents: List of dictionaries containing the keys document
-        and, optionaly, filename.
+        and, optionally, filename.
             example: [{"document":"example content","filename":"intro.py"}]
         :return: Detail or ScanResult response and status code
         """
+        if len(documents) > MULTI_DOCUMENT_LIMIT:
+            raise ValueError(
+                "too many documents submitted for scan (max={0})".format(
+                    MULTI_DOCUMENT_LIMIT
+                )
+            )
 
         if all(isinstance(doc, dict) for doc in documents):
             request_obj = self.DOCUMENT_SCHEMA.load(documents, many=True)

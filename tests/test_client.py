@@ -1,11 +1,13 @@
 import json
 import os
 from collections import namedtuple
+from unittest.mock import patch
 
+from marshmallow import ValidationError
 from vcr_unittest import VCRTestCase
 
 from pygitguardian import GGClient, ScanResultSchema
-from pygitguardian.config import DEFAULT_BASE_URI
+from pygitguardian.config import DEFAULT_BASE_URI, DOCUMENT_SIZE_THRESHOLD_BYTES
 
 
 FILENAME = ".env"
@@ -241,6 +243,7 @@ class TestClient(VCRTestCase):
         self.assertEqual(status_code, 200)
         self.assertEqual(health.detail, "Valid API key.")
         self.assertEqual(str(health), "200:Valid API key.")
+        self.assertEqual(bool(health), True)
         if not self.live_server:
             self.assertEqual(len(self.cassette), 1)
             self.assertEqual(
@@ -249,7 +252,7 @@ class TestClient(VCRTestCase):
 
     def test_assert_content_type(self):
         with self.assertRaises(TypeError):
-            self.client.get(endpoint="/doc/static/logo.png", schema=None, version=None)
+            self.client.get(endpoint="/docs/static/logo.png", schema=None, version=None)
 
     def test_content_scan(self):
         scan_result, status_code = self.client.content_scan(
@@ -275,29 +278,78 @@ class TestClient(VCRTestCase):
             )
 
     def test_multi_content_scan(self):
-        req = [
-            {"filename": FILENAME, "document": DOCUMENT},
-            {"document": DOCUMENT},
-            {"filename": "normal", "document": "normal"},
+        TestEntry = namedtuple("TestEntry", "name, input, expected")
+        test_data = [
+            TestEntry(
+                "with breaks",
+                [
+                    {"filename": FILENAME, "document": DOCUMENT},
+                    {"document": DOCUMENT},
+                    {"filename": "normal", "document": "normal"},
+                ],
+                EXAMPLE_RESPONSE,
+            ),
+            TestEntry("max size array", [{"document": "valid"}] * 20, None),
         ]
-        scan_results, status_code = self.client.multi_content_scan(req)
-        self.assertEqual(status_code, 200)
-        self.assertEqual(type(scan_results), list)
-        example_dict = json.loads(EXAMPLE_RESPONSE)
-        for i, scan_result in enumerate(scan_results):
-            self.assertEqual(
-                all(
-                    elem in example_dict[i]["policies"] for elem in scan_result.policies
-                ),
-                True,
-            )
-            self.assertEqual(
-                scan_result.policy_break_count, example_dict[i]["policy_break_count"]
-            )
 
-            if not self.live_server:
-                self.assertEqual(len(self.cassette), 1)
-                self.assertEqual(
-                    self.cassette.requests[0].uri,
-                    "https://api.gitguardian.com/v1/multiscan",
-                )
+        for entry in test_data:
+            with self.subTest(msg=entry.name):
+                scan_results, status_code = self.client.multi_content_scan(entry.input)
+                self.assertEqual(status_code, 200)
+                self.assertEqual(type(scan_results), list)
+                example_dict = json.loads(EXAMPLE_RESPONSE)
+                for i, scan_result in enumerate(scan_results):
+                    if entry.expected:
+                        self.assertEqual(
+                            all(
+                                elem in example_dict[i]["policies"]
+                                for elem in scan_result.policies
+                            ),
+                            True,
+                        )
+                        self.assertEqual(
+                            scan_result.policy_break_count,
+                            example_dict[i]["policy_break_count"],
+                        )
+
+                if not self.live_server:
+                    self.assertEqual(len(self.cassette), 2)
+                    self.assertEqual(
+                        self.cassette.requests[0].uri,
+                        "https://api.gitguardian.com/v1/multiscan",
+                    )
+
+    @patch("pygitguardian.config.DOCUMENT_SIZE_THRESHOLD_BYTES", 20)
+    def test_content_scan_exceptions(self):
+        TestEntry = namedtuple("TestEntry", "name, input, exception, regex")
+        test_data = [
+            TestEntry(
+                "too large file",
+                "a" * (DOCUMENT_SIZE_THRESHOLD_BYTES + 1),
+                ValidationError,
+                "file exceeds the maximum allowed size",
+            ),
+            TestEntry(
+                "invalid type",
+                "dwhewe\x00ddw",
+                ValidationError,
+                "document has null characters",
+            ),
+        ]
+
+        for entry in test_data:
+            with self.subTest(msg=entry.name):
+                with self.assertRaisesRegex(entry.exception, entry.regex):
+                    self.client.content_scan(entry.input)
+
+    def test_multi_content_exceptions(self):
+        TestEntry = namedtuple("TestEntry", "name, input, exception")
+        test_data = [
+            TestEntry("too large array", [{"document": "valid"}] * 21, ValueError),
+            TestEntry("invalid type", [("tuple"), {"document": "valid"}], TypeError),
+        ]
+
+        for entry in test_data:
+            with self.subTest(msg=entry.name):
+                with self.assertRaises(entry.exception):
+                    self.client.multi_content_scan(entry.input)
