@@ -297,9 +297,9 @@ class TestClient(VCRTestCase):
                 scan_results, status_code = self.client.multi_content_scan(entry.input)
                 self.assertEqual(status_code, 200)
                 self.assertEqual(type(scan_results), list)
-                example_dict = json.loads(EXAMPLE_RESPONSE)
                 for i, scan_result in enumerate(scan_results):
                     if entry.expected:
+                        example_dict = json.loads(entry.expected)
                         self.assertEqual(
                             all(
                                 elem in example_dict[i]["policies"]
