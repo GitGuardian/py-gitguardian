@@ -26,7 +26,7 @@ setup(
     version=__version__,
     packages=find_packages(exclude=["tests"]),
     description=readme(),
-    install_requires=["marshmallow", "requests"],
+    install_requires=["marshmallow>=3.5", "requests>=2"],
     include_package_data=True,
     author="GitGuardian",
     author_email="support@gitguardian.com",

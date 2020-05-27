@@ -7,7 +7,7 @@ from requests import codes
 from pygitguardian import GGClient
 
 
-API_KEY = os.getenv("GG_APIKEY")
+API_KEY = os.getenv("GG_API_KEY")
 FILENAME = ".env"
 DOCUMENT = """
     import urllib.request

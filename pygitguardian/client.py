@@ -6,13 +6,9 @@ import requests
 from marshmallow import Schema
 from requests import Response, Session, codes
 
+from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
 from .models import Detail, ScanResult
 from .schemas import DetailSchema, DocumentSchema, ScanResultSchema
-
-
-_BASE_URI = "https://api.gitguardian.com"
-_API_VERSION = "v1"
-_DEFAULT_TIMEOUT = 20.0  # 20s default timeout
 
 
 class GGClient:
@@ -27,7 +23,7 @@ class GGClient:
         base_uri: Optional[str] = None,
         session: Optional[requests.Session] = None,
         user_agent: Optional[str] = None,
-        timeout: Optional[float] = _DEFAULT_TIMEOUT,
+        timeout: Optional[float] = DEFAULT_TIMEOUT,
     ) -> "GGClient":
         """
         :param token: APIKey to be added to requests
@@ -43,7 +39,7 @@ class GGClient:
             if not base_uri.startswith(("http://", "https://")):
                 raise ValueError("Invalid protocol, prepend with http:// or https://")
         else:
-            base_uri = _BASE_URI
+            base_uri = DEFAULT_BASE_URI
 
         if not isinstance(token, str):
             raise TypeError("Missing token string")
@@ -70,7 +66,7 @@ class GGClient:
         method: str,
         endpoint: str,
         schema: Schema = None,
-        version: str = _API_VERSION,
+        version: str = DEFAULT_API_VERSION,
         many: bool = False,
         **kwargs
     ) -> Tuple[Any, Response]:
@@ -104,7 +100,7 @@ class GGClient:
         endpoint: str,
         data: str = None,
         schema: Schema = None,
-        version: str = _API_VERSION,
+        version: str = DEFAULT_API_VERSION,
         many: bool = False,
         **kwargs
     ) -> Tuple[Any, Response]:
@@ -122,7 +118,7 @@ class GGClient:
         self,
         endpoint: str,
         schema: Schema = None,
-        version: str = _API_VERSION,
+        version: str = DEFAULT_API_VERSION,
         many: bool = False,
         **kwargs
     ) -> Tuple[Any, Response]:
@@ -166,7 +162,7 @@ class GGClient:
         if all(isinstance(doc, dict) for doc in documents):
             request_obj = self.DOCUMENT_SCHEMA.load(documents, many=True)
         else:
-            raise TypeError("documents must be a dict")
+            raise TypeError("each document must be a dict")
 
         obj, resp = self.post(
             endpoint="multiscan",

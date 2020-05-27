@@ -1,0 +1,5 @@
+DEFAULT_BASE_URI = "https://api.gitguardian.com"
+DEFAULT_API_VERSION = "v1"
+DEFAULT_TIMEOUT = 20.0  # 20s default timeout
+
+DOCUMENT_SIZE_THRESHOLD_BYTES = 1048576  # 1MB

@@ -13,10 +13,8 @@ from marshmallow import (
     validates,
 )
 
+from .config import DOCUMENT_SIZE_THRESHOLD_BYTES
 from .models import Detail, Match, PolicyBreak, ScanResult
-
-
-MB = 1048576
 
 
 class DocumentSchema(Schema):
@@ -32,13 +30,15 @@ class DocumentSchema(Schema):
         validate that document is smaller than scan limit
         """
         encoded = document.encode("utf-8")
-        if len(encoded) > MB:
+        if len(encoded) > DOCUMENT_SIZE_THRESHOLD_BYTES:
             raise ValidationError(
-                "This file exceeds the maximum allowed size of {}B".format(MB)
+                "file exceeds the maximum allowed size of {}B".format(
+                    DOCUMENT_SIZE_THRESHOLD_BYTES
+                )
             )
 
         if "\x00" in document:
-            raise ValidationError("Document has null characters")
+            raise ValidationError("document has null characters")
 
         return document
 

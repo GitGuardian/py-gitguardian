@@ -5,7 +5,7 @@ from collections import namedtuple
 from vcr_unittest import VCRTestCase
 
 from pygitguardian import GGClient, ScanResultSchema
-from pygitguardian.client import _BASE_URI
+from pygitguardian.config import DEFAULT_BASE_URI
 
 
 FILENAME = ".env"
@@ -225,7 +225,7 @@ class TestClient(VCRTestCase):
                     if entry.uri:
                         self.assertEqual(client.base_uri, entry.uri)
                     else:
-                        self.assertEqual(client.base_uri, _BASE_URI)
+                        self.assertEqual(client.base_uri, DEFAULT_BASE_URI)
                     self.assertEqual(client.token, entry.token)
                     self.assertTrue(
                         entry.user_agent in client.session.headers["User-Agent"],

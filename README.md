@@ -33,11 +33,13 @@ pipenv install pygitguardian
 poetry add pygitguardian
 ```
 
-Check [examples/content_scan.py](examples/content_scan.py) for an example usage of the API.
+## Examples
+
+Check [examples/](examples/) for an example usages of the API.
 
 ### Dependencies
 
-Py-gitguardian depends on these excelent libraries:
+Py-gitguardian depends on these excellent libraries:
 
 - `requests` - HTTP client
 - `marshmallow` - Request (de)serialization and input validation
