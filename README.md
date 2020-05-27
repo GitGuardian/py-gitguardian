@@ -35,7 +35,7 @@ poetry add pygitguardian
 
 ## Examples
 
-Check [examples/](examples/) for an example usages of the API.
+Check [examples/](examples/) for full examples on how to use py-gitguardian.
 
 ### Scanning text content
 
