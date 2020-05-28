@@ -80,6 +80,19 @@ for name in glob.glob("**/*"):
 scan, status_code = client.multi_content_scan(to_scan)
 ```
 
+### Transform results to dict or JSON
+
+Any model in `py-gitguardian` can be turned to a JSON string or a dictionary using
+the `to_dict` and `to_json` methods.
+
+```py
+from pygitguardian.models import Detail
+
+detail = Detail("Invalid API Key.")
+print(detail.to_dict())
+print(detail.to_json())
+```
+
 ### Dependencies
 
 Py-gitguardian depends on these excellent libraries:

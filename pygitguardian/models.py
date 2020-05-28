@@ -152,6 +152,7 @@ class Match(Base):
         index_end: Optional[int] = None,
         **kwargs
     ):
+        super().__init__()
         self.match = match
         self.match_type = match_type
         self.line_start = line_start
@@ -198,6 +199,7 @@ class PolicyBreak(Base):
     SCHEMA = PolicyBreakSchema()
 
     def __init__(self, break_type: str, policy: str, matches: List[Match], **kwargs):
+        super().__init__()
         self.break_type = break_type
         self.policy = policy
         self.matches = matches
