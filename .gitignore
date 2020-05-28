@@ -121,3 +121,4 @@ secret.py
 secrets
 
 Pipfile.lock
+dist/

@@ -1,4 +1,4 @@
-<img src="./doc/logo.svg">
+<img src="https://cdn.jsdelivr.net/gh/gitguardian/py-gitguardian/doc/logo.svg">
 
 # GitGuardian API Client
 
