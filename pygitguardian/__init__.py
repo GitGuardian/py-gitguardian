@@ -1,10 +1,17 @@
 """PyGitGuardian API Client"""
 from .client import GGClient
-from .models import Detail, Match, PolicyBreak, ScanResult
-from .schemas import DetailSchema, DocumentSchema, ScanResultSchema
+from .models import (
+    Detail,
+    DetailSchema,
+    DocumentSchema,
+    Match,
+    PolicyBreak,
+    ScanResult,
+    ScanResultSchema,
+)
 
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 GGClient._version = __version__
 
 __all__ = [

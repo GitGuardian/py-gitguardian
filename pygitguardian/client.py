@@ -1,9 +1,8 @@
 import platform
 import urllib.parse
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Dict, Iterable, Optional, Union
 
 import requests
-from marshmallow import Schema
 from requests import Response, Session, codes
 
 from .config import (
@@ -12,26 +11,22 @@ from .config import (
     DEFAULT_TIMEOUT,
     MULTI_DOCUMENT_LIMIT,
 )
-from .models import Detail, ScanResult
-from .schemas import DetailSchema, DocumentSchema, ScanResultSchema
+from .models import Detail, Document, MultiScanResult, ScanResult
 
 
 class GGClient:
-    DETAIL_SCHEMA = DetailSchema()
-    DOCUMENT_SCHEMA = DocumentSchema()
-    SCAN_RESULT_SCHEMA = ScanResultSchema()
     _version = "undefined"
 
     def __init__(
         self,
-        token: str,
+        api_key: str,
         base_uri: Optional[str] = None,
         session: Optional[requests.Session] = None,
         user_agent: Optional[str] = None,
         timeout: Optional[float] = DEFAULT_TIMEOUT,
     ) -> "GGClient":
         """
-        :param token: APIKey to be added to requests
+        :param api_key: API Key to be added to requests
         :param base_uri: Base URI for the API, defaults to "https://api.gitguardian.com"
         :param session: custom requests session, defaults to requests.Session()
         :param user_agent: user agent to identify requests, defaults to ""
@@ -46,11 +41,11 @@ class GGClient:
         else:
             base_uri = DEFAULT_BASE_URI
 
-        if not isinstance(token, str):
-            raise TypeError("Missing token string")
+        if not isinstance(api_key, str):
+            raise TypeError("api_key is not a string")
 
         self.base_uri = base_uri
-        self.token = token
+        self.api_key = api_key
         self.session = (
             session if session is isinstance(session, Session) else requests.Session()
         )
@@ -63,77 +58,64 @@ class GGClient:
             self.user_agent = " ".join([self.user_agent, user_agent])
 
         self.session.headers.update(
-            {"User-Agent": self.user_agent, "Authorization": "Token {0}".format(token)}
+            {
+                "User-Agent": self.user_agent,
+                "Authorization": "Token {0}".format(api_key),
+            }
         )
 
     def request(
-        self,
-        method: str,
-        endpoint: str,
-        schema: Schema = None,
-        version: str = DEFAULT_API_VERSION,
-        many: bool = False,
-        **kwargs
-    ) -> Tuple[Any, Response]:
+        self, method: str, endpoint: str, version: str = DEFAULT_API_VERSION, **kwargs
+    ) -> Response:
         if version:
             endpoint = urllib.parse.urljoin(version + "/", endpoint)
 
         url = urllib.parse.urljoin(self.base_uri, endpoint)
 
-        response = self.session.request(
+        resp = self.session.request(
             method=method, url=url, timeout=self.timeout, **kwargs
         )
 
-        if response.headers["content-type"] != "application/json":
+        if resp.headers["content-type"] != "application/json":
             raise TypeError("Response is not JSON")
 
-        if response.status_code == codes.ok and schema:
-            obj = schema.load(response.json(), many=many)
-            if many:
-                for element in obj:
-                    element.status_code = response.status_code
-            else:
-                obj.status_code = response.status_code
-        else:
-            obj = self.DETAIL_SCHEMA.load(response.json())
-            obj.status_code = response.status_code
-
-        return obj, response
+        return resp
 
     def post(
         self,
         endpoint: str,
         data: str = None,
-        schema: Schema = None,
         version: str = DEFAULT_API_VERSION,
-        many: bool = False,
         **kwargs
-    ) -> Tuple[Any, Response]:
+    ) -> Response:
         return self.request(
-            "post",
-            endpoint=endpoint,
-            schema=schema,
-            json=data,
-            version=version,
-            many=many,
-            **kwargs,
+            "post", endpoint=endpoint, json=data, version=version, **kwargs,
         )
 
     def get(
-        self,
-        endpoint: str,
-        schema: Schema = None,
-        version: str = DEFAULT_API_VERSION,
-        many: bool = False,
-        **kwargs
-    ) -> Tuple[Any, Response]:
-        return self.request(
-            method="get", endpoint=endpoint, schema=schema, version=version, **kwargs
-        )
+        self, endpoint: str, version: str = DEFAULT_API_VERSION, **kwargs
+    ) -> Response:
+        return self.request(method="get", endpoint=endpoint, version=version, **kwargs)
+
+    def health_check(self) -> Detail:
+        """
+        health_check handles the /health endpoint of the API
+
+        use Detail.status_code to check the response status code of the API
+
+        200 if server is online and api_key is valid
+        :return: Detail response and status code
+        """
+        resp = self.get(endpoint="health")
+
+        obj = Detail.SCHEMA.load(resp.json())
+        obj.status_code = resp.status_code
+
+        return obj
 
     def content_scan(
         self, document: str, filename: Optional[str] = None
-    ) -> Tuple[Union[Detail, ScanResult], int]:
+    ) -> Union[Detail, ScanResult]:
         """
         content_scan handles the /scan endpoint of the API
 
@@ -146,15 +128,21 @@ class GGClient:
         if filename:
             doc_dict["filename"] = filename
 
-        request_obj = self.DOCUMENT_SCHEMA.load(doc_dict)
-        obj, resp = self.post(
-            endpoint="scan", data=request_obj, schema=self.SCAN_RESULT_SCHEMA
-        )
-        return obj, resp.status_code
+        request_obj = Document.SCHEMA.load(doc_dict)
+
+        resp = self.post(endpoint="scan", data=request_obj)
+        if resp.status_code == codes.ok:
+            obj = ScanResult.SCHEMA.load(resp.json())
+        else:
+            obj = Detail.SCHEMA.load(resp.json())
+
+        obj.status_code = resp.status_code
+
+        return obj
 
     def multi_content_scan(
         self, documents: Iterable[Dict[str, str]],
-    ) -> Tuple[Union[Detail, List[ScanResult]], int]:
+    ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API
 
@@ -171,26 +159,17 @@ class GGClient:
             )
 
         if all(isinstance(doc, dict) for doc in documents):
-            request_obj = self.DOCUMENT_SCHEMA.load(documents, many=True)
+            request_obj = Document.SCHEMA.load(documents, many=True)
         else:
             raise TypeError("each document must be a dict")
 
-        obj, resp = self.post(
-            endpoint="multiscan",
-            data=request_obj,
-            schema=self.SCAN_RESULT_SCHEMA,
-            many=True,
-        )
-        return obj, resp.status_code
+        resp = self.post(endpoint="multiscan", data=request_obj)
 
-    def health_check(self) -> Tuple[Detail, int]:
-        """
-        health_check handles the /health endpoint of the API
+        if resp.status_code == codes.ok:
+            obj = MultiScanResult.SCHEMA.load(dict(scan_results=resp.json()))
+        else:
+            obj = Detail.SCHEMA.load(resp.json())
 
-        use Detail.status_code to check the response status code of the API
+        obj.status_code = resp.status_code
 
-        200 if server is online and token is valid
-        :return: Detail response and status code
-        """
-        obj, resp = self.get(endpoint="health")
-        return obj, resp.status_code
+        return obj

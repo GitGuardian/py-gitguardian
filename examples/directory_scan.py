@@ -9,7 +9,7 @@ from pygitguardian.config import MULTI_DOCUMENT_LIMIT
 
 API_KEY = os.getenv("GG_API_KEY")
 
-client = GGClient(token=API_KEY)
+client = GGClient(api_key=API_KEY)
 
 # Create a list of dictionaries for scanning
 to_scan = []

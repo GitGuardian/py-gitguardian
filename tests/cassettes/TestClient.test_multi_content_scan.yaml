@@ -19,7 +19,7 @@ interactions:
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.0.1 (Linux;py3.8.3)
+          - pygitguardian/1.0.2 (Linux;py3.8.3)
         authorization:
           - Token XXX
       method: POST
@@ -40,7 +40,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 27 May 2020 12:40:25 GMT
+          - Thu, 28 May 2020 10:01:04 GMT
         Server:
           - nginx
         Transfer-Encoding:
@@ -75,7 +75,7 @@ interactions:
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.0.1 (Linux;py3.8.3)
+          - pygitguardian/1.0.2 (Linux;py3.8.3)
         authorization:
           - Token XXX
       method: POST
@@ -111,7 +111,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Wed, 27 May 2020 12:40:26 GMT
+          - Thu, 28 May 2020 10:01:05 GMT
         Server:
           - nginx
         Transfer-Encoding:

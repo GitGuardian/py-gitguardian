@@ -13,7 +13,7 @@ Python 3.5+
 
 ## Getting started
 
-You can obtain tokens for API usage on your [dashboard](https://dashboard.gitguardian.com/api).
+You can obtain API keys for API usage on your [dashboard](https://dashboard.gitguardian.com/api).
 
 **pip**
 
@@ -48,9 +48,9 @@ DOCUMENT = """
     consume(response.read())"
 """
 
-client = GGClient(token=API_KEY)
+client = GGClient(api_key=API_KEY)
 
-# Check the health of the API and the token used.
+# Check the health of the API and the API key used.
 health_obj, status = client.health_check()
 
 if status != codes[r"\o/"]:  # this is 200 but cooler
@@ -70,7 +70,7 @@ print("Scan results:", scan_result.has_secrets, "-", scan_result.policy_break_co
 
 ```py
 API_KEY = os.getenv("GG_API_KEY")
-client = GGClient(token=API_KEY)
+client = GGClient(api_key=API_KEY)
 # Create a list of dictionaries for scanning
 to_scan = []
 for name in glob.glob("**/*"):

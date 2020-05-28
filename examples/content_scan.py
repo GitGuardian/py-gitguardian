@@ -16,9 +16,9 @@ DOCUMENT = """
     consume(response.read())"
 """
 
-client = GGClient(token=API_KEY)
+client = GGClient(api_key=API_KEY)
 
-# Check the health of the API and the token used.
+# Check the health of the API and the API key used.
 health_obj, status = client.health_check()
 
 if status == codes[r"\o/"]:  # this is 200 but cooler
