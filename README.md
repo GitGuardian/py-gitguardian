@@ -40,6 +40,7 @@ Check [examples/](examples/) for full examples on how to use py-gitguardian.
 ### Scanning text content
 
 ```py
+# please don't hardcode your gg_api_key in source code :) 
 API_KEY = os.getenv("GG_API_KEY")
 DOCUMENT = """
     import urllib.request
