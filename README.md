@@ -13,7 +13,7 @@ Python 3.5+
 
 ## Getting started
 
-You can obtain API keys for API usage on your [dashboard](https://dashboard.gitguardian.com/api).
+You can obtain API keys for API usage on your [dashboard](https://dashboard.gitguardian.com/api/v1/auth/user/github_login/authorize?utm_source=github&utm_medium=py_gitguardian&utm_campaign=py1).
 
 **pip**
 
