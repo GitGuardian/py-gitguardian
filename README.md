@@ -2,6 +2,11 @@
 
 # GitGuardian API Client
 
+![Main](https://github.com/GitGuardian/py-gitguardian/workflows/Main/badge.svg)
+[![GitHub license](https://img.shields.io/github/license/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/blob/master/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/stargazers)
+[![CodeFactor](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian/badge)](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian)
+
 API client library for the GitGuardian API.
 
 You can check API details [here](https://api.gitguardian.com/docs)
