@@ -4,7 +4,7 @@
 
 API client library for the GitGuardian API.
 
-You can check API details [here](https://api.gitguardian.com/doc)
+You can check API details [here](https://api.gitguardian.com/docs)
 with all the response codes and expected structures on each method.
 
 ## Requirements
@@ -40,7 +40,7 @@ Check [examples/](examples/) for full examples on how to use py-gitguardian.
 ### Scanning text content
 
 ```py
-# please don't hardcode your gg_api_key in source code :) 
+# please don't hardcode your gg_api_key in source code :)
 API_KEY = os.getenv("GG_API_KEY")
 DOCUMENT = """
     import urllib.request
