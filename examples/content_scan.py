@@ -19,9 +19,9 @@ DOCUMENT = """
 client = GGClient(api_key=API_KEY)
 
 # Check the health of the API and the API key used.
-health_obj, status = client.health_check()
+health_obj = client.health_check()
 
-if status == codes[r"\o/"]:  # this is 200 but cooler
+if health_obj.status_code == codes[r"\o/"]:  # this is 200 but cooler
     try:
         scan_result = client.content_scan(filename=FILENAME, document=DOCUMENT)
     except Exception as exc:
