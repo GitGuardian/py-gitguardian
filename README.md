@@ -57,19 +57,16 @@ DOCUMENT = """
 client = GGClient(api_key=API_KEY)
 
 # Check the health of the API and the API key used.
-health_obj, status = client.health_check()
-
-if status != codes[r"\o/"]:  # this is 200 but cooler
+if client.health_check().success:
+    try:
+        scan_result = client.content_scan(DOCUMENT)
+    except Exception as exc:
+        # Handle exceptions such as schema validation
+        traceback.print_exc(2, file=sys.stderr)
+        print(str(exc))
+        print(scan_result)
+else:
     print("Invalid API Key")
-
-try:
-    scan_result = client.content_scan(DOCUMENT)
-except Exception as exc:
-    # Handle exceptions such as schema validation
-    traceback.print_exc(2, file=sys.stderr)
-    print(str(exc))
-
-print("Scan results:", scan_result.has_secrets, "-", scan_result.policy_break_count)
 ```
 
 ### Scanning multiple files
@@ -79,11 +76,11 @@ API_KEY = os.getenv("GG_API_KEY")
 client = GGClient(api_key=API_KEY)
 # Create a list of dictionaries for scanning
 to_scan = []
-for name in glob.glob("**/*"):
+for name in glob.glob("**/*", recursive=True):
     with open(name) as fn:
         to_scan.append({"document": fn.read(), "filename": os.path.basename(name)})
 
-scan, status_code = client.multi_content_scan(to_scan)
+scan = client.multi_content_scan(to_scan)
 ```
 
 ### Transform results to dict or JSON
