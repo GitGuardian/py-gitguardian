@@ -7,7 +7,11 @@
 [![GitHub stars](https://img.shields.io/github/stars/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/stargazers)
 [![CodeFactor](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian/badge)](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian)
 
-API client library for the GitGuardian API.
+API client library for the [GitGuardian API](https://api.gitguardian.com/).
+
+The GitGuardian API puts at your fingertips the power to detect more than 200 types of secrets in any text content, as well as other potential security vulnerabilities.
+
+**py-gitguardian** can be used create integrations to scan various sources, from your workstation's filesystem to your favorite chat application.
 
 You can check API details [here](https://api.gitguardian.com/docs)
 with all the response codes and expected structures on each method.
