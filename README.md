@@ -6,6 +6,7 @@
 [![GitHub license](https://img.shields.io/github/license/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/blob/master/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/stargazers)
 [![CodeFactor](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian/badge)](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian)
+[![codecov.io](https://codecov.io/github/GitGuardian/py-gitguardian/coverage.svg?branch=master)](https://codecov.io/github/GitGuardian/py-gitguardian?branch=master)
 
 API client library for the [GitGuardian API](https://api.gitguardian.com/).
 
