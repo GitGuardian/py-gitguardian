@@ -2,11 +2,12 @@
 
 # GitGuardian API Client
 
-![Main](https://github.com/GitGuardian/py-gitguardian/workflows/Main/badge.svg)
-[![GitHub license](https://img.shields.io/github/license/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/blob/master/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/GitGuardian/py-gitguardian)](https://github.com/GitGuardian/py-gitguardian/stargazers)
-[![CodeFactor](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian/badge)](https://www.codefactor.io/repository/github/gitguardian/py-gitguardian)
-[![codecov.io](https://codecov.io/github/GitGuardian/py-gitguardian/coverage.svg?branch=master)](https://codecov.io/github/GitGuardian/py-gitguardian?branch=master)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/GitGuardian/py-gitguardian/Main?color=%231B2D55&style=for-the-badge)
+![PyPI](https://img.shields.io/pypi/v/pygitguardian?color=%231B2D55&style=for-the-badge)
+![GitHub](https://img.shields.io/github/license/GitGuardian/py-gitguardian?color=%231B2D55&style=for-the-badge)
+![GitHub stars](https://img.shields.io/github/stars/gitguardian/py-gitguardian?color=%231B2D55&style=for-the-badge)
+![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/gitguardian/py-gitguardian?color=%231B2D55&style=for-the-badge)
+![Codecov](https://img.shields.io/codecov/c/github/GitGuardian/py-gitguardian?color=%231B2D55&style=for-the-badge)
 
 API client library for the [GitGuardian API](https://api.gitguardian.com/).
 
