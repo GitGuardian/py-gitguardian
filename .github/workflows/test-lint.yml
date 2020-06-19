@@ -45,7 +45,7 @@ jobs:
           pipenv install --system --dev --skip-lock
       - name: Test with pytest
         run: |
-          pipenv run coverage run --source pygitguardian -m nose tests
+          pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings
           pipenv run coverage report --fail-under=80
           pipenv run coverage xml
       - uses: codecov/codecov-action@v1

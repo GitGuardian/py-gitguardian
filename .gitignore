@@ -115,6 +115,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Pylinting
+.mypy_cache
+
 # Catch sensitive files
 .env
 secrets.py

@@ -23,7 +23,7 @@ pipenv run pre-commit install -f --hook-type commit-msg --hook-type pre-commit
 
 ## Testing
 
-Pygitguardian testing is done with `nosetest`. You should make sure your changes don't report any error on
+Pygitguardian testing is done with `pytest`. You should make sure your changes don't report any error on:
 
 ```
 make test

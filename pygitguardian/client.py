@@ -1,6 +1,6 @@
 import platform
 import urllib.parse
-from typing import Dict, Iterable, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import requests
 from requests import Response, Session, codes
@@ -24,7 +24,7 @@ class GGClient:
         session: Optional[requests.Session] = None,
         user_agent: Optional[str] = None,
         timeout: Optional[float] = DEFAULT_TIMEOUT,
-    ) -> "GGClient":
+    ):
         """
         :param api_key: API Key to be added to requests
         :param base_uri: Base URI for the API, defaults to "https://api.gitguardian.com"
@@ -65,7 +65,11 @@ class GGClient:
         )
 
     def request(
-        self, method: str, endpoint: str, version: str = DEFAULT_API_VERSION, **kwargs
+        self,
+        method: str,
+        endpoint: str,
+        version: Optional[str] = DEFAULT_API_VERSION,
+        **kwargs
     ) -> Response:
         if version:
             endpoint = urllib.parse.urljoin(version + "/", endpoint)
@@ -93,7 +97,7 @@ class GGClient:
         )
 
     def get(
-        self, endpoint: str, version: str = DEFAULT_API_VERSION, **kwargs
+        self, endpoint: str, version: Optional[str] = DEFAULT_API_VERSION, **kwargs
     ) -> Response:
         return self.request(method="get", endpoint=endpoint, version=version, **kwargs)
 
@@ -141,7 +145,7 @@ class GGClient:
         return obj
 
     def multi_content_scan(
-        self, documents: Iterable[Dict[str, str]],
+        self, documents: List[Dict[str, str]],
     ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API

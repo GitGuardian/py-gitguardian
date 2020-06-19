@@ -1,0 +1,144 @@
+interactions:
+  - request:
+      body:
+        '[{"document": "valid"}, {"document": "valid"}, {"document": "valid"}, {"document":
+        "valid"}, {"document": "valid"}, {"document": "valid"}, {"document": "valid"},
+        {"document": "valid"}, {"document": "valid"}, {"document": "valid"}, {"document":
+        "valid"}, {"document": "valid"}, {"document": "valid"}, {"document": "valid"},
+        {"document": "valid"}, {"document": "valid"}, {"document": "valid"}, {"document":
+        "valid"}, {"document": "valid"}, {"document": "valid"}]'
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "460"
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.1.0 (Linux;py3.8.3)
+      method: POST
+      uri: https://api.gitguardian.com/v1/multiscan
+    response:
+      body:
+        string:
+          '[{"policy_break_count":0,"policies":["Secrets detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]}]'
+      headers:
+        Allow:
+          - OPTIONS, POST
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 19 Jun 2020 14:57:18 GMT
+        Server:
+          - nginx
+        Transfer-Encoding:
+          - chunked
+        Vary:
+          - Accept-Encoding
+          - Cookie
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        content-length:
+          - "2141"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '[{"document": "valid"}, {"document": "valid"}, {"document": "valid"}, {"document":
+        "valid"}, {"document": "valid"}, {"document": "valid"}, {"document": "valid"},
+        {"document": "valid"}, {"document": "valid"}, {"document": "valid"}, {"document":
+        "valid"}, {"document": "valid"}, {"document": "valid"}, {"document": "valid"},
+        {"document": "valid"}, {"document": "valid"}, {"document": "valid"}, {"document":
+        "valid"}, {"document": "valid"}, {"document": "valid"}]'
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "460"
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.1.0 (Linux;py3.8.3)
+      method: POST
+      uri: https://api.gitguardian.com/v1/multiscan
+    response:
+      body:
+        string:
+          '[{"policy_break_count":0,"policies":["Secrets detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]},{"policy_break_count":0,"policies":["Secrets
+          detection","File extensions","Filenames"],"policy_breaks":[]}]'
+      headers:
+        Allow:
+          - OPTIONS, POST
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 19 Jun 2020 14:58:38 GMT
+        Server:
+          - nginx
+        Transfer-Encoding:
+          - chunked
+        Vary:
+          - Accept-Encoding
+          - Cookie
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        content-length:
+          - "2141"
+      status:
+        code: 200
+        message: OK
+version: 1

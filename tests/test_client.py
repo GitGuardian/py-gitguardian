@@ -1,14 +1,19 @@
 import json
-import os
-from collections import namedtuple
+from typing import Dict, List
 from unittest.mock import patch
 
+import pytest
 from marshmallow import ValidationError
-from vcr_unittest import VCRTestCase
 
 from pygitguardian import GGClient
-from pygitguardian.config import DEFAULT_BASE_URI, DOCUMENT_SIZE_THRESHOLD_BYTES
-from pygitguardian.models import Detail, MultiScanResult, ScanResultSchema
+from pygitguardian.config import (
+    DEFAULT_BASE_URI,
+    DOCUMENT_SIZE_THRESHOLD_BYTES,
+    MULTI_DOCUMENT_LIMIT,
+)
+from pygitguardian.models import Detail, MultiScanResult, ScanResult
+
+from .conftest import base_uri, my_vcr
 
 
 FILENAME = ".env"
@@ -136,254 +141,265 @@ VCR_BASE_CONF = {
 }
 
 
-class TestClient(VCRTestCase):
-    def _get_vcr_kwargs(self, **kwargs):
-        return {**kwargs, **VCR_BASE_CONF}
-
-    def setUp(self):
-        self.live_server = os.environ.get("TEST_LIVE_SERVER", "false").lower() == "true"
-        if not self.live_server:
-            super().setUp()
-
-        self.api_key = os.environ.get("TEST_LIVE_SERVER_TOKEN", "zeapi_key")
-        self.base_uri = os.environ.get(
-            "TEST_LIVE_SERVER_URL", "https://api.gitguardian.com"
-        )
-
-        self.client = GGClient(base_uri=self.base_uri, api_key=self.api_key)
-
-    def test_client_creation(self):
-        TestEntry = namedtuple(
-            "TestEntry", "name, api_key, uri, user_agent, timeout, exception"
-        )
-        test_data = [
-            TestEntry(
-                name="valid prefix",
-                api_key="validapi_keyforsure",
-                uri="http://fake_uri",
-                user_agent="custom",
-                timeout=30.0,
-                exception=None,
-            ),
-            TestEntry(
-                name="valid - no trailing /",
-                api_key="validapi_keyforsure",
-                uri="https://api.gitguardian.com",
-                user_agent="custom",
-                timeout=30.0,
-                exception=None,
-            ),
-            TestEntry(
-                name="valid - trailing /",
-                api_key="validapi_keyforsure",
-                uri="https://api.gitguardian.com/",
-                user_agent="custom",
-                timeout=30.0,
-                exception=None,
-            ),
-            TestEntry(
-                name="No baseuri",
-                api_key="validapi_keyforsure",
-                uri=None,
-                user_agent="custom",
-                timeout=30.0,
-                exception=None,
-            ),
-            TestEntry(
-                name="No baseuri",
-                api_key=None,
-                uri=None,
-                user_agent="custom",
-                timeout=30.0,
-                exception=TypeError,
-            ),
-            TestEntry(
-                name="invalid prefix",
-                api_key="validapi_keyforsure",
-                uri="fake_uri",
-                user_agent=None,
-                timeout=30.0,
-                exception=ValueError,
-            ),
-        ]
-        for entry in test_data:
-            with self.subTest(msg=entry.name):
-                if entry.exception is not None:
-                    with self.assertRaises(entry.exception):
-                        client = GGClient(
-                            api_key=entry.api_key,
-                            base_uri=entry.uri,
-                            user_agent=entry.user_agent,
-                            timeout=entry.timeout,
-                        )
-                else:
-                    client = GGClient(
-                        base_uri=entry.uri,
-                        api_key=entry.api_key,
-                        user_agent=entry.user_agent,
-                        timeout=entry.timeout,
-                    )
-
-                if entry.exception is None:
-                    if entry.uri:
-                        self.assertEqual(client.base_uri, entry.uri)
-                    else:
-                        self.assertEqual(client.base_uri, DEFAULT_BASE_URI)
-                    self.assertEqual(client.api_key, entry.api_key)
-                    self.assertTrue(
-                        entry.user_agent in client.session.headers["User-Agent"],
-                    )
-                    self.assertEqual(client.timeout, entry.timeout)
-                    self.assertEqual(
-                        client.session.headers["Authorization"],
-                        "Token {0}".format(entry.api_key),
-                    )
-
-    def test_health_check(self):
-        health = self.client.health_check()
-        self.assertEqual(health.status_code, 200)
-        self.assertEqual(health.detail, "Valid API key.")
-        self.assertEqual(str(health), "200:Valid API key.")
-        self.assertEqual(bool(health), True)
-        self.assertEqual(health.success, True)
-
-        self.assertEqual(type(health.to_dict()), dict)
-        self.assertEqual(type(health.to_json()), str)
-        if not self.live_server:
-            self.assertEqual(len(self.cassette), 1)
-            self.assertEqual(
-                self.cassette.requests[0].uri, "https://api.gitguardian.com/v1/health"
+@pytest.mark.parametrize(
+    "api_key, uri, user_agent, timeout, exception",
+    [
+        pytest.param(
+            "validapi_keyforsure",
+            "http://fake_uri",
+            "custom",
+            30.0,
+            None,
+            id="valid prefix",
+        ),
+        pytest.param(
+            "validapi_keyforsure",
+            "https://api.gitguardian.com",
+            "custom",
+            30.0,
+            None,
+            id="valid - no trailing /",
+        ),
+        pytest.param(
+            "validapi_keyforsure",
+            "https://api.gitguardian.com/",
+            "custom",
+            30.0,
+            None,
+            id="valid - trailing /",
+        ),
+        pytest.param(
+            "validapi_keyforsure", None, "custom", 30.0, None, id="No baseuri",
+        ),
+        pytest.param(None, None, "custom", 30.0, TypeError, id="No baseuri",),
+        pytest.param(
+            "validapi_keyforsure",
+            "fake_uri",
+            None,
+            30.0,
+            ValueError,
+            id="invalid prefix",
+        ),
+    ],
+)
+def test_client_creation(
+    api_key: str, uri: str, user_agent: str, timeout: float, exception: Exception
+):
+    if exception is not None:
+        with pytest.raises(exception):
+            client = GGClient(
+                api_key=api_key, base_uri=uri, user_agent=user_agent, timeout=timeout,
             )
+    else:
+        client = GGClient(
+            base_uri=uri, api_key=api_key, user_agent=user_agent, timeout=timeout,
+        )
 
-    def test_assert_content_type(self):
-        with self.assertRaises(TypeError):
-            self.client.get(endpoint="/docs/static/logo.png", version=None)
+    if exception is None:
+        if uri:
+            assert client.base_uri == uri
+        else:
+            assert client.base_uri == DEFAULT_BASE_URI
+        assert client.api_key == api_key
+        assert user_agent in client.session.headers["User-Agent"]
+        assert client.timeout == timeout
+        assert client.session.headers["Authorization"] == "Token {0}".format(api_key)
 
-    def test_content_scan(self):
-        scan_result = self.client.content_scan(filename=FILENAME, document=DOCUMENT)
-        self.assertEqual(type(repr(scan_result)), str)
-        self.assertEqual(type(str(scan_result)), str)
-        self.assertEqual(scan_result.status_code, 200)
-        example_dict = json.loads(EXAMPLE_RESPONSE)[0]
-        scan_dict = json.loads(ScanResultSchema().dumps(scan_result))
 
-        self.assertEqual(
-            all(elem in example_dict["policies"] for elem in scan_dict["policies"]),
+@my_vcr.use_cassette
+def test_health_check(client: GGClient):
+    health = client.health_check()
+    assert health.status_code == 200
+    assert health.detail == "Valid API key."
+    assert str(health) == "200:Valid API key."
+    assert bool(health)
+    assert health.success
+
+    assert type(health.to_dict()) == dict
+    assert type(health.to_json()) == str
+
+
+@pytest.mark.parametrize(
+    "name, to_scan, expected, has_secrets, has_policy_breaks",
+    [
+        pytest.param(
+            "with_breaks",
+            [
+                {"filename": FILENAME, "document": DOCUMENT},
+                {"document": DOCUMENT},
+                {"filename": "normal", "document": "normal"},
+            ],
+            EXAMPLE_RESPONSE,
             True,
-        )
-        self.assertEqual(scan_result.has_secrets, True)
-        self.assertEqual(scan_result.policy_break_count, 2)
+            True,
+            id="with_breaks",
+        ),
+        pytest.param(
+            "max_size_array",
+            [{"document": "valid"}] * MULTI_DOCUMENT_LIMIT,
+            None,
+            False,
+            False,
+            id="max_size_array",
+        ),
+    ],
+)
+@my_vcr.use_cassette
+def test_multi_content_scan(
+    client: GGClient,
+    name: str,
+    to_scan: List[Dict[str, str]],
+    expected: str,
+    has_secrets: bool,
+    has_policy_breaks: bool,
+):
+    with my_vcr.use_cassette(name + ".yaml"):
+        multiscan = client.multi_content_scan(to_scan)
 
-        self.assertEqual(type(scan_result.to_dict()), dict)
-        self.assertEqual(type(scan_result.to_json()), str)
+        assert multiscan.status_code == 200
+        if not isinstance(multiscan, MultiScanResult):
+            pytest.fail("multiscan is not a MultiScanResult")
+            return
 
-        if not self.live_server:
-            self.assertEqual(len(self.cassette), 1)
-            self.assertEqual(
-                self.cassette.requests[0].uri, "https://api.gitguardian.com/v1/scan"
-            )
+        assert type(multiscan.to_dict()) == dict
+        assert type(multiscan.to_json()) == str
+        assert type(repr(multiscan)) == str
+        assert type(str(multiscan)) == str
+        assert multiscan.has_secrets == has_secrets
+        assert multiscan.has_policy_breaks == has_policy_breaks
 
-    def test_multi_content_scan(self):
-        TestEntry = namedtuple("TestEntry", "name, input, expected")
-        test_data = [
-            TestEntry(
-                "with breaks",
-                [
-                    {"filename": FILENAME, "document": DOCUMENT},
-                    {"document": DOCUMENT},
-                    {"filename": "normal", "document": "normal"},
-                ],
-                EXAMPLE_RESPONSE,
-            ),
-            TestEntry("max size array", [{"document": "valid"}] * 20, None),
-        ]
+        for i, scan_result in enumerate(multiscan.scan_results):
+            if expected:
+                example_dict = json.loads(expected)
+                assert all(
+                    elem in example_dict[i]["policies"] for elem in scan_result.policies
+                )
+                assert (
+                    scan_result.policy_break_count
+                    == example_dict[i]["policy_break_count"]
+                )
 
-        for entry in test_data:
-            with self.subTest(msg=entry.name):
-                multiscan = self.client.multi_content_scan(entry.input)
-                if multiscan.status_code != 200:
-                    self.assertEqual(type(multiscan), Detail)
 
-                self.assertEqual(type(multiscan.to_dict()), dict)
-                self.assertEqual(type(multiscan.to_json()), str)
-                self.assertEqual(type(repr(multiscan)), str)
-                self.assertEqual(type(str(multiscan)), str)
-                self.assertEqual(type(multiscan.has_secrets), bool)
-                self.assertEqual(multiscan.status_code, 200)
+@patch("pygitguardian.config.DOCUMENT_SIZE_THRESHOLD_BYTES", 20)
+@pytest.mark.parametrize(
+    "to_scan, exception, regex",
+    [
+        pytest.param(
+            "a" * (DOCUMENT_SIZE_THRESHOLD_BYTES + 1),
+            ValidationError,
+            r"file exceeds the maximum allowed size",
+            id="too large file",
+        ),
+        pytest.param(
+            "dwhewe\x00ddw",
+            ValidationError,
+            r"document has null characters",
+            id="invalid type",
+        ),
+    ],
+)
+def test_content_scan_exceptions(
+    client: GGClient, to_scan: str, exception: Exception, regex: str
+):
+    with pytest.raises(exception, match=regex):
+        client.content_scan(to_scan)
 
-                self.assertEqual(type(multiscan), MultiScanResult)
-                for i, scan_result in enumerate(multiscan.scan_results):
-                    if entry.expected:
-                        example_dict = json.loads(entry.expected)
-                        self.assertEqual(
-                            all(
-                                elem in example_dict[i]["policies"]
-                                for elem in scan_result.policies
-                            ),
-                            True,
-                        )
-                        self.assertEqual(
-                            scan_result.policy_break_count,
-                            example_dict[i]["policy_break_count"],
-                        )
 
-                if not self.live_server:
-                    self.assertEqual(
-                        self.cassette.requests[0].uri,
-                        "https://api.gitguardian.com/v1/multiscan",
-                    )
+@pytest.mark.parametrize(
+    "to_scan, exception",
+    [
+        pytest.param([{"document": "valid"}] * 21, ValueError, id="too large array"),
+        pytest.param([("tuple"), {"document": "valid"}], TypeError, id="invalid type"),
+    ],
+)
+def test_multi_content_exceptions(
+    client: GGClient, to_scan: List, exception: Exception
+):
+    with pytest.raises(exception):
+        client.multi_content_scan(to_scan)
 
-    @patch("pygitguardian.config.DOCUMENT_SIZE_THRESHOLD_BYTES", 20)
-    def test_content_scan_exceptions(self):
-        TestEntry = namedtuple("TestEntry", "name, input, exception, regex")
-        test_data = [
-            TestEntry(
-                "too large file",
-                "a" * (DOCUMENT_SIZE_THRESHOLD_BYTES + 1),
-                ValidationError,
-                "file exceeds the maximum allowed size",
-            ),
-            TestEntry(
-                "invalid type",
-                "dwhewe\x00ddw",
-                ValidationError,
-                "document has null characters",
-            ),
-        ]
 
-        for entry in test_data:
-            with self.subTest(msg=entry.name):
-                with self.assertRaisesRegex(entry.exception, entry.regex):
-                    self.client.content_scan(entry.input)
+@my_vcr.use_cassette
+def test_multi_content_not_ok():
+    req = [{"document": "valid"}]
+    client = GGClient(base_uri=base_uri, api_key="invalid")
 
-    def test_multi_content_exceptions(self):
-        TestEntry = namedtuple("TestEntry", "name, input, exception")
-        test_data = [
-            TestEntry("too large array", [{"document": "valid"}] * 21, ValueError),
-            TestEntry("invalid type", [("tuple"), {"document": "valid"}], TypeError),
-        ]
+    obj = client.multi_content_scan(req)
 
-        for entry in test_data:
-            with self.subTest(msg=entry.name):
-                with self.assertRaises(entry.exception):
-                    self.client.multi_content_scan(entry.input)
+    assert obj.status_code, 401
+    assert isinstance(obj, Detail)
+    assert obj.detail == "Invalid API key."
 
-    def test_multi_content_not_ok(self):
-        req = [{"document": "valid"}]
-        client = GGClient(base_uri=self.base_uri, api_key="invalid")
 
-        obj = client.multi_content_scan(req)
+@my_vcr.use_cassette
+def test_content_not_ok():
+    req = {"document": "valid", "filename": "valid"}
+    client = GGClient(base_uri=base_uri, api_key="invalid")
 
-        self.assertEqual(obj.status_code, 401)
-        self.assertIsInstance(obj, Detail)
-        self.assertEqual(obj.detail, "Invalid API key.")
+    obj = client.content_scan(**req)
 
-    def test_content_not_ok(self):
-        req = {"document": "valid", "filename": "valid"}
-        client = GGClient(base_uri=self.base_uri, api_key="invalid")
+    assert obj.status_code, 401
+    assert isinstance(obj, Detail)
+    assert obj.detail == "Invalid API key."
 
-        obj = client.content_scan(**req)
 
-        self.assertEqual(obj.status_code, 401)
-        self.assertIsInstance(obj, Detail)
-        self.assertEqual(obj.detail, "Invalid API key.")
+@pytest.mark.parametrize(
+    "name, to_scan, policy_break_count, has_secrets, has_policy_breaks",
+    [
+        pytest.param(
+            "filename_secret",
+            {"filename": FILENAME, "document": DOCUMENT},
+            2,
+            True,
+            True,
+            id="filename_secret",
+        ),
+        pytest.param("secret", {"document": DOCUMENT}, 1, True, True, id="secret",),
+        pytest.param(
+            "filename",
+            {"filename": FILENAME, "document": "normal"},
+            1,
+            False,
+            True,
+            id="filename",
+        ),
+        pytest.param(
+            "no_breaks",
+            {"filename": "normal", "document": "normal"},
+            0,
+            False,
+            False,
+            id="no_breaks",
+        ),
+    ],
+)
+def test_content_scan(
+    client: GGClient,
+    name: str,
+    to_scan: Dict[str, str],
+    has_secrets: bool,
+    has_policy_breaks: bool,
+    policy_break_count: int,
+):
+    with my_vcr.use_cassette(name + ".yaml"):
+        scan_result = client.content_scan(**to_scan)
+        assert type(repr(scan_result)) == str
+        assert type(str(scan_result)) == str
+        assert scan_result.status_code == 200
+        if isinstance(scan_result, ScanResult):
+            assert scan_result.has_secrets == has_secrets
+            assert scan_result.has_policy_breaks == has_policy_breaks
+            assert scan_result.policy_break_count == policy_break_count
+        else:
+            pytest.fail("returned should be a ScanResult")
+
+        assert type(scan_result.to_dict()) == dict
+        scan_result_json = scan_result.to_json()
+        assert type(scan_result_json) == str
+        assert type(json.loads(scan_result_json)) == dict
+
+
+@my_vcr.use_cassette
+def test_assert_content_type(client: GGClient):
+    with pytest.raises(TypeError):
+        client.get(endpoint="/docs/static/logo.png", version=None)

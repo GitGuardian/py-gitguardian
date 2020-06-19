@@ -13,10 +13,10 @@ all:
 	echo "      make isort"          # Run isort linter on python code
 
 test:
-	pipenv run nosetests $(test)
+	pipenv run pytest --disable-pytest-warnings -vvv $(test)
 
 coverage:
-	pipenv run coverage run --source pygitguardian -m nose tests && pipenv run coverage report --fail-under=80
+	pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings && pipenv run coverage report --fail-under=80
 
 black:
 	pipenv run black --config black.toml .

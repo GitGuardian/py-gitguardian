@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import ClassVar, Dict, List, Optional
 
 from marshmallow import (
     EXCLUDE,
@@ -14,7 +14,7 @@ from .config import DOCUMENT_SIZE_THRESHOLD_BYTES
 
 
 class Base:
-    SCHEMA = None
+    SCHEMA: ClassVar[Schema]
 
     def __init__(self):
         self.status_code = None
@@ -204,6 +204,10 @@ class PolicyBreak(Base):
         self.policy = policy
         self.matches = matches
 
+    @property
+    def is_secret(self) -> bool:
+        return self.policy == "Secrets detection"
+
     def __repr__(self):
         return (
             "break_type:{0}, "
@@ -255,18 +259,28 @@ class ScanResult(Base):
         self.policy_breaks = policy_breaks
 
     @property
-    def has_secrets(self) -> bool:
+    def has_policy_breaks(self) -> bool:
         """has_secrets is an easy way to check if your provided document has policy breaks
 
         >>> obj = ScanResult(2, [], [])
-        >>> obj.has_secrets
+        >>> obj.has_policy_breaks
         True
 
-        :return: true if there were policy breaks in the documents
+        :return: true if there were policy breaks (including secrets) in the document
         :rtype: bool
         """
 
         return self.policy_break_count > 0
+
+    @property
+    def has_secrets(self) -> bool:
+        """has_secrets is an easy way to check if your provided document has secrets
+
+        :return: true if there were secrets in the document
+        :rtype: bool
+        """
+
+        return any(policy_break.is_secret for policy_break in self.policy_breaks)
 
     def __repr__(self):
         return (
@@ -280,7 +294,7 @@ class ScanResult(Base):
     def __str__(self):
         return "{0} policy breaks from the evaluated policies: {1}".format(
             self.policy_break_count,
-            ", ".join([policy_break.policy for policy_break in self.policy_breaks]),
+            ", ".join(policy_break.policy for policy_break in self.policy_breaks),
         )
 
 
@@ -316,20 +330,28 @@ class MultiScanResult(Base):
         self.scan_results = scan_results
 
     @property
-    def has_secrets(self) -> bool:
-        """has_secrets is an easy way to check if your provided document has policy breaks
+    def has_policy_breaks(self) -> bool:
+        """has_policy_breaks is an easy way to check if your provided document has policy breaks
 
         >>> obj = ScanResult(2, [], [])
-        >>> obj.has_secrets
+        >>> obj.has_policy_breaks
         True
 
-        :return: true if there were policy breaks in the documents
+        :return: true if there were policy breaks (including secrets) in the documents
         :rtype: bool
         """
 
-        return any(
-            (len(scan_result.policy_breaks) > 0 for scan_result in self.scan_results)
-        )
+        return any(scan_result.has_policy_breaks for scan_result in self.scan_results)
+
+    @property
+    def has_secrets(self) -> bool:
+        """has_secrets is an easy way to check if your provided document has secrets
+
+        :return: true if there were secrets in the documents
+        :rtype: bool
+        """
+
+        return any(scan_result.has_secrets for scan_result in self.scan_results)
 
     def __repr__(self):
         return "scan_results:{0}".format(self.scan_results)
