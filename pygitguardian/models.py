@@ -263,10 +263,10 @@ class ScanResult(Base):
         """has_secrets is an easy way to check if your provided document has policy breaks
 
         >>> obj = ScanResult(2, [], [])
-        >>> obj.has_secrets
+        >>> obj.has_policy_breaks
         True
 
-        :return: true if there were policy breaks in the documents
+        :return: true if there were policy breaks (including secrets) in the document
         :rtype: bool
         """
 
@@ -274,13 +274,9 @@ class ScanResult(Base):
 
     @property
     def has_secrets(self) -> bool:
-        """has_secrets is an easy way to check if your provided document has policy breaks
+        """has_secrets is an easy way to check if your provided document has secrets
 
-        >>> obj = ScanResult(2, [], [])
-        >>> obj.has_secrets
-        True
-
-        :return: true if there were policy breaks in the documents
+        :return: true if there were secrets in the document
         :rtype: bool
         """
 
@@ -341,7 +337,7 @@ class MultiScanResult(Base):
         >>> obj.has_policy_breaks
         True
 
-        :return: true if there were policy breaks in the documents
+        :return: true if there were policy breaks (including secrets) in the documents
         :rtype: bool
         """
 
@@ -350,10 +346,6 @@ class MultiScanResult(Base):
     @property
     def has_secrets(self) -> bool:
         """has_secrets is an easy way to check if your provided document has secrets
-
-        >>> obj = ScanResult(2, [], [])
-        >>> obj.has_secrets
-        False
 
         :return: true if there were secrets in the documents
         :rtype: bool
