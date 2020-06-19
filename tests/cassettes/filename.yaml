@@ -1,0 +1,86 @@
+interactions:
+  - request:
+      body: '{"document": "normal", "filename": ".env"}'
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "42"
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.1.0 (Linux;py3.8.3)
+      method: POST
+      uri: https://api.gitguardian.com/v1/scan
+    response:
+      body:
+        string: '{"policy_break_count":1,"policies":["Secrets detection","File extensions","Filenames"],"policy_breaks":[{"type":".env","policy":"Filenames","matches":[{"type":"filename","match":".env"}]}]}'
+      headers:
+        Allow:
+          - OPTIONS, POST
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "189"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 19 Jun 2020 13:32:52 GMT
+        Server:
+          - nginx
+        Vary:
+          - Cookie
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: '{"document": "normal", "filename": ".env"}'
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "42"
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.1.0 (Linux;py3.8.3)
+      method: POST
+      uri: https://api.gitguardian.com/v1/scan
+    response:
+      body:
+        string: '{"policy_break_count":1,"policies":["Secrets detection","File extensions","Filenames"],"policy_breaks":[{"type":".env","policy":"Filenames","matches":[{"type":"filename","match":".env"}]}]}'
+      headers:
+        Allow:
+          - OPTIONS, POST
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "189"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 19 Jun 2020 14:58:41 GMT
+        Server:
+          - nginx
+        Vary:
+          - Cookie
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+      status:
+        code: 200
+        message: OK
+version: 1
