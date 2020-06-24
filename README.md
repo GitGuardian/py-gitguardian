@@ -80,11 +80,13 @@ else:
 ```py
 API_KEY = os.getenv("GG_API_KEY")
 client = GGClient(api_key=API_KEY)
+
 # Create a list of dictionaries for scanning
-to_scan = []
-for name in glob.glob("**/*", recursive=True):
-    with open(name) as fn:
-        to_scan.append({"document": fn.read(), "filename": os.path.basename(name)})
+file_paths = (pathlib.Path(name) for name in glob.iglob("**/*", recursive=True))
+to_scan = [
+    {"filename": path.name, "document": path.read_text(errors="replace")}
+    for path in file_paths
+]
 
 scan = client.multi_content_scan(to_scan)
 ```
