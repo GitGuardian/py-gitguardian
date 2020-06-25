@@ -22,6 +22,10 @@ with all the response codes and expected structures on each method.
 
 Python 3.5+
 
+## Projects using `py-gitguardian`
+
+- [**GitGuardian Shield**](https://github.com/GitGuardian/gg-shield) - Scan for secrets in your CI and pre-commit.
+
 ## Getting started
 
 You can obtain API keys for API usage on your [dashboard](https://dashboard.gitguardian.com/api/v1/auth/user/github_login/authorize?utm_source=github&utm_medium=py_gitguardian&utm_campaign=py1).
