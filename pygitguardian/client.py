@@ -16,6 +16,11 @@ from .models import Detail, Document, MultiScanResult, ScanResult
 
 class GGClient:
     _version = "undefined"
+    session: requests.Session
+    api_key: str
+    base_uri: str
+    timeout: Optional[float]
+    user_agent: str
 
     def __init__(
         self,
@@ -35,7 +40,7 @@ class GGClient:
         :raises ValueError: if the protocol is invalid
         """
 
-        if base_uri:
+        if isinstance(base_uri, str):
             if not base_uri.startswith(("http://", "https://")):
                 raise ValueError("Invalid protocol, prepend with http:// or https://")
         else:
@@ -46,15 +51,13 @@ class GGClient:
 
         self.base_uri = base_uri
         self.api_key = api_key
-        self.session = (
-            session if session is isinstance(session, Session) else requests.Session()
-        )
+        self.session = session if isinstance(session, Session) else requests.Session()
         self.timeout = timeout
         self.user_agent = "pygitguardian/{0} ({1};py{2})".format(
             self._version, platform.system(), platform.python_version()
         )
 
-        if user_agent:
+        if isinstance(user_agent, str):
             self.user_agent = " ".join([self.user_agent, user_agent])
 
         self.session.headers.update(
@@ -93,7 +96,7 @@ class GGClient:
         **kwargs
     ) -> Response:
         return self.request(
-            "post", endpoint=endpoint, json=data, version=version, **kwargs,
+            "post", endpoint=endpoint, json=data, version=version, **kwargs
         )
 
     def get(
@@ -145,7 +148,8 @@ class GGClient:
         return obj
 
     def multi_content_scan(
-        self, documents: List[Dict[str, str]],
+        self,
+        documents: List[Dict[str, str]],
     ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API

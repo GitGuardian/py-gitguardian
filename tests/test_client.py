@@ -169,9 +169,9 @@ VCR_BASE_CONF = {
             id="valid - trailing /",
         ),
         pytest.param(
-            "validapi_keyforsure", None, "custom", 30.0, None, id="No baseuri",
+            "validapi_keyforsure", None, "custom", 30.0, None, id="No baseuri"
         ),
-        pytest.param(None, None, "custom", 30.0, TypeError, id="No baseuri",),
+        pytest.param(None, None, "custom", 30.0, TypeError, id="No baseuri"),
         pytest.param(
             "validapi_keyforsure",
             "fake_uri",
@@ -188,11 +188,11 @@ def test_client_creation(
     if exception is not None:
         with pytest.raises(exception):
             client = GGClient(
-                api_key=api_key, base_uri=uri, user_agent=user_agent, timeout=timeout,
+                api_key=api_key, base_uri=uri, user_agent=user_agent, timeout=timeout
             )
     else:
         client = GGClient(
-            base_uri=uri, api_key=api_key, user_agent=user_agent, timeout=timeout,
+            base_uri=uri, api_key=api_key, user_agent=user_agent, timeout=timeout
         )
 
     if exception is None:
@@ -354,7 +354,7 @@ def test_content_not_ok():
             True,
             id="filename_secret",
         ),
-        pytest.param("secret", {"document": DOCUMENT}, 1, True, True, id="secret",),
+        pytest.param("secret", {"document": DOCUMENT}, 1, True, True, id="secret"),
         pytest.param(
             "filename",
             {"filename": FILENAME, "document": "normal"},
