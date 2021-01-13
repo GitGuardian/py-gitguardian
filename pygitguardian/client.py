@@ -2,7 +2,6 @@ import platform
 import urllib.parse
 from typing import Dict, List, Optional, Union
 
-import requests
 from requests import Response, Session, codes
 
 from .config import (
@@ -14,9 +13,38 @@ from .config import (
 from .models import Detail, Document, MultiScanResult, ScanResult
 
 
+def load_detail(resp: Response) -> Detail:
+    """
+    load_detail loads a Detail from a response
+    be it JSON or html.
+
+    :param resp: API response
+    :type resp: Response
+    :return: detail object of response
+    :rtype: Detail
+    """
+    if resp.headers["content-type"] == "application/json":
+        data = resp.json()
+    else:
+        data = {"detail": resp.text}
+
+    return Detail.SCHEMA.load(data)
+
+
+def is_ok(resp: Response) -> bool:
+    """
+    is_ok returns True is the API responded with 200
+    and the content type is JSON.
+    """
+    return (
+        resp.headers["content-type"] == "application/json"
+        and resp.status_code == codes.ok
+    )
+
+
 class GGClient:
     _version = "undefined"
-    session: requests.Session
+    session: Session
     api_key: str
     base_uri: str
     timeout: Optional[float]
@@ -26,7 +54,7 @@ class GGClient:
         self,
         api_key: str,
         base_uri: Optional[str] = None,
-        session: Optional[requests.Session] = None,
+        session: Optional[Session] = None,
         user_agent: Optional[str] = None,
         timeout: Optional[float] = DEFAULT_TIMEOUT,
     ):
@@ -51,7 +79,7 @@ class GGClient:
 
         self.base_uri = base_uri
         self.api_key = api_key
-        self.session = session if isinstance(session, Session) else requests.Session()
+        self.session = session if isinstance(session, Session) else Session()
         self.timeout = timeout
         self.user_agent = "pygitguardian/{0} ({1};py{2})".format(
             self._version, platform.system(), platform.python_version()
@@ -79,14 +107,9 @@ class GGClient:
 
         url = urllib.parse.urljoin(self.base_uri, endpoint)
 
-        resp = self.session.request(
+        return self.session.request(
             method=method, url=url, timeout=self.timeout, **kwargs
         )
-
-        if resp.headers["content-type"] != "application/json":
-            raise TypeError("Response is not JSON")
-
-        return resp
 
     def post(
         self,
@@ -115,7 +138,7 @@ class GGClient:
         """
         resp = self.get(endpoint="health")
 
-        obj = Detail.SCHEMA.load(resp.json())
+        obj = load_detail(resp)
         obj.status_code = resp.status_code
 
         return obj
@@ -138,10 +161,10 @@ class GGClient:
         request_obj = Document.SCHEMA.load(doc_dict)
 
         resp = self.post(endpoint="scan", data=request_obj)
-        if resp.status_code == codes.ok:
+        if is_ok(resp):
             obj = ScanResult.SCHEMA.load(resp.json())
         else:
-            obj = Detail.SCHEMA.load(resp.json())
+            obj = load_detail(resp)
 
         obj.status_code = resp.status_code
 
@@ -173,10 +196,10 @@ class GGClient:
 
         resp = self.post(endpoint="multiscan", data=request_obj)
 
-        if resp.status_code == codes.ok:
+        if is_ok(resp):
             obj = MultiScanResult.SCHEMA.load(dict(scan_results=resp.json()))
         else:
-            obj = Detail.SCHEMA.load(resp.json())
+            obj = load_detail(resp)
 
         obj.status_code = resp.status_code
 
