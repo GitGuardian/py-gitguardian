@@ -1,11 +1,12 @@
 import json
-from typing import Dict, List
+from typing import Dict, List, Type
 from unittest.mock import patch
 
 import pytest
 from marshmallow import ValidationError
 
 from pygitguardian import GGClient
+from pygitguardian.client import is_ok, load_detail
 from pygitguardian.config import (
     DEFAULT_BASE_URI,
     DOCUMENT_SIZE_THRESHOLD_BYTES,
@@ -183,7 +184,7 @@ VCR_BASE_CONF = {
     ],
 )
 def test_client_creation(
-    api_key: str, uri: str, user_agent: str, timeout: float, exception: Exception
+    api_key: str, uri: str, user_agent: str, timeout: float, exception: Type[Exception]
 ):
     if exception is not None:
         with pytest.raises(exception):
@@ -299,7 +300,7 @@ def test_multi_content_scan(
     ],
 )
 def test_content_scan_exceptions(
-    client: GGClient, to_scan: str, exception: Exception, regex: str
+    client: GGClient, to_scan: str, exception: Type[Exception], regex: str
 ):
     with pytest.raises(exception, match=regex):
         client.content_scan(to_scan)
@@ -313,7 +314,7 @@ def test_content_scan_exceptions(
     ],
 )
 def test_multi_content_exceptions(
-    client: GGClient, to_scan: List, exception: Exception
+    client: GGClient, to_scan: List, exception: Type[Exception]
 ):
     with pytest.raises(exception):
         client.multi_content_scan(to_scan)
@@ -326,7 +327,7 @@ def test_multi_content_not_ok():
 
     obj = client.multi_content_scan(req)
 
-    assert obj.status_code, 401
+    assert obj.status_code == 401
     assert isinstance(obj, Detail)
     assert obj.detail == "Invalid API key."
 
@@ -338,7 +339,7 @@ def test_content_not_ok():
 
     obj = client.content_scan(**req)
 
-    assert obj.status_code, 401
+    assert obj.status_code == 401
     assert isinstance(obj, Detail)
     assert obj.detail == "Invalid API key."
 
@@ -401,5 +402,17 @@ def test_content_scan(
 
 @my_vcr.use_cassette
 def test_assert_content_type(client: GGClient):
-    with pytest.raises(TypeError):
-        client.get(endpoint="/docs/static/logo.png", version=None)
+    """
+    GIVEN a response that's 200 but the content is not JSON
+    WHEN is_ok is called
+    THEN is_ok should be false
+    WHEN load_detail is called
+    THEN is should return a Detail object
+    """
+    resp = client.get(endpoint="/docs/static/logo.png", version=None)
+    assert is_ok(resp) is False
+    obj = load_detail(resp)
+    obj.status_code = resp.status_code
+    assert obj.status_code == 200
+    assert isinstance(obj, Detail)
+    assert str(obj).startswith("200:"), str(obj)
