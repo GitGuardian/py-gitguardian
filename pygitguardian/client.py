@@ -49,6 +49,7 @@ class GGClient:
     base_uri: str
     timeout: Optional[float]
     user_agent: str
+    extra_headers: Dict
 
     def __init__(
         self,
@@ -92,7 +93,7 @@ class GGClient:
             {
                 "User-Agent": self.user_agent,
                 "Authorization": "Token {0}".format(api_key),
-            }
+            },
         )
 
     def request(
@@ -100,6 +101,7 @@ class GGClient:
         method: str,
         endpoint: str,
         version: Optional[str] = DEFAULT_API_VERSION,
+        extra_headers: Dict[str, str] = None,
         **kwargs
     ) -> Response:
         if version:
@@ -107,8 +109,28 @@ class GGClient:
 
         url = urllib.parse.urljoin(self.base_uri, endpoint)
 
+        headers = (
+            {**self.session.headers, **extra_headers}
+            if extra_headers
+            else self.session.headers
+        )
         return self.session.request(
-            method=method, url=url, timeout=self.timeout, **kwargs
+            method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
+        )
+
+    def get(
+        self,
+        endpoint: str,
+        version: Optional[str] = DEFAULT_API_VERSION,
+        extra_headers: Optional[Dict[str, str]] = None,
+        **kwargs
+    ) -> Response:
+        return self.request(
+            method="get",
+            endpoint=endpoint,
+            version=version,
+            extra_headers=extra_headers,
+            **kwargs,
         )
 
     def post(
@@ -116,16 +138,17 @@ class GGClient:
         endpoint: str,
         data: str = None,
         version: str = DEFAULT_API_VERSION,
+        extra_headers: Optional[Dict[str, str]] = None,
         **kwargs
     ) -> Response:
         return self.request(
-            "post", endpoint=endpoint, json=data, version=version, **kwargs
+            "post",
+            endpoint=endpoint,
+            json=data,
+            version=version,
+            extra_headers=extra_headers,
+            **kwargs,
         )
-
-    def get(
-        self, endpoint: str, version: Optional[str] = DEFAULT_API_VERSION, **kwargs
-    ) -> Response:
-        return self.request(method="get", endpoint=endpoint, version=version, **kwargs)
 
     def health_check(self) -> Detail:
         """
@@ -144,13 +167,17 @@ class GGClient:
         return obj
 
     def content_scan(
-        self, document: str, filename: Optional[str] = None
+        self,
+        document: str,
+        filename: Optional[str] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, ScanResult]:
         """
         content_scan handles the /scan endpoint of the API
 
         :param filename: name of file, example: "intro.py"
         :param document: content of file
+        :param extra_headers: additional headers to add to the request
         :return: Detail or ScanResult response and status code
         """
 
@@ -160,7 +187,11 @@ class GGClient:
 
         request_obj = Document.SCHEMA.load(doc_dict)
 
-        resp = self.post(endpoint="scan", data=request_obj)
+        resp = self.post(
+            endpoint="scan",
+            data=request_obj,
+            extra_headers=extra_headers,
+        )
         if is_ok(resp):
             obj = ScanResult.SCHEMA.load(resp.json())
         else:
@@ -173,6 +204,7 @@ class GGClient:
     def multi_content_scan(
         self,
         documents: List[Dict[str, str]],
+        extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API
@@ -180,6 +212,7 @@ class GGClient:
         :param documents: List of dictionaries containing the keys document
         and, optionally, filename.
             example: [{"document":"example content","filename":"intro.py"}]
+        :param extra_headers: additional headers to add to the request
         :return: Detail or ScanResult response and status code
         """
         if len(documents) > MULTI_DOCUMENT_LIMIT:
@@ -194,7 +227,11 @@ class GGClient:
         else:
             raise TypeError("each document must be a dict")
 
-        resp = self.post(endpoint="multiscan", data=request_obj)
+        resp = self.post(
+            endpoint="multiscan",
+            data=request_obj,
+            extra_headers=extra_headers,
+        )
 
         if is_ok(resp):
             obj = MultiScanResult.SCHEMA.load(dict(scan_results=resp.json()))
