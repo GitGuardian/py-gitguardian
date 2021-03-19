@@ -1,9 +1,10 @@
 import json
-from typing import Dict, List, Type
-from unittest.mock import patch
+from typing import Dict, List, Optional, Type
+from unittest.mock import Mock, patch
 
 import pytest
 from marshmallow import ValidationError
+from requests.models import Response
 
 from pygitguardian import GGClient
 from pygitguardian.client import is_ok, load_detail
@@ -143,7 +144,7 @@ VCR_BASE_CONF = {
 
 
 @pytest.mark.parametrize(
-    "api_key, uri, user_agent, timeout, exception",
+    "api_key, uri, user_agent, timeout, exception ",
     [
         pytest.param(
             "validapi_keyforsure",
@@ -181,19 +182,37 @@ VCR_BASE_CONF = {
             ValueError,
             id="invalid prefix",
         ),
+        pytest.param(
+            "validapi_keyforsure",
+            "https://api.gitguardian.com/",
+            "custom",
+            30.0,
+            None,
+            id="Custom headers",
+        ),
     ],
 )
 def test_client_creation(
-    api_key: str, uri: str, user_agent: str, timeout: float, exception: Type[Exception]
+    api_key: str,
+    uri: str,
+    user_agent: str,
+    timeout: float,
+    exception: Type[Exception],
 ):
     if exception is not None:
         with pytest.raises(exception):
             client = GGClient(
-                api_key=api_key, base_uri=uri, user_agent=user_agent, timeout=timeout
+                api_key=api_key,
+                base_uri=uri,
+                user_agent=user_agent,
+                timeout=timeout,
             )
     else:
         client = GGClient(
-            base_uri=uri, api_key=api_key, user_agent=user_agent, timeout=timeout
+            base_uri=uri,
+            api_key=api_key,
+            user_agent=user_agent,
+            timeout=timeout,
         )
 
     if exception is None:
@@ -202,8 +221,8 @@ def test_client_creation(
         else:
             assert client.base_uri == DEFAULT_BASE_URI
         assert client.api_key == api_key
-        assert user_agent in client.session.headers["User-Agent"]
         assert client.timeout == timeout
+        assert user_agent in client.session.headers["User-Agent"]
         assert client.session.headers["Authorization"] == "Token {0}".format(api_key)
 
 
@@ -416,3 +435,66 @@ def test_assert_content_type(client: GGClient):
     assert obj.status_code == 200
     assert isinstance(obj, Detail)
     assert str(obj).startswith("200:"), str(obj)
+
+
+@pytest.mark.parametrize(
+    "session_headers, extra_headers, expected_headers",
+    [
+        pytest.param(
+            {"session-header": "value"},
+            None,
+            {"session-header": "value"},
+            id="no-additional-headers",
+        ),
+        pytest.param(
+            {"session-header": "value"},
+            {"additional-header": "value"},
+            {"session-header": "value", "additional-header": "value"},
+            id="additional-headers",
+        ),
+        pytest.param(
+            {"session-header": "value", "common-header": "session-value"},
+            {"additional-header": "value", "common-header": "add-value"},
+            {
+                "session-header": "value",
+                "additional-header": "value",
+                "common-header": "add-value",
+            },
+            id="priority-additional-headers",
+        ),
+    ],
+)
+@patch("requests.Session.request")
+@my_vcr.use_cassette
+def test_extra_headers(
+    request_mock: Mock,
+    client: GGClient,
+    session_headers: Dict[str, str],
+    extra_headers: Optional[Dict[str, str]],
+    expected_headers: Dict[str, str],
+):
+    """
+    GIVEN client's session headers
+    WHEN calling any client method with additional headers
+    THEN session/method headers should be merged with priority on method headers
+    """
+    client.session.headers = session_headers
+
+    mock_response = Mock(spec=Response)
+    mock_response.headers = {"content-type": "text"}
+    mock_response.text = "some error"
+    mock_response.status_code = 400
+    request_mock.return_value = mock_response
+
+    client.multi_content_scan(
+        [{"filename": FILENAME, "document": DOCUMENT}],
+        extra_headers=extra_headers,
+    )
+    assert request_mock.called
+    _, kwargs = request_mock.call_args
+    assert expected_headers == kwargs["headers"]
+
+    client.content_scan("some_string", extra_headers=extra_headers)
+    assert request_mock.called
+    _, kwargs = request_mock.call_args
+    assert expected_headers == kwargs["headers"]
