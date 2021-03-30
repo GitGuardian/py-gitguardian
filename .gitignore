@@ -125,3 +125,4 @@ secret.py
 secrets
 
 dist/
+.cache_ggshield
