@@ -104,10 +104,7 @@ class GGClient:
         extra_headers: Dict[str, str] = None,
         **kwargs
     ) -> Response:
-        if version:
-            endpoint = urllib.parse.urljoin(version + "/", endpoint)
-
-        url = urllib.parse.urljoin(self.base_uri, endpoint)
+        url = self._url_from_endpoint(endpoint, version)
 
         headers = (
             {**self.session.headers, **extra_headers}
@@ -117,6 +114,12 @@ class GGClient:
         return self.session.request(
             method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
         )
+
+    def _url_from_endpoint(self, endpoint: str, version: Optional[str]) -> str:
+        if version:
+            endpoint = urllib.parse.urljoin(version + "/", endpoint)
+
+        return urllib.parse.urljoin(self.base_uri + "/", endpoint)
 
     def get(
         self,

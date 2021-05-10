@@ -226,6 +226,42 @@ def test_client_creation(
         assert client.session.headers["Authorization"] == "Token {0}".format(api_key)
 
 
+@pytest.mark.parametrize(
+    ("base_uries", "version", "endpoints_and_urls"),
+    [
+        (
+            ("https://api.gitguardian.com",),
+            "v1",
+            (
+                ("multiscan", "https://api.gitguardian.com/v1/multiscan"),
+                ("scan", "https://api.gitguardian.com/v1/scan"),
+            ),
+        ),
+        (
+            (
+                "https://gg-onprem-instance.company.com/exposed",
+                "https://gg-onprem-instance.company.com/exposed/",
+            ),
+            "v1",
+            (
+                (
+                    "multiscan",
+                    "https://gg-onprem-instance.company.com/exposed/v1/multiscan",
+                ),
+                ("scan", "https://gg-onprem-instance.company.com/exposed/v1/scan"),
+            ),
+        ),
+    ],
+)
+def test_client__url_from_endpoint(base_uries, version, endpoints_and_urls):
+    for curr_base_uri in base_uries:
+        client = GGClient(api_key="validapi_keyforsure", base_uri=curr_base_uri)
+        for endpoint, expected_url in endpoints_and_urls:
+            assert (
+                client._url_from_endpoint(endpoint, version) == expected_url
+            ), "Could not get the expected URL for base_uri=`{}`".format(base_uri)
+
+
 @my_vcr.use_cassette
 def test_health_check(client: GGClient):
     health = client.health_check()
