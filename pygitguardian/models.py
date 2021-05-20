@@ -1,3 +1,4 @@
+from datetime import date
 from typing import ClassVar, Dict, List, Optional
 
 from marshmallow import (
@@ -367,3 +368,73 @@ class MultiScanResult(Base):
                 ]
             ),
         )
+
+
+class QuotaSchema(Schema):
+    count = fields.Int()
+    limit = fields.Int()
+    remaining = fields.Int()
+    since = fields.Date()
+
+    @post_load
+    def make_quota(self, data, **kwargs):
+        return Quota(**data)
+
+
+class Quota(Base):
+    """
+    Quota describes a quota category in the GitGuardian API.
+    Allows you to check your current available quota.
+    Example:
+    {"count": 2,
+    "limit": 5000,
+    "remaining": 4998,
+    "since": "2021-04-18"}
+    """
+
+    SCHEMA = QuotaSchema()
+
+    def __init__(self, count: int, limit: int, remaining: int, since: date, **kwargs):
+        super().__init__()
+        self.count = count
+        self.limit = limit
+        self.remaining = remaining
+        self.since = since
+
+    def __repr__(self):
+        return (
+            "count:{0}, "
+            "limit:{1}, "
+            "remaining:{2}, "
+            "since:{3}".format(self.count, self.limit, self.remaining, repr(self.since))
+        )
+
+
+class QuotaResponseSchema(Schema):
+    content = fields.Nested(QuotaSchema)
+
+    @post_load
+    def make_quota_response(self, data, **kwargs):
+        return QuotaResponse(**data)
+
+
+class QuotaResponse(Base):
+    """
+    Quota describes a quota category in the GitGuardian API.
+    Allows you to check your current available quota.
+    Example:
+    {"content": {
+        "count": 2,
+        "limit": 5000,
+        "remaining": 4998,
+        "since": "2021-04-18"}}
+    """
+
+    SCHEMA = QuotaResponseSchema()
+
+    def __init__(self, content: Quota, **kwargs):
+        super().__init__()
+        self.content = content
+
+    def __repr__(self):
+        return "content:{0}".format(repr(self.content))
