@@ -10,7 +10,7 @@ from .config import (
     DEFAULT_TIMEOUT,
     MULTI_DOCUMENT_LIMIT,
 )
-from .models import Detail, Document, MultiScanResult, ScanResult
+from .models import Detail, Document, MultiScanResult, QuotaResponse, ScanResult
 
 
 def load_detail(resp: Response) -> Detail:
@@ -238,6 +238,31 @@ class GGClient:
 
         if is_ok(resp):
             obj = MultiScanResult.SCHEMA.load(dict(scan_results=resp.json()))
+        else:
+            obj = load_detail(resp)
+
+        obj.status_code = resp.status_code
+
+        return obj
+
+    def quota_overview(
+        self,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, QuotaResponse]:
+        """
+        content_scan handles the /scan endpoint of the API
+
+        :param extra_headers: additional headers to add to the request
+        :return: Detail or Quota response and status code
+        """
+
+        resp = self.get(
+            endpoint="quotas",
+            extra_headers=extra_headers,
+        )
+
+        if is_ok(resp):
+            obj = QuotaResponse.SCHEMA.load(resp.json())
         else:
             obj = load_detail(resp)
 

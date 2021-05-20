@@ -1,5 +1,6 @@
 import json
-from typing import Dict, List, Optional, Type
+from datetime import date
+from typing import Any, Dict, List, Optional, Type
 from unittest.mock import Mock, patch
 
 import pytest
@@ -13,7 +14,7 @@ from pygitguardian.config import (
     DOCUMENT_SIZE_THRESHOLD_BYTES,
     MULTI_DOCUMENT_LIMIT,
 )
-from pygitguardian.models import Detail, MultiScanResult, ScanResult
+from pygitguardian.models import Detail, MultiScanResult, QuotaResponse, ScanResult
 
 from .conftest import base_uri, my_vcr
 
@@ -432,7 +433,7 @@ def test_content_not_ok():
 def test_content_scan(
     client: GGClient,
     name: str,
-    to_scan: Dict[str, str],
+    to_scan: Dict[str, Any],
     has_secrets: bool,
     has_policy_breaks: bool,
     policy_break_count: int,
@@ -505,7 +506,7 @@ def test_assert_content_type(client: GGClient):
 def test_extra_headers(
     request_mock: Mock,
     client: GGClient,
-    session_headers: Dict[str, str],
+    session_headers: Any,
     extra_headers: Optional[Dict[str, str]],
     expected_headers: Dict[str, str],
 ):
@@ -534,3 +535,23 @@ def test_extra_headers(
     assert request_mock.called
     _, kwargs = request_mock.call_args
     assert expected_headers == kwargs["headers"]
+
+
+def test_quota_overview(client: GGClient):
+    with my_vcr.use_cassette("quota.yaml"):
+        quota_response = client.quota_overview()
+        assert type(repr(quota_response)) == str
+        assert type(str(quota_response)) == str
+        assert quota_response.status_code == 200
+        if isinstance(quota_response, QuotaResponse):
+            assert quota_response.content.limit == 5000
+            assert quota_response.content.count == 2
+            assert quota_response.content.remaining == 4998
+            assert quota_response.content.since == date(2021, 4, 18)
+        else:
+            pytest.fail("returned should be a QuotaResponse")
+
+        assert type(quota_response.to_dict()) == dict
+        quota_response_json = quota_response.to_json()
+        assert type(quota_response_json) == str
+        assert type(json.loads(quota_response_json)) == dict
