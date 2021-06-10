@@ -1,5 +1,5 @@
 from datetime import date
-from typing import ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional
 
 from marshmallow import (
     EXCLUDE,
@@ -7,6 +7,7 @@ from marshmallow import (
     ValidationError,
     fields,
     post_load,
+    pre_load,
     validate,
     validates,
 )
@@ -90,6 +91,14 @@ class Document(Base):
 
 class DetailSchema(Schema):
     detail = fields.String(required=True)
+
+    @pre_load
+    def rename_errors(self, data: Dict, many: bool, **kwargs: Any) -> Dict:
+        error = data.pop("error", None)
+        if error is not None:
+            data["detail"] = str(error)
+
+        return data
 
     @post_load
     def make_detail_response(self, data, **kwargs):
