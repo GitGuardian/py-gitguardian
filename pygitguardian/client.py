@@ -250,7 +250,7 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, QuotaResponse]:
         """
-        content_scan handles the /scan endpoint of the API
+        quota_overview handles the /quotas endpoint of the API
 
         :param extra_headers: additional headers to add to the request
         :return: Detail or Quota response and status code
