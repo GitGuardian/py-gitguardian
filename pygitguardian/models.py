@@ -415,7 +415,7 @@ class Quota(Base):
             "count:{0}, "
             "limit:{1}, "
             "remaining:{2}, "
-            "since:{3}".format(self.count, self.limit, self.remaining, repr(self.since))
+            "since:{3}".format(self.count, self.limit, self.remaining, self.since.isoformat())
         )
 
 
