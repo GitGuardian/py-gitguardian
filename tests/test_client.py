@@ -1,4 +1,5 @@
 import json
+from collections import OrderedDict
 from datetime import date
 from typing import Any, Dict, List, Optional, Type
 from unittest.mock import Mock, patch
@@ -272,7 +273,7 @@ def test_health_check(client: GGClient):
     assert bool(health)
     assert health.success
 
-    assert type(health.to_dict()) == dict
+    assert type(health.to_dict()) == OrderedDict
     assert type(health.to_json()) == str
 
 
@@ -285,7 +286,7 @@ def test_health_check_error(client: GGClient):
     assert bool(health) is False
     assert health.success is False
 
-    assert type(health.to_dict()) == dict
+    assert type(health.to_dict()) == OrderedDict
     assert type(health.to_json()) == str
 
 
@@ -331,7 +332,7 @@ def test_multi_content_scan(
             pytest.fail("multiscan is not a MultiScanResult")
             return
 
-        assert type(multiscan.to_dict()) == dict
+        assert type(multiscan.to_dict()) == OrderedDict
         assert type(multiscan.to_json()) == str
         assert type(repr(multiscan)) == str
         assert type(str(multiscan)) == str
@@ -463,7 +464,7 @@ def test_content_scan(
         else:
             pytest.fail("returned should be a ScanResult")
 
-        assert type(scan_result.to_dict()) == dict
+        assert type(scan_result.to_dict()) == OrderedDict
         scan_result_json = scan_result.to_json()
         assert type(scan_result_json) == str
         assert type(json.loads(scan_result_json)) == dict
@@ -564,7 +565,7 @@ def test_quota_overview(client: GGClient):
         else:
             pytest.fail("returned should be a QuotaResponse")
 
-        assert type(quota_response.to_dict()) == dict
+        assert type(quota_response.to_dict()) == OrderedDict
         quota_response_json = quota_response.to_json()
         assert type(quota_response_json) == str
         assert type(json.loads(quota_response_json)) == dict

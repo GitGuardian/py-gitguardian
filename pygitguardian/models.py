@@ -15,8 +15,13 @@ from marshmallow import (
 from .config import DOCUMENT_SIZE_THRESHOLD_BYTES
 
 
+class BaseSchema(Schema):
+    class Meta:
+        ordered = True
+
+
 class Base:
-    SCHEMA: ClassVar[Schema]
+    SCHEMA: ClassVar[BaseSchema]
 
     def __init__(self):
         self.status_code = None
@@ -41,7 +46,7 @@ class Base:
         return self.status_code == 200
 
 
-class DocumentSchema(Schema):
+class DocumentSchema(BaseSchema):
     class Meta:
         unknown = EXCLUDE
 
@@ -89,7 +94,7 @@ class Document(Base):
         return "filename:{0}, document:{1}".format(self.filename, self.document)
 
 
-class DetailSchema(Schema):
+class DetailSchema(BaseSchema):
     detail = fields.String(required=True)
 
     @pre_load
@@ -124,7 +129,7 @@ class Detail(Base):
         return "{0}:{1}".format(self.status_code, self.detail)
 
 
-class MatchSchema(Schema):
+class MatchSchema(BaseSchema):
     match = fields.String(required=True)
     match_type = fields.String(data_key="type", required=True)
     line_start = fields.Int(allow_none=True)
@@ -188,7 +193,7 @@ class Match(Base):
         )
 
 
-class PolicyBreakSchema(Schema):
+class PolicyBreakSchema(BaseSchema):
     break_type = fields.String(data_key="type", required=True)
     policy = fields.String(required=True)
     matches = fields.List(fields.Nested(MatchSchema), required=True)
@@ -226,7 +231,7 @@ class PolicyBreak(Base):
         )
 
 
-class ScanResultSchema(Schema):
+class ScanResultSchema(BaseSchema):
     policy_break_count = fields.Integer(required=True)
     policies = fields.List(fields.String(), required=True)
     policy_breaks = fields.List(fields.Nested(PolicyBreakSchema), required=True)
@@ -308,7 +313,7 @@ class ScanResult(Base):
         )
 
 
-class MultiScanResultSchema(Schema):
+class MultiScanResultSchema(BaseSchema):
     scan_results = fields.List(
         fields.Nested(ScanResultSchema),
         required=True,
@@ -379,7 +384,7 @@ class MultiScanResult(Base):
         )
 
 
-class QuotaSchema(Schema):
+class QuotaSchema(BaseSchema):
     count = fields.Int()
     limit = fields.Int()
     remaining = fields.Int()
@@ -419,7 +424,7 @@ class Quota(Base):
         )
 
 
-class QuotaResponseSchema(Schema):
+class QuotaResponseSchema(BaseSchema):
     content = fields.Nested(QuotaSchema)
 
     @post_load
