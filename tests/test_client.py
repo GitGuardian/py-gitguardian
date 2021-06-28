@@ -131,19 +131,6 @@ EXAMPLE_RESPONSE = """
 ]
 """
 
-VCR_BASE_CONF = {
-    "decode_compressed_response": True,
-    "ignore_localhost": True,
-    "match_on": ["url", "method", "body"],
-    "serializer": "yaml",
-    "record_mode": "once",
-    "filter_headers": [
-        ("authorization", "Token XXX"),
-        ("apikey", None),
-        ("private-api_key", None),
-    ],
-}
-
 
 @pytest.mark.parametrize(
     "api_key, uri, user_agent, timeout, exception ",
