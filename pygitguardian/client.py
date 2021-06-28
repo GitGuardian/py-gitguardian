@@ -10,7 +10,22 @@ from .config import (
     DEFAULT_TIMEOUT,
     MULTI_DOCUMENT_LIMIT,
 )
-from .models import Detail, Document, MultiScanResult, QuotaResponse, ScanResult
+from .models import (
+    Detail,
+    Document,
+    HealthCheckResponse,
+    MultiScanResult,
+    QuotaResponse,
+    ScanResult,
+)
+
+
+class Versions:
+    app_version: Optional[str] = None
+    secrets_engine_version: Optional[str] = None
+
+
+VERSIONS = Versions()
 
 
 def load_detail(resp: Response) -> Detail:
@@ -111,15 +126,46 @@ class GGClient:
             if extra_headers
             else self.session.headers
         )
-        return self.session.request(
+        response: Response = self.session.request(
             method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
         )
+
+        self.app_version = response.headers.get("X-App-Version", self.app_version)
+        self.secrets_engine_version = response.headers.get(
+            "X-Secrets-Engine-Version", self.secrets_engine_version
+        )
+
+        return response
 
     def _url_from_endpoint(self, endpoint: str, version: Optional[str]) -> str:
         if version:
             endpoint = urllib.parse.urljoin(version + "/", endpoint)
 
         return urllib.parse.urljoin(self.base_uri + "/", endpoint)
+
+    @property
+    def app_version(self) -> Optional[str]:
+        global VERSIONS
+
+        return VERSIONS.app_version
+
+    @app_version.setter
+    def app_version(self, value: Optional[str]):
+        global VERSIONS
+
+        VERSIONS.app_version = value
+
+    @property
+    def secrets_engine_version(self) -> Optional[str]:
+        global VERSIONS
+
+        return VERSIONS.secrets_engine_version
+
+    @secrets_engine_version.setter
+    def secrets_engine_version(self, value: Optional[str]):
+        global VERSIONS
+
+        VERSIONS.secrets_engine_version = value
 
     def get(
         self,
@@ -153,7 +199,7 @@ class GGClient:
             **kwargs,
         )
 
-    def health_check(self) -> Detail:
+    def health_check(self) -> HealthCheckResponse:
         """
         health_check handles the /health endpoint of the API
 
@@ -164,10 +210,12 @@ class GGClient:
         """
         resp = self.get(endpoint="health")
 
-        obj = load_detail(resp)
-        obj.status_code = resp.status_code
-
-        return obj
+        return HealthCheckResponse(
+            detail=load_detail(resp).detail,
+            status_code=resp.status_code,
+            app_version=self.app_version,
+            secrets_engine_version=self.secrets_engine_version,
+        )
 
     def content_scan(
         self,

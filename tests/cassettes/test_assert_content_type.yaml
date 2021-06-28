@@ -309,6 +309,10 @@ interactions:
           - Tue, 16 Jun 2020 12:37:49 GMT
         Server:
           - nginx
+        X-App-Version:
+          - 1.26.0-rc.4
+        X-Secrets-Engine-Version:
+          - 2.43.0
       status:
         code: 200
         message: OK
@@ -622,6 +626,10 @@ interactions:
           - Tue, 16 Jun 2020 12:37:49 GMT
         Server:
           - nginx
+        X-App-Version:
+          - 1.26.0-rc.4
+        X-Secrets-Engine-Version:
+          - 2.43.0
       status:
         code: 200
         message: OK

@@ -67,6 +67,10 @@ interactions:
           - DENY
         content-length:
           - "2141"
+        X-App-Version:
+          - 1.26.0-rc.4
+        X-Secrets-Engine-Version:
+          - 2.43.0
       status:
         code: 200
         message: OK
@@ -138,6 +142,10 @@ interactions:
           - DENY
         content-length:
           - "2141"
+        X-App-Version:
+          - 1.26.0-rc.4
+        X-Secrets-Engine-Version:
+          - 2.43.0
       status:
         code: 200
         message: OK
