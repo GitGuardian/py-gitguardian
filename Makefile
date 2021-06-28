@@ -19,7 +19,7 @@ coverage:
 	pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings && pipenv run coverage report --fail-under=80
 
 black:
-	pipenv run black --config black.toml .
+	pipenv run black .
 
 flake8:
 	pipenv run flake8
