@@ -420,7 +420,9 @@ class Quota(Base):
             "count:{0}, "
             "limit:{1}, "
             "remaining:{2}, "
-            "since:{3}".format(self.count, self.limit, self.remaining, self.since.isoformat())
+            "since:{3}".format(
+                self.count, self.limit, self.remaining, self.since.isoformat()
+            )
         )
 
 
@@ -452,3 +454,41 @@ class QuotaResponse(Base):
 
     def __repr__(self):
         return "content:{0}".format(repr(self.content))
+
+
+class HealthCheckResponseSchema(BaseSchema):
+    detail = fields.String(allow_none=False)
+    status_code = fields.Int(allow_none=False)
+    app_version = fields.String(allow_none=True)
+    secrets_engine_version = fields.String(allow_none=True)
+
+
+class HealthCheckResponse(Base):
+    SCHEMA = HealthCheckResponseSchema()
+
+    def __init__(
+        self,
+        detail: str,
+        status_code: int,
+        app_version: Optional[str],
+        secrets_engine_version: Optional[str],
+        **kwargs,
+    ):
+        super().__init__()
+        self.detail = detail
+        self.status_code = status_code
+        self.app_version = app_version
+        self.secrets_engine_version = secrets_engine_version
+
+    def __repr__(self):
+        return (
+            "detail:{0}, "
+            "status_code:{1}, "
+            "app version:{2}, "
+            "secrets engine version:{3}".format(
+                self.detail,
+                self.status_code,
+                self.app_version or "",
+                self.secrets_engine_version or "",
+            )
+        )

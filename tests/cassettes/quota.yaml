@@ -32,6 +32,10 @@ interactions:
           - nginx
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains
+        X-App-Version:
+          - 1.26.0-rc.4
+        X-Secrets-Engine-Version:
+          - 2.43.0
       status:
         code: 200
         message: OK

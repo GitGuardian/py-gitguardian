@@ -269,7 +269,10 @@ def test_health_check(client: GGClient):
     health = client.health_check()
     assert health.status_code == 200
     assert health.detail == "Valid API key."
-    assert str(health) == "200:Valid API key."
+    assert str(health) == (
+        "detail:Valid API key., status_code:200, "
+        "app version:1.26.0-rc.4, secrets engine version:2.43.0"
+    )
     assert bool(health)
     assert health.success
 
@@ -282,7 +285,10 @@ def test_health_check_error(client: GGClient):
     health = client.health_check()
     assert health.status_code == 400
     assert health.detail == "Configuration error."
-    assert str(health) == "400:Configuration error."
+    assert str(health) == (
+        "detail:Configuration error., status_code:400, "
+        "app version:1.26.0-rc.4, secrets engine version:2.43.0"
+    )
     assert bool(health) is False
     assert health.success is False
 
@@ -569,3 +575,37 @@ def test_quota_overview(client: GGClient):
         quota_response_json = quota_response.to_json()
         assert type(quota_response_json) == str
         assert type(json.loads(quota_response_json)) == dict
+
+
+@pytest.mark.parametrize("method", ["get", "post"])
+@patch("requests.Session.request")
+def test_versions_from_headers(request_mock: Mock, client: GGClient, method):
+    app_version_value = "1.0"
+    secrets_engine_version_value = "2.0"
+
+    mock_response = Mock(spec=Response)
+    mock_response.headers = {
+        "X-App-Version": app_version_value,
+        "X-Secrets-Engine-Version": secrets_engine_version_value,
+    }
+    request_mock.return_value = mock_response
+
+    client.request(method=method, endpoint="endpoint")
+    assert request_mock.called
+
+    assert client.app_version is app_version_value
+    assert client.secrets_engine_version is secrets_engine_version_value
+
+    mock_response = Mock(spec=Response)
+    mock_response.headers = {}
+    request_mock.return_value = mock_response
+
+    client.request(method=method, endpoint="endpoint")
+    assert request_mock.called
+
+    assert client.app_version is app_version_value
+    assert client.secrets_engine_version is secrets_engine_version_value
+
+    other_client = GGClient(api_key="")
+    assert other_client.app_version is app_version_value
+    assert other_client.secrets_engine_version is secrets_engine_version_value
