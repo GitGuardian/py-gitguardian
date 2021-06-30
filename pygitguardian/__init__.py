@@ -2,7 +2,7 @@
 from .client import GGClient
 
 
-__version__ = "1.2.1"
+__version__ = "1.2.2"
 GGClient._version = __version__
 
 __all__ = [
