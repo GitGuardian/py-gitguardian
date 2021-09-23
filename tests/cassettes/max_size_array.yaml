@@ -9,13 +9,13 @@ interactions:
         "valid"}, {"document": "valid"}, {"document": "valid"}]'
       headers:
         Accept:
-          - "*/*"
+          - '*/*'
         Accept-Encoding:
           - gzip, deflate
         Connection:
           - keep-alive
         Content-Length:
-          - "460"
+          - '460'
         Content-Type:
           - application/json
         User-Agent:
@@ -66,7 +66,7 @@ interactions:
         X-Frame-Options:
           - DENY
         content-length:
-          - "2141"
+          - '2141'
         X-App-Version:
           - 1.26.0-rc.4
         X-Secrets-Engine-Version:
@@ -84,13 +84,13 @@ interactions:
         "valid"}, {"document": "valid"}, {"document": "valid"}]'
       headers:
         Accept:
-          - "*/*"
+          - '*/*'
         Accept-Encoding:
           - gzip, deflate
         Connection:
           - keep-alive
         Content-Length:
-          - "460"
+          - '460'
         Content-Type:
           - application/json
         User-Agent:
@@ -141,7 +141,7 @@ interactions:
         X-Frame-Options:
           - DENY
         content-length:
-          - "2141"
+          - '2141'
         X-App-Version:
           - 1.26.0-rc.4
         X-Secrets-Engine-Version:

@@ -2,12 +2,14 @@ import glob
 import os
 import sys
 import traceback
+from typing import List
 
 from pygitguardian import GGClient
 from pygitguardian.config import MULTI_DOCUMENT_LIMIT
+from pygitguardian.models import Detail, ScanResult
 
 
-API_KEY = os.getenv("GG_API_KEY")
+API_KEY = os.getenv("GITGUARDIAN_API_KEY", "")
 
 client = GGClient(api_key=API_KEY)
 
@@ -18,7 +20,7 @@ for name in glob.glob("**/*", recursive=True):
         to_scan.append({"document": fn.read(), "filename": os.path.basename(name)})
 
 # Process in a chunked way to avoid passing the multi document limit
-to_process = []
+to_process: List[ScanResult] = []
 for i in range(0, len(to_scan), MULTI_DOCUMENT_LIMIT):
     chunk = to_scan[i : i + MULTI_DOCUMENT_LIMIT]
     try:
@@ -27,9 +29,11 @@ for i in range(0, len(to_scan), MULTI_DOCUMENT_LIMIT):
         # Handle exceptions such as schema validation
         traceback.print_exc(2, file=sys.stderr)
         print(str(exc))
-    if not scan.success:
+    if isinstance(scan, Detail):
         print("Error scanning some files. Results may be incomplete.")
         print(scan)
+        continue
+
     to_process.extend(scan.scan_results)
     continue
 

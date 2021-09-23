@@ -1,5 +1,5 @@
 from datetime import date
-from typing import Any, ClassVar, Dict, List, Optional
+from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from marshmallow import (
     EXCLUDE,
@@ -23,20 +23,20 @@ class BaseSchema(Schema):
 class Base:
     SCHEMA: ClassVar[BaseSchema]
 
-    def __init__(self):
-        self.status_code = None
+    def __init__(self) -> None:
+        self.status_code: Optional[int] = None
 
     def to_json(self) -> str:
         """
         to_json converts model to JSON string.
         """
-        return self.SCHEMA.dumps(self)
+        return cast(str, self.SCHEMA.dumps(self))
 
     def to_dict(self) -> Dict:
         """
         to_dict converts model to a dictionary representation.
         """
-        return self.SCHEMA.dump(self)
+        return cast(Dict, self.SCHEMA.dump(self))
 
     @property
     def success(self) -> bool:
@@ -84,13 +84,13 @@ class Document(Base):
 
     SCHEMA = DocumentSchema()
 
-    def __init__(self, document: str, filename: Optional[str] = None, **kwargs):
+    def __init__(self, document: str, filename: Optional[str] = None, **kwargs: Any):
         super().__init__()
         self.document = document
         if filename:
             self.filename = filename
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "filename:{0}, document:{1}".format(self.filename, self.document)
 
 
@@ -106,7 +106,7 @@ class DetailSchema(BaseSchema):
         return data
 
     @post_load
-    def make_detail_response(self, data, **kwargs):
+    def make_detail_response(self, data: Dict[str, str], **kwargs: Any) -> "Detail":
         return Detail(**data)
 
 
@@ -121,11 +121,11 @@ class Detail(Base):
 
     SCHEMA = DetailSchema()
 
-    def __init__(self, detail: str, **kwargs):
+    def __init__(self, detail: str, **kwargs: Any) -> None:
         super().__init__()
         self.detail = detail
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "{0}:{1}".format(self.status_code, self.detail)
 
 
@@ -138,7 +138,7 @@ class MatchSchema(BaseSchema):
     index_end = fields.Int(allow_none=True)
 
     @post_load
-    def make_match(self, data, **kwargs):
+    def make_match(self, data: Dict[str, Any], **kwargs: Any) -> "Match":
         return Match(**data)
 
 
@@ -165,8 +165,8 @@ class Match(Base):
         line_end: Optional[int] = None,
         index_start: Optional[int] = None,
         index_end: Optional[int] = None,
-        **kwargs
-    ):
+        **kwargs: Any,
+    ) -> None:
         super().__init__()
         self.match = match
         self.match_type = match_type
@@ -175,7 +175,7 @@ class Match(Base):
         self.index_start = index_start
         self.index_end = index_end
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "match:{0}, "
             "match_type:{1}, "
@@ -199,7 +199,7 @@ class PolicyBreakSchema(BaseSchema):
     matches = fields.List(fields.Nested(MatchSchema), required=True)
 
     @post_load
-    def make_policy_break(self, data, **kwargs):
+    def make_policy_break(self, data: Dict[str, Any], **kwargs: Any) -> "PolicyBreak":
         return PolicyBreak(**data)
 
 
@@ -213,7 +213,9 @@ class PolicyBreak(Base):
 
     SCHEMA = PolicyBreakSchema()
 
-    def __init__(self, break_type: str, policy: str, matches: List[Match], **kwargs):
+    def __init__(
+        self, break_type: str, policy: str, matches: List[Match], **kwargs: Any
+    ) -> None:
         super().__init__()
         self.break_type = break_type
         self.policy = policy
@@ -223,7 +225,7 @@ class PolicyBreak(Base):
     def is_secret(self) -> bool:
         return self.policy == "Secrets detection"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "break_type:{0}, "
             "policy:{1}, "
@@ -237,7 +239,7 @@ class ScanResultSchema(BaseSchema):
     policy_breaks = fields.List(fields.Nested(PolicyBreakSchema), required=True)
 
     @post_load
-    def make_scan_result(self, data, **kwargs):
+    def make_scan_result(self, data: Dict[str, Any], **kwargs: Any) -> "ScanResult":
         return ScanResult(**data)
 
 
@@ -258,8 +260,8 @@ class ScanResult(Base):
         policy_break_count: int,
         policy_breaks: List[PolicyBreak],
         policies: List[str],
-        **kwargs
-    ):
+        **kwargs: Any,
+    ) -> None:
         """
         :param policy_break_count: number of policy breaks
         :type policy_break_count: int
@@ -297,7 +299,7 @@ class ScanResult(Base):
 
         return any(policy_break.is_secret for policy_break in self.policy_breaks)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "policy_break_count:{0}, "
             "policies:{1}, "
@@ -306,7 +308,7 @@ class ScanResult(Base):
             )
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{0} policy breaks from the evaluated policies: {1}".format(
             self.policy_break_count,
             ", ".join(policy_break.policy for policy_break in self.policy_breaks),
@@ -321,7 +323,9 @@ class MultiScanResultSchema(BaseSchema):
     )
 
     @post_load
-    def make_scan_result(self, data, **kwargs):
+    def make_scan_result(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> "MultiScanResult":
         return MultiScanResult(**data)
 
 
@@ -337,7 +341,7 @@ class MultiScanResult(Base):
 
     SCHEMA = MultiScanResultSchema()
 
-    def __init__(self, scan_results: List[ScanResult], **kwargs):
+    def __init__(self, scan_results: List[ScanResult], **kwargs: Any) -> None:
         """
         :param scan_results: List of scan_results
         """
@@ -368,10 +372,10 @@ class MultiScanResult(Base):
 
         return any(scan_result.has_secrets for scan_result in self.scan_results)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "scan_results:{0}".format(self.scan_results)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "{0} scan results containing {1} policy breaks".format(
             len(self.scan_results),
             len(
@@ -391,7 +395,7 @@ class QuotaSchema(BaseSchema):
     since = fields.Date()
 
     @post_load
-    def make_quota(self, data, **kwargs):
+    def make_quota(self, data: Dict[str, Any], **kwargs: Any) -> "Quota":
         return Quota(**data)
 
 
@@ -408,14 +412,16 @@ class Quota(Base):
 
     SCHEMA = QuotaSchema()
 
-    def __init__(self, count: int, limit: int, remaining: int, since: date, **kwargs):
+    def __init__(
+        self, count: int, limit: int, remaining: int, since: date, **kwargs: Any
+    ) -> None:
         super().__init__()
         self.count = count
         self.limit = limit
         self.remaining = remaining
         self.since = since
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "count:{0}, "
             "limit:{1}, "
@@ -430,7 +436,9 @@ class QuotaResponseSchema(BaseSchema):
     content = fields.Nested(QuotaSchema)
 
     @post_load
-    def make_quota_response(self, data, **kwargs):
+    def make_quota_response(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> "QuotaResponse":
         return QuotaResponse(**data)
 
 
@@ -448,11 +456,11 @@ class QuotaResponse(Base):
 
     SCHEMA = QuotaResponseSchema()
 
-    def __init__(self, content: Quota, **kwargs):
+    def __init__(self, content: Quota, **kwargs: Any) -> None:
         super().__init__()
         self.content = content
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "content:{0}".format(repr(self.content))
 
 
@@ -469,10 +477,10 @@ class HealthCheckResponse(Base):
     def __init__(
         self,
         detail: str,
-        status_code: int,
+        status_code: Optional[int],
         app_version: Optional[str],
         secrets_engine_version: Optional[str],
-        **kwargs,
+        **kwargs: Any,
     ):
         super().__init__()
         self.detail = detail
@@ -480,7 +488,7 @@ class HealthCheckResponse(Base):
         self.app_version = app_version
         self.secrets_engine_version = secrets_engine_version
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             "detail:{0}, "
             "status_code:{1}, "
