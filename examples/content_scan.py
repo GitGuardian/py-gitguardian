@@ -5,9 +5,10 @@ import traceback
 from requests import codes
 
 from pygitguardian import GGClient
+from pygitguardian.models import ScanResult
 
 
-API_KEY = os.getenv("GG_API_KEY")
+API_KEY = os.getenv("GITGUARDIAN_API_KEY", "")
 FILENAME = ".env"
 DOCUMENT = """
     import urllib.request
@@ -29,6 +30,12 @@ if health_obj.status_code == codes[r"\o/"]:  # this is 200 but cooler
         traceback.print_exc(2, file=sys.stderr)
         print(str(exc))
 
-    print("Scan results:", scan_result.has_secrets, "-", scan_result.policy_break_count)
+    if isinstance(scan_result, ScanResult):
+        print(
+            "Scan results:",
+            scan_result.has_secrets,
+            "-",
+            scan_result.policy_break_count,
+        )
 else:
     print("Invalid API Key")

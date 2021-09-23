@@ -8,13 +8,13 @@ interactions:
         "normal", "filename": "normal"}]'
       headers:
         Accept:
-          - "*/*"
+          - '*/*'
         Accept-Encoding:
           - gzip, deflate
         Connection:
           - keep-alive
         Content-Length:
-          - "492"
+          - '492'
         Content-Type:
           - application/json
         User-Agent:
@@ -50,7 +50,7 @@ interactions:
         X-Frame-Options:
           - DENY
         content-length:
-          - "1192"
+          - '1192'
         X-App-Version:
           - 1.26.0-rc.4
         X-Secrets-Engine-Version:
@@ -67,13 +67,13 @@ interactions:
         "normal", "filename": "normal"}]'
       headers:
         Accept:
-          - "*/*"
+          - '*/*'
         Accept-Encoding:
           - gzip, deflate
         Connection:
           - keep-alive
         Content-Length:
-          - "492"
+          - '492'
         Content-Type:
           - application/json
         User-Agent:
@@ -109,7 +109,7 @@ interactions:
         X-Frame-Options:
           - DENY
         content-length:
-          - "1192"
+          - '1192'
         X-App-Version:
           - 1.26.0-rc.4
         X-Secrets-Engine-Version:

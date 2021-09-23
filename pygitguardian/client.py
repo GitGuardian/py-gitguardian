@@ -1,6 +1,6 @@
 import platform
 import urllib.parse
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
 from requests import Response, Session, codes
 
@@ -43,7 +43,7 @@ def load_detail(resp: Response) -> Detail:
     else:
         data = {"detail": resp.text}
 
-    return Detail.SCHEMA.load(data)
+    return cast(Detail, Detail.SCHEMA.load(data))
 
 
 def is_ok(resp: Response) -> bool:
@@ -116,8 +116,8 @@ class GGClient:
         method: str,
         endpoint: str,
         version: Optional[str] = DEFAULT_API_VERSION,
-        extra_headers: Dict[str, str] = None,
-        **kwargs
+        extra_headers: Optional[Dict[str, str]] = None,
+        **kwargs: Any,
     ) -> Response:
         url = self._url_from_endpoint(endpoint, version)
 
@@ -150,7 +150,7 @@ class GGClient:
         return VERSIONS.app_version
 
     @app_version.setter
-    def app_version(self, value: Optional[str]):
+    def app_version(self, value: Optional[str]) -> None:
         global VERSIONS
 
         VERSIONS.app_version = value
@@ -162,7 +162,7 @@ class GGClient:
         return VERSIONS.secrets_engine_version
 
     @secrets_engine_version.setter
-    def secrets_engine_version(self, value: Optional[str]):
+    def secrets_engine_version(self, value: Optional[str]) -> None:
         global VERSIONS
 
         VERSIONS.secrets_engine_version = value
@@ -172,7 +172,7 @@ class GGClient:
         endpoint: str,
         version: Optional[str] = DEFAULT_API_VERSION,
         extra_headers: Optional[Dict[str, str]] = None,
-        **kwargs
+        **kwargs: Any,
     ) -> Response:
         return self.request(
             method="get",
@@ -185,10 +185,10 @@ class GGClient:
     def post(
         self,
         endpoint: str,
-        data: str = None,
+        data: Optional[str] = None,
         version: str = DEFAULT_API_VERSION,
         extra_headers: Optional[Dict[str, str]] = None,
-        **kwargs
+        **kwargs: Any,
     ) -> Response:
         return self.request(
             "post",
@@ -243,6 +243,8 @@ class GGClient:
             data=request_obj,
             extra_headers=extra_headers,
         )
+
+        obj: Union[Detail, ScanResult]
         if is_ok(resp):
             obj = ScanResult.SCHEMA.load(resp.json())
         else:
@@ -284,6 +286,7 @@ class GGClient:
             extra_headers=extra_headers,
         )
 
+        obj: Union[Detail, MultiScanResult]
         if is_ok(resp):
             obj = MultiScanResult.SCHEMA.load(dict(scan_results=resp.json()))
         else:
@@ -309,6 +312,7 @@ class GGClient:
             extra_headers=extra_headers,
         )
 
+        obj: Union[Detail, QuotaResponse]
         if is_ok(resp):
             obj = QuotaResponse.SCHEMA.load(resp.json())
         else:

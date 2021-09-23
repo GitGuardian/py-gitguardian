@@ -3,13 +3,13 @@ interactions:
       body: '{"document": "valid", "filename": "valid"}'
       headers:
         Accept:
-          - "*/*"
+          - '*/*'
         Accept-Encoding:
           - gzip, deflate
         Connection:
           - keep-alive
         Content-Length:
-          - "42"
+          - '42'
         Content-Type:
           - application/json
         User-Agent:
@@ -25,7 +25,7 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "29"
+          - '29'
         Content-Type:
           - application/json
         Date:
@@ -51,13 +51,13 @@ interactions:
       body: '{"document": "valid", "filename": "valid"}'
       headers:
         Accept:
-          - "*/*"
+          - '*/*'
         Accept-Encoding:
           - gzip, deflate
         Connection:
           - keep-alive
         Content-Length:
-          - "42"
+          - '42'
         Content-Type:
           - application/json
         User-Agent:
@@ -73,7 +73,7 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "29"
+          - '29'
         Content-Type:
           - application/json
         Date:

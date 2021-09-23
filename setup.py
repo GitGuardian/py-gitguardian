@@ -9,15 +9,15 @@ VERSION_RE = re.compile(r"__version__\s*=\s*\"(.*?)\"")
 HERE = os.path.abspath(os.path.dirname(__file__))
 
 
-def read(*args):
+def read(*args: str) -> str:
     """Reads complete file contents."""
     return io.open(os.path.join(HERE, *args), encoding="utf-8").read()
 
 
-def get_version():
+def get_version() -> str:
     """Reads the version from this module."""
     init = read("pygitguardian", "__init__.py")
-    return VERSION_RE.search(init).group(1)
+    return VERSION_RE.search(init).group(1)  # type: ignore
 
 
 setup(
@@ -43,10 +43,9 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "Topic :: Security",
     ],
