@@ -418,7 +418,17 @@ def test_content_not_ok():
             True,
             id="filename_secret",
         ),
-        pytest.param("secret", {"document": DOCUMENT}, 1, True, True, id="secret"),
+        pytest.param(
+            "secret", {"document": DOCUMENT}, 1, True, True, id="secret (deprecated)"
+        ),
+        pytest.param(
+            "secret_validity",
+            {"document": DOCUMENT},
+            1,
+            True,
+            True,
+            id="secret with validity",
+        ),
         pytest.param(
             "filename",
             {"filename": FILENAME, "document": "normal"},
