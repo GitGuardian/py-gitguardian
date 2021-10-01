@@ -196,6 +196,7 @@ class Match(Base):
 class PolicyBreakSchema(BaseSchema):
     break_type = fields.String(data_key="type", required=True)
     policy = fields.String(required=True)
+    validity = fields.String(required=False, load_default=None, dump_default=None)
     matches = fields.List(fields.Nested(MatchSchema), required=True)
 
     @post_load
@@ -214,11 +215,17 @@ class PolicyBreak(Base):
     SCHEMA = PolicyBreakSchema()
 
     def __init__(
-        self, break_type: str, policy: str, matches: List[Match], **kwargs: Any
+        self,
+        break_type: str,
+        policy: str,
+        validity: Optional[str],
+        matches: List[Match],
+        **kwargs: Any,
     ) -> None:
         super().__init__()
         self.break_type = break_type
         self.policy = policy
+        self.validity = validity
         self.matches = matches
 
     @property
