@@ -20,7 +20,7 @@ with all the response codes and expected structures on each method.
 
 ## Requirements
 
-Python 3.5+
+Python 3.7+
 
 ## Projects using `py-gitguardian`
 
