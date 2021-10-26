@@ -18,6 +18,7 @@ from .config import DOCUMENT_SIZE_THRESHOLD_BYTES
 class BaseSchema(Schema):
     class Meta:
         ordered = True
+        unknown = EXCLUDE
 
 
 class Base:
@@ -47,9 +48,6 @@ class Base:
 
 
 class DocumentSchema(BaseSchema):
-    class Meta:
-        unknown = EXCLUDE
-
     filename = fields.String(validate=validate.Length(max=256), allow_none=True)
     document = fields.String(required=True)
 
