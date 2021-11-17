@@ -216,8 +216,8 @@ class PolicyBreak(Base):
         self,
         break_type: str,
         policy: str,
-        validity: Optional[str],
         matches: List[Match],
+        validity: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__()
@@ -482,9 +482,9 @@ class HealthCheckResponse(Base):
     def __init__(
         self,
         detail: str,
-        status_code: Optional[int],
-        app_version: Optional[str],
-        secrets_engine_version: Optional[str],
+        status_code: int,
+        app_version: Optional[str] = None,
+        secrets_engine_version: Optional[str] = None,
         **kwargs: Any,
     ):
         super().__init__()
