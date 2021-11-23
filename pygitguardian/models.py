@@ -216,8 +216,8 @@ class PolicyBreak(Base):
         self,
         break_type: str,
         policy: str,
+        validity: str,
         matches: List[Match],
-        validity: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__()
