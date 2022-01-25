@@ -81,7 +81,7 @@ class GGClient:
         :param user_agent: user agent to identify requests, defaults to ""
         :param timeout: request timeout, defaults to 20s
 
-        :raises ValueError: if the protocol is invalid
+        :raises ValueError: if the protocol or the api_key is invalid
         """
 
         if isinstance(base_uri, str):
@@ -92,6 +92,18 @@ class GGClient:
 
         if not isinstance(api_key, str):
             raise TypeError("api_key is not a string")
+
+        try:
+            # The requests module encodes headers in latin-1, if api_key contains
+            # characters which cannot be encoded in latin-1, the raised exception is
+            # going to be very obscure. Catch the problem early to raise a clearer
+            # exception.
+            # See https://github.com/GitGuardian/ggshield/issues/101
+            api_key.encode("latin-1")
+        except UnicodeEncodeError:
+            raise ValueError(
+                "Invalid value for API Key: must be only latin-1 characters."
+            )
 
         self.base_uri = base_uri
         self.api_key = api_key

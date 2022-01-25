@@ -179,6 +179,14 @@ EXAMPLE_RESPONSE = """
             None,
             id="Custom headers",
         ),
+        pytest.param(
+            "–––––––FILL-ME–––––––––",
+            "https://api.gitguardian.com/",
+            "None",
+            30.0,
+            ValueError,
+            id="U+2013 dash characters in API key",
+        ),
     ],
 )
 def test_client_creation(
