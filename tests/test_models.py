@@ -45,7 +45,27 @@ class TestModel:
             (
                 MultiScanResultSchema,
                 MultiScanResult,
-                {"scan_results": [], "type": "hello"},
+                {
+                    "scan_results": [
+                        {
+                            "policy_break_count": 1,
+                            "policies": ["pol"],
+                            "policy_breaks": [
+                                {
+                                    "type": "break",
+                                    "policy": "mypol",
+                                    "matches": [
+                                        {
+                                            "match": "hello",
+                                            "type": "hello",
+                                        }
+                                    ],
+                                }
+                            ],
+                        }
+                    ],
+                    "type": "hello",
+                },
             ),
             (
                 PolicyBreakSchema,
