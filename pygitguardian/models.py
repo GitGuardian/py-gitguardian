@@ -324,7 +324,7 @@ class MultiScanResultSchema(BaseSchema):
     scan_results = fields.List(
         fields.Nested(ScanResultSchema),
         required=True,
-        validates=validate.Length(min=1),
+        validate=validate.Length(min=1),
     )
 
     @post_load
