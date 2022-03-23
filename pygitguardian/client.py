@@ -11,6 +11,7 @@ from .config import (
     MULTI_DOCUMENT_LIMIT,
 )
 from .models import (
+    APITokenResponse,
     Detail,
     Document,
     HealthCheckResponse,
@@ -332,4 +333,25 @@ class GGClient:
 
         obj.status_code = resp.status_code
 
+        return obj
+
+    def api_token_information(
+        self, extra_headers: Optional[Dict[str, str]] = None
+    ) -> Union[Detail, APITokenResponse]:
+        """
+        api_token_information handles the /token endpoint of the API
+
+        :param extra_headers: additional headers to add to the request
+        :return: Detail or APIToken response and status code
+        """
+
+        resp = self.get(endpoint="token", extra_headers=extra_headers)
+
+        obj: Union[Detail, APITokenResponse]
+        if is_ok(resp):
+            obj = APITokenResponse.SCHEMA.load(resp.json())
+        else:
+            obj = load_detail(resp)
+
+        obj.status_code = resp.status_code
         return obj

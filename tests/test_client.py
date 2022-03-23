@@ -260,6 +260,16 @@ def test_client__url_from_endpoint(base_uries, version, endpoints_and_urls):
 
 
 @my_vcr.use_cassette
+def test_api_token_information(client: GGClient):
+    response = client.api_token_information()
+    assert response.status_code == 200
+    assert str(response) == "name:My Token"
+
+    assert type(response.to_dict()) == OrderedDict
+    assert type(response.to_json()) == str
+
+
+@my_vcr.use_cassette
 def test_health_check(client: GGClient):
     health = client.health_check()
     assert health.status_code == 200

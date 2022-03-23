@@ -3,6 +3,8 @@ from typing import OrderedDict
 import pytest
 
 from pygitguardian.models import (
+    APITokenResponse,
+    APITokenResponseSchema,
     Document,
     DocumentSchema,
     HealthCheckResponseSchema,
@@ -35,6 +37,17 @@ class TestModel:
     @pytest.mark.parametrize(
         "schema_klass, expected_klass, instance_data",
         [
+            (
+                APITokenResponseSchema,
+                APITokenResponse,
+                {
+                    "type": "personal_access_token",
+                    "account_id": 17,
+                    "name": "My Token",
+                    "scope": ["scan"],
+                    "expire_at": None,
+                },
+            ),
             (DocumentSchema, OrderedDict, {"filename": "hello", "document": "hello"}),
             (
                 HealthCheckResponseSchema,

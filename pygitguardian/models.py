@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from marshmallow import (
@@ -505,3 +505,51 @@ class HealthCheckResponse(Base):
                 self.secrets_engine_version or "",
             )
         )
+
+
+class APITokenResponseSchema(BaseSchema):
+    type = fields.String(allow_none=False)
+    account_id = fields.Int(allow_none=False)
+    name = fields.String(allow_none=False)
+    scope = fields.List(fields.String)
+    expire_at = fields.DateTime(allow_none=True)
+
+    @post_load
+    def make_api_token_response(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> "APITokenResponse":
+        return APITokenResponse(**data)
+
+
+class APITokenResponse(Base):
+    """
+    APIToken describes a quota category in the GitGuardian API.
+
+    Example:
+    {"type": "personal_access_token",
+     "account_id": 17,
+     "name": "My Token",
+     "scope": ["scan"],
+     "expire_at": "2021-04-18T00:00:00Z"}
+    """
+
+    SCHEMA = APITokenResponseSchema()
+
+    def __init__(
+        self,
+        type: str,
+        account_id: int,
+        name: str,
+        scope: List[str],
+        expire_at: Optional[datetime] = None,
+        **kwargs: Any,
+    ):
+        super().__init__()
+        self.type = type
+        self.account_id = account_id
+        self.name = name
+        self.scope = scope
+        self.expire_at = expire_at
+
+    def __repr__(self) -> str:
+        return "name:{0}".format(self.name)
