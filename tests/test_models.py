@@ -32,6 +32,12 @@ class TestModel:
         assert isinstance(document.to_dict(), dict)
         assert isinstance(str(document), str)
 
+    def test_document_handle_0_bytes(self):
+        document = Document.SCHEMA.load(
+            {"filename": "name", "document": "hello\0world"}
+        )
+        assert document["document"] == "hello\uFFFDworld"
+
     @pytest.mark.parametrize(
         "schema_klass, expected_klass, instance_data",
         [

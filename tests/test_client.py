@@ -362,12 +362,6 @@ def test_multi_content_scan(
             r"file exceeds the maximum allowed size",
             id="too large file",
         ),
-        pytest.param(
-            "dwhewe\x00ddw",
-            ValidationError,
-            r"document has null characters",
-            id="invalid type",
-        ),
     ],
 )
 def test_content_scan_exceptions(
@@ -436,6 +430,14 @@ def test_content_not_ok():
             True,
             True,
             id="secret with validity",
+        ),
+        pytest.param(
+            "document_with_0_bytes",
+            {"document": "Hello\0World"},
+            0,
+            False,
+            False,
+            id="Document containing a 0 byte",
         ),
         pytest.param(
             "filename",

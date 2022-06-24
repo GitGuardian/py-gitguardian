@@ -52,7 +52,7 @@ class DocumentSchema(BaseSchema):
     document = fields.String(required=True)
 
     @validates("document")
-    def validate_document(self, document: str) -> str:
+    def validate_document(self, document: str) -> None:
         """
         validate that document is smaller than scan limit
         """
@@ -64,10 +64,12 @@ class DocumentSchema(BaseSchema):
                 )
             )
 
-        if "\x00" in document:
-            raise ValidationError("document has null characters")
-
-        return document
+    @post_load
+    def replace_0_bytes(self, in_data: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
+        doc = in_data["document"]
+        # Our API does not accept 0 bytes in documents, so replace them with the replacement character
+        in_data["document"] = doc.replace("\0", "\uFFFD")
+        return in_data
 
 
 class Document(Base):
