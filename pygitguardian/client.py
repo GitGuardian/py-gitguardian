@@ -1,6 +1,8 @@
+import json
+import logging
 import platform
 import urllib.parse
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Mapping, Optional, Union, cast
 
 from requests import Response, Session, codes
 
@@ -26,6 +28,9 @@ class Versions:
 
 
 VERSIONS = Versions()
+
+
+logger = logging.getLogger(__name__)
 
 
 def load_detail(resp: Response) -> Detail:
@@ -138,8 +143,30 @@ class GGClient:
             if extra_headers
             else self.session.headers
         )
+
+        class HeaderLog:
+            """Defer turning the `headers` dict into a string unless logger really needs
+            it. Obfuscate any Authorization header."""
+
+            def __init__(self, headers: Mapping[str, Any]) -> None:
+                self.headers = headers
+
+            def __str__(self) -> str:
+                headers = dict(self.headers)
+                if "Authorization" in headers:
+                    headers["Authorization"] = "XXX"
+                return json.dumps(headers, indent=2, sort_keys=True)
+
+        logger.debug(
+            "Sending a %s request to %s. headers=%s", method, url, HeaderLog(headers)
+        )
         response: Response = self.session.request(
             method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
+        )
+        logger.debug(
+            "Response=%d. Headers=%s",
+            response.status_code,
+            json.dumps(dict(response.headers), indent=2, sort_keys=True),
         )
 
         self.app_version = response.headers.get("X-App-Version", self.app_version)
