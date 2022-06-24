@@ -236,7 +236,10 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, ScanResult]:
         """
-        content_scan handles the /scan endpoint of the API
+        content_scan handles the /scan endpoint of the API.
+
+        If document contains `0` bytes, they will be replaced with the Unicode
+        replacement character.
 
         :param filename: name of file, example: "intro.py"
         :param document: content of file
@@ -272,7 +275,10 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, MultiScanResult]:
         """
-        multi_content_scan handles the /multiscan endpoint of the API
+        multi_content_scan handles the /multiscan endpoint of the API.
+
+        If documents contain `0` bytes, they will be replaced with the Unicode
+        replacement character.
 
         :param documents: List of dictionaries containing the keys document
         and, optionally, filename.
