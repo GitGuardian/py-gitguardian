@@ -1,4 +1,5 @@
 import json
+import re
 from collections import OrderedDict
 from datetime import date
 from typing import Any, Dict, List, Optional, Type
@@ -264,10 +265,8 @@ def test_health_check(client: GGClient):
     health = client.health_check()
     assert health.status_code == 200
     assert health.detail == "Valid API key."
-    assert str(health) == (
-        "detail:Valid API key., status_code:200, "
-        "app version:1.26.0-rc.4, secrets engine version:2.43.0"
-    )
+    assert re.match(r"^v\d+\.\d+\.\d+([-0-9.rc])?$", health.app_version)
+    assert re.match(r"^\d+\.\d+\.\d+$", health.secrets_engine_version)
     assert bool(health)
     assert health.success
 
@@ -556,10 +555,10 @@ def test_quota_overview(client: GGClient):
         assert type(str(quota_response)) == str
         assert quota_response.status_code == 200
         if isinstance(quota_response, QuotaResponse):
-            assert quota_response.content.limit == 5000
-            assert quota_response.content.count == 2
-            assert quota_response.content.remaining == 4998
-            assert quota_response.content.since == date(2021, 4, 18)
+            content = quota_response.content
+            assert content.count + content.remaining == content.limit
+            assert content.limit == 10000
+            assert 2021 <= content.since.year <= date.today().year
         else:
             pytest.fail("returned should be a QuotaResponse")
 

@@ -9,15 +9,17 @@ interactions:
         Connection:
           - keep-alive
         User-Agent:
-          - pygitguardian/1.1.0 (Linux;py3.8.3)
+          - pygitguardian/1.3.4 (Linux;py3.8.10)
       method: GET
       uri: https://api.gitguardian.com/v1/health
     response:
       body:
         string: '{"detail":"Valid API key."}'
       headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
         Allow:
-          - OPTIONS, GET
+          - GET, HEAD, OPTIONS
         Connection:
           - keep-alive
         Content-Length:
@@ -25,61 +27,32 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 19 Jun 2020 13:32:39 GMT
+          - Thu, 30 Jun 2022 10:29:31 GMT
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
         Server:
           - nginx
+        Set-Cookie:
+          - AWSALB=ZAU9JIicUlzJUNwRc9mylRpa+xGHlXk7K6hR4AXPyVGxpv6RzWENXH+X6DekAaXLAqGr8GCssUXwqYsvRjfFPtGZd53wkfYQJmrmBAMw1ZNexucrzoXCmEycJsHU;
+            Expires=Thu, 07 Jul 2022 10:29:31 GMT; Path=/
+          - AWSALBCORS=ZAU9JIicUlzJUNwRc9mylRpa+xGHlXk7K6hR4AXPyVGxpv6RzWENXH+X6DekAaXLAqGr8GCssUXwqYsvRjfFPtGZd53wkfYQJmrmBAMw1ZNexucrzoXCmEycJsHU;
+            Expires=Thu, 07 Jul 2022 10:29:31 GMT; Path=/; SameSite=None; Secure
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains
         Vary:
           - Cookie
+        X-App-Version:
+          - v2.8.1
         X-Content-Type-Options:
+          - nosniff
           - nosniff
         X-Frame-Options:
           - DENY
-        X-App-Version:
-          - 1.26.0-rc.4
+          - SAMEORIGIN
         X-Secrets-Engine-Version:
-          - 2.43.0
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate
-        Connection:
-          - keep-alive
-        User-Agent:
-          - pygitguardian/1.1.0 (Linux;py3.8.3)
-      method: GET
-      uri: https://api.gitguardian.com/v1/health
-    response:
-      body:
-        string: '{"detail":"Valid API key."}'
-      headers:
-        Allow:
-          - OPTIONS, GET
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '27'
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 19 Jun 2020 14:58:35 GMT
-        Server:
-          - nginx
-        Vary:
-          - Cookie
-        X-Content-Type-Options:
-          - nosniff
-        X-Frame-Options:
-          - DENY
-        X-App-Version:
-          - 1.26.0-rc.4
-        X-Secrets-Engine-Version:
-          - 2.43.0
+          - 2.70.0
+        X-XSS-Protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
