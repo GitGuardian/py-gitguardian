@@ -468,15 +468,16 @@ def test_content_scan(
 
 
 @my_vcr.use_cassette
-def test_assert_content_type(client: GGClient):
+def test_assert_content_type():
     """
     GIVEN a response that's 200 but the content is not JSON
     WHEN is_ok is called
     THEN is_ok should be false
     WHEN load_detail is called
-    THEN is should return a Detail object
+    THEN it should return a Detail object
     """
-    resp = client.get(endpoint="/docs/static/logo.png", version=None)
+    client = GGClient(api_key="", base_uri="https://docs.gitguardian.com")
+    resp = client.get(endpoint="/img/gg_owl.svg", version=None)
     assert is_ok(resp) is False
     obj = load_detail(resp)
     obj.status_code = resp.status_code
