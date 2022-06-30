@@ -115,7 +115,6 @@ class Detail(Base):
     api output is a simple string.
 
     Attributes:
-        status_code (int): response status code
         detail (str): response string
     """
 
