@@ -3,6 +3,8 @@ from typing import OrderedDict
 import pytest
 
 from pygitguardian.models import (
+    Detail,
+    DetailSchema,
     Document,
     DocumentSchema,
     HealthCheckResponseSchema,
@@ -110,6 +112,11 @@ class TestModel:
                 ScanResult,
                 {"policy_break_count": 1, "policy_breaks": [], "policies": []},
             ),
+            (
+                DetailSchema,
+                Detail,
+                {"detail": "Fail"},
+            ),
         ],
     )
     def test_schema_loads(self, schema_klass, expected_klass, instance_data):
@@ -125,3 +132,12 @@ class TestModel:
 
         obj = schema.load(data)
         assert isinstance(obj, expected_klass)
+
+    def test_detail_renames_error_field(self):
+        """
+        GIVEN a Detail JSON dict with an `error` field instead of a `detail` field
+        WHEN loading using the schema
+        THEN the created Detail instance contains a `detail` field with the right value
+        """
+        detail = Detail.SCHEMA.load({"error": "An error message"})
+        assert detail.detail == "An error message"

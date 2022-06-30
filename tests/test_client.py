@@ -275,22 +275,6 @@ def test_health_check(client: GGClient):
     assert type(health.to_json()) == str
 
 
-@my_vcr.use_cassette
-def test_health_check_error(client: GGClient):
-    health = client.health_check()
-    assert health.status_code == 400
-    assert health.detail == "Configuration error."
-    assert str(health) == (
-        "detail:Configuration error., status_code:400, "
-        "app version:1.26.0-rc.4, secrets engine version:2.43.0"
-    )
-    assert bool(health) is False
-    assert health.success is False
-
-    assert type(health.to_dict()) == OrderedDict
-    assert type(health.to_json()) == str
-
-
 @pytest.mark.parametrize(
     "name, to_scan, expected, has_secrets, has_policy_breaks",
     [
