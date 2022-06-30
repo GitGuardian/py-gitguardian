@@ -13,15 +13,17 @@ interactions:
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.1.0 (Linux;py3.8.3)
+          - pygitguardian/1.3.4 (Linux;py3.8.10)
       method: POST
       uri: https://api.gitguardian.com/v1/multiscan
     response:
       body:
         string: '{"detail":"Invalid API key."}'
       headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
         Allow:
-          - OPTIONS, POST
+          - POST, OPTIONS
         Connection:
           - keep-alive
         Content-Length:
@@ -29,69 +31,33 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 19 Jun 2020 13:32:45 GMT
+          - Thu, 30 Jun 2022 10:29:35 GMT
+        Referrer-Policy:
+          - strict-origin-when-cross-origin
         Server:
           - nginx
+        Set-Cookie:
+          - AWSALB=iASCo3J8fcIwk17mVKrGNJZZn6v8pGg7jhcqQD7mgG5Hu0Y3JrLJQWoCZF83mu4pHSdv39X1KcvItzwNtN2ujdKBIxmdLUCCvsrpqTUz7o+dAxD086VHKmt81cWh;
+            Expires=Thu, 07 Jul 2022 10:29:35 GMT; Path=/
+          - AWSALBCORS=iASCo3J8fcIwk17mVKrGNJZZn6v8pGg7jhcqQD7mgG5Hu0Y3JrLJQWoCZF83mu4pHSdv39X1KcvItzwNtN2ujdKBIxmdLUCCvsrpqTUz7o+dAxD086VHKmt81cWh;
+            Expires=Thu, 07 Jul 2022 10:29:35 GMT; Path=/; SameSite=None; Secure
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains
         Vary:
           - Cookie
         WWW-Authenticate:
           - Token
+        X-App-Version:
+          - v2.8.1
         X-Content-Type-Options:
+          - nosniff
           - nosniff
         X-Frame-Options:
           - DENY
-        X-App-Version:
-          - 1.26.0-rc.4
         X-Secrets-Engine-Version:
-          - 2.43.0
-      status:
-        code: 401
-        message: Unauthorized
-  - request:
-      body: '[{"document": "valid"}]'
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '23'
-        Content-Type:
-          - application/json
-        User-Agent:
-          - pygitguardian/1.1.0 (Linux;py3.8.3)
-      method: POST
-      uri: https://api.gitguardian.com/v1/multiscan
-    response:
-      body:
-        string: '{"detail":"Invalid API key."}'
-      headers:
-        Allow:
-          - OPTIONS, POST
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '29'
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 19 Jun 2020 14:58:38 GMT
-        Server:
-          - nginx
-        Vary:
-          - Cookie
-        WWW-Authenticate:
-          - Token
-        X-Content-Type-Options:
-          - nosniff
-        X-Frame-Options:
-          - DENY
-        X-App-Version:
-          - 1.26.0-rc.4
-        X-Secrets-Engine-Version:
-          - 2.43.0
+          - 2.70.0
+        X-XSS-Protection:
+          - 1; mode=block
       status:
         code: 401
         message: Unauthorized
