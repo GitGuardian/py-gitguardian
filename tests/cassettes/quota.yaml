@@ -9,33 +9,50 @@ interactions:
         Connection:
           - keep-alive
         User-Agent:
-          - pygitguardian/1.1.3 (Linux;py3.9.5)
+          - pygitguardian/1.3.4 (Linux;py3.8.10)
       method: GET
       uri: https://api.gitguardian.com/v1/quotas
     response:
       body:
-        string: '{"content": {"count": 2,"limit": 5000,"remaining": 4998,"since": "2021-04-18"}}'
+        string: '{"content":{"count":1092,"limit":10000,"remaining":8908,"since":"2022-05-31"}}'
       headers:
         Access-Control-Expose-Headers:
           - X-App-Version
+        Allow:
+          - GET, HEAD, OPTIONS
         Connection:
           - keep-alive
         Content-Length:
-          - '79'
+          - '78'
         Content-Type:
           - application/json
         Date:
-          - Wed, 19 May 2021 15:57:19 GMT
+          - Thu, 30 Jun 2022 10:29:43 GMT
         Referrer-Policy:
-          - same-origin
+          - strict-origin-when-cross-origin
         Server:
           - nginx
+        Set-Cookie:
+          - AWSALB=VrB3AmmOenUGpcQmmBHpD0IPTpDMLjk+9jYaMY0CHng7krkcm7W6MOcLTgFUARmhhvAFbzeiLnNXuClqxjvf42e/qfYZkv5fRm35bkE69HfBN8CGjcv+8uCCW40a;
+            Expires=Thu, 07 Jul 2022 10:29:43 GMT; Path=/
+          - AWSALBCORS=VrB3AmmOenUGpcQmmBHpD0IPTpDMLjk+9jYaMY0CHng7krkcm7W6MOcLTgFUARmhhvAFbzeiLnNXuClqxjvf42e/qfYZkv5fRm35bkE69HfBN8CGjcv+8uCCW40a;
+            Expires=Thu, 07 Jul 2022 10:29:43 GMT; Path=/; SameSite=None; Secure
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains
+        Vary:
+          - Cookie
         X-App-Version:
-          - 1.26.0-rc.4
+          - v2.8.1
+        X-Content-Type-Options:
+          - nosniff
+          - nosniff
+        X-Frame-Options:
+          - DENY
+          - SAMEORIGIN
         X-Secrets-Engine-Version:
-          - 2.43.0
+          - 2.70.0
+        X-XSS-Protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
