@@ -1,6 +1,6 @@
 interactions:
   - request:
-      body: '{"document": "Hello World"}'
+      body: '{"document": "Hello\ufffdWorld"}'
       headers:
         Accept:
           - '*/*'
@@ -9,7 +9,7 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '27'
+          - '32'
         Content-Type:
           - application/json
         User-Agent:
@@ -33,22 +33,22 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 24 Jun 2022 16:08:40 GMT
+          - Thu, 30 Jun 2022 10:29:40 GMT
         Referrer-Policy:
           - strict-origin-when-cross-origin
         Server:
           - nginx
         Set-Cookie:
-          - AWSALB=jzG+lNYQFwVa/HLEk17W6yiGRSKg6NTA2/1+uOmn+n5jG7J03MudYdFdbtJdN7+y9jwsoul66j7dHclQD7B8ZRa4FWTZJO3AeCHhfcZQxhwEb5uko4OvEhi9jD2o;
-            Expires=Fri, 01 Jul 2022 16:08:40 GMT; Path=/
-          - AWSALBCORS=jzG+lNYQFwVa/HLEk17W6yiGRSKg6NTA2/1+uOmn+n5jG7J03MudYdFdbtJdN7+y9jwsoul66j7dHclQD7B8ZRa4FWTZJO3AeCHhfcZQxhwEb5uko4OvEhi9jD2o;
-            Expires=Fri, 01 Jul 2022 16:08:40 GMT; Path=/; SameSite=None; Secure
+          - AWSALB=WA3Tk6K80taEJdzPSjtKcTNQolkPt3iwPang+9+v8yEs4lAq8ra2jag95ypynFTbLRIMcIVlrRREnu/ZeTjqt7uNt1y0jk2b1cx2TAG7MY7MmuLL9T+NLJzSN6DD;
+            Expires=Thu, 07 Jul 2022 10:29:40 GMT; Path=/
+          - AWSALBCORS=WA3Tk6K80taEJdzPSjtKcTNQolkPt3iwPang+9+v8yEs4lAq8ra2jag95ypynFTbLRIMcIVlrRREnu/ZeTjqt7uNt1y0jk2b1cx2TAG7MY7MmuLL9T+NLJzSN6DD;
+            Expires=Thu, 07 Jul 2022 10:29:40 GMT; Path=/; SameSite=None; Secure
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains
         Vary:
           - Cookie
         X-App-Version:
-          - v2.7.5
+          - v2.8.1
         X-Content-Type-Options:
           - nosniff
           - nosniff
@@ -56,7 +56,7 @@ interactions:
           - DENY
           - SAMEORIGIN
         X-Secrets-Engine-Version:
-          - 2.69.0
+          - 2.70.0
         X-XSS-Protection:
           - 1; mode=block
       status:
