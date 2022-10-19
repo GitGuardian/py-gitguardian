@@ -1,10 +1,12 @@
-paths-ignore:
-  - Makefile
-  - .gitignore
-  - CONTRIBUTING.md
-  - LICENSE
-  - README.md
-  - doc/**/*
-
-matches-ignore:
-  - 5e9107aedc48b14af2749703ed3f83c2e1e6aca82ed86af980a2b925708c2da6
+secret:
+  ignored-matches:
+    - match: 5e9107aedc48b14af2749703ed3f83c2e1e6aca82ed86af980a2b925708c2da6
+      name: ''
+  ignored-paths:
+    - doc/**/*
+    - README.md
+    - CONTRIBUTING.md
+    - Makefile
+    - .gitignore
+    - LICENSE
+version: 2
