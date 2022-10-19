@@ -548,6 +548,52 @@ def test_extra_headers(
     assert expected_headers == kwargs["headers"]
 
 
+@patch("requests.Session.request")
+def test_multiscan_parameters(
+    request_mock: Mock,
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling multi_content_scan with parameters
+    THEN the parameters are passed in the request
+    """
+    mock_response = Mock(spec=Response)
+    mock_response.headers = {"content-type": "application/json"}
+    mock_response.status_code = 200
+    mock_response.json.return_value = [
+        {
+            "policy_break_count": 1,
+            "policies": ["pol"],
+            "policy_breaks": [
+                {
+                    "type": "break",
+                    "policy": "mypol",
+                    "matches": [
+                        {
+                            "match": "hello",
+                            "type": "hello",
+                        }
+                    ],
+                }
+            ],
+        }
+    ]
+
+    request_mock.return_value = mock_response
+
+    params = {"ignore_known_secrets": True}
+
+    client.multi_content_scan(
+        [{"filename": FILENAME, "document": DOCUMENT}],
+        ignore_known_secrets=True,
+    )
+
+    assert request_mock.called
+    # 1 is for kwargs
+    assert request_mock.call_args[1]["params"] == params
+
+
 def test_quota_overview(client: GGClient):
     with my_vcr.use_cassette("quota.yaml"):
         quota_response = client.quota_overview()

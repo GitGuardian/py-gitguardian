@@ -147,3 +147,23 @@ class TestModel:
         """
         detail = Detail.SCHEMA.load({"error": "An error message"})
         assert detail.detail == "An error message"
+
+    @pytest.mark.parametrize("known_secret", [True, False])
+    def test_policy_break_known_secret_field(self, known_secret):
+        """
+        GIVEN the data with policy breaks
+        WHEN loading using the schema
+        THEN known_secret is parsed correctly with the default value set to False
+        """
+        data = {
+            "type": "hello",
+            "policy": "hello",
+            "validity": "hey",
+            "matches": [{"match": "hello", "type": "hello"}],
+        }
+        if known_secret:
+            data["known_secret"] = True
+
+        obj = PolicyBreakSchema().load(data)
+
+        assert obj.known_secret is known_secret

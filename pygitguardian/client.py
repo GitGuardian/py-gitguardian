@@ -273,6 +273,7 @@ class GGClient:
         self,
         documents: List[Dict[str, str]],
         extra_headers: Optional[Dict[str, str]] = None,
+        ignore_known_secrets: Optional[bool] = None,
     ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API.
@@ -284,6 +285,7 @@ class GGClient:
         and, optionally, filename.
             example: [{"document":"example content","filename":"intro.py"}]
         :param extra_headers: additional headers to add to the request
+        :param ignore_known_secrets: indicates whether known secrets should be ignored
         :return: Detail or ScanResult response and status code
         """
         if len(documents) > MULTI_DOCUMENT_LIMIT:
@@ -298,10 +300,16 @@ class GGClient:
         else:
             raise TypeError("each document must be a dict")
 
+        params = (
+            {"ignore_known_secrets": ignore_known_secrets}
+            if ignore_known_secrets
+            else {}
+        )
         resp = self.post(
             endpoint="multiscan",
             data=request_obj,
             extra_headers=extra_headers,
+            params=params,
         )
 
         obj: Union[Detail, MultiScanResult]
