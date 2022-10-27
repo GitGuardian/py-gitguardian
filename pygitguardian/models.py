@@ -56,7 +56,7 @@ class DocumentSchema(BaseSchema):
         """
         validate that document is smaller than scan limit
         """
-        encoded = document.encode("utf-8")
+        encoded = document.encode("utf-8", errors="replace")
         if len(encoded) > DOCUMENT_SIZE_THRESHOLD_BYTES:
             raise ValidationError(
                 "file exceeds the maximum allowed size of {}B".format(
@@ -69,6 +69,15 @@ class DocumentSchema(BaseSchema):
         doc = in_data["document"]
         # Our API does not accept 0 bytes in documents, so replace them with the replacement character
         in_data["document"] = doc.replace("\0", "\uFFFD")
+        return in_data
+
+    @post_load
+    def force_utf_8_encoding(
+        self, in_data: Dict[str, Any], **kwargs: Any
+    ) -> Dict[str, Any]:
+        doc = in_data["document"]
+        # Force UTF-8 and substitute ? for encoding errors
+        in_data["document"] = doc.encode("utf-8", errors="replace").decode("utf-8")
         return in_data
 
 
