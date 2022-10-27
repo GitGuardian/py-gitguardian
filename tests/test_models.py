@@ -40,6 +40,12 @@ class TestModel:
         )
         assert document["document"] == "hello\uFFFDworld"
 
+    def test_document_handle_surrogates(self):
+        document = Document.SCHEMA.load(
+            {"filename": "name", "document": "hello\udbdeworld"}
+        )
+        assert document["document"] == "hello?world", document
+
     @pytest.mark.parametrize(
         "schema_klass, expected_klass, instance_data",
         [
