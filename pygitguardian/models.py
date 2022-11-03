@@ -205,6 +205,7 @@ class PolicyBreakSchema(BaseSchema):
     break_type = fields.String(data_key="type", required=True)
     policy = fields.String(required=True)
     validity = fields.String(required=False, load_default=None, dump_default=None)
+    known_secret = fields.Boolean(required=False, load_default=False, dump_default=None)
     matches = fields.List(fields.Nested(MatchSchema), required=True)
 
     @post_load
@@ -228,12 +229,14 @@ class PolicyBreak(Base):
         policy: str,
         validity: str,
         matches: List[Match],
+        known_secret: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__()
         self.break_type = break_type
         self.policy = policy
         self.validity = validity
+        self.known_secret = known_secret
         self.matches = matches
 
     @property
