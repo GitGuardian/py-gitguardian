@@ -1,7 +1,13 @@
+import os
 import platform
+import tarfile
 import urllib.parse
+from io import BytesIO
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
 
+import click
+import requests
 from requests import Response, Session, codes
 
 from .config import (
@@ -9,6 +15,12 @@ from .config import (
     DEFAULT_BASE_URI,
     DEFAULT_TIMEOUT,
     MULTI_DOCUMENT_LIMIT,
+)
+from .iac_models import (
+    IaCScanParameters,
+    IaCScanParametersSchema,
+    IaCScanResult,
+    IaCScanResultSchema,
 )
 from .models import (
     Detail,
@@ -18,6 +30,10 @@ from .models import (
     QuotaResponse,
     ScanResult,
 )
+
+
+# max files size to create a tar from
+MAX_TAR_CONTENT_SIZE = 30 * 1024 * 1024
 
 
 class Versions:
@@ -55,6 +71,27 @@ def is_ok(resp: Response) -> bool:
         resp.headers["content-type"] == "application/json"
         and resp.status_code == codes.ok
     )
+
+
+def _create_tar(root_path: Path, filenames: List[str]) -> bytes:
+    """
+    :param root_path: the root_path from which the tar is created
+    :param files: the files which need to be added to the tar, filenames should be the paths relative to the root_path
+    :return: a bytes object containing the tar.gz created from the files, with paths relative to root_path
+    """
+    tar_stream = BytesIO()
+    current_dir_size = 0
+    with tarfile.open(fileobj=tar_stream, mode="w:gz") as tar:
+        for filename in filenames:
+            full_path = root_path / filename
+            current_dir_size += os.path.getsize(full_path)
+            if current_dir_size > MAX_TAR_CONTENT_SIZE:
+                raise click.ClickException(
+                    f"The total size of the files processed exceeds {MAX_TAR_CONTENT_SIZE / (1024 * 1024):.0f}MB, "
+                    f"please try again with less files"
+                )
+            tar.add(full_path, filename)
+    return tar_stream.getvalue()
 
 
 class GGClient:
@@ -197,7 +234,7 @@ class GGClient:
     def post(
         self,
         endpoint: str,
-        data: Optional[str] = None,
+        data: Optional[Dict[str, str]] = None,
         version: str = DEFAULT_API_VERSION,
         extra_headers: Optional[Dict[str, str]] = None,
         **kwargs: Any,
@@ -347,3 +384,38 @@ class GGClient:
         obj.status_code = resp.status_code
 
         return obj
+
+    # For IaC Scans
+    def iac_directory_scan(
+        self,
+        directory: Path,
+        filenames: List[str],
+        scan_parameters: IaCScanParameters,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, IaCScanResult]:
+
+        tar = _create_tar(directory, filenames)
+        result: Union[Detail, IaCScanResult]
+        try:
+            resp = self.post(
+                endpoint="iac_scan",
+                extra_headers=extra_headers,
+                files={
+                    "directory": tar,
+                },
+                data={
+                    "scan_parameters": IaCScanParametersSchema().dumps(scan_parameters),
+                },
+            )
+        except requests.exceptions.ReadTimeout:
+            result = Detail("The request timed out.")
+            result.status_code = 504
+        else:
+            if is_ok(resp):
+                result = IaCScanResultSchema().load(resp.json())
+            else:
+                result = load_detail(resp)
+
+            result.status_code = resp.status_code
+
+        return result
