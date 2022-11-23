@@ -1,9 +1,13 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Main
 
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      # Only build on pushes to the main branch, otherwise branches pushed for PR
+      # are built twice
+      - main
+    tags:
 
 jobs:
   lint:
@@ -17,7 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade pipenv
+          python -m pip install --upgrade pipenv==2022.10.4
           pipenv install --dev --system --skip-lock
       - name: Lint with flake8
         run: |
@@ -29,9 +33,10 @@ jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
@@ -41,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --upgrade pipenv
+          python -m pip install --upgrade pipenv==2022.10.4
           pipenv install --system --dev --skip-lock
       - name: Test with pytest
         run: |
