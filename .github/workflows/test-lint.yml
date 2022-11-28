@@ -9,6 +9,7 @@ on:
       # are built twice
       - master
     tags:
+      - 'v*'
 
 jobs:
   lint:
