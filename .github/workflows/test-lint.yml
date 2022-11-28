@@ -2,11 +2,12 @@ name: Main
 
 on:
   pull_request:
+  workflow_dispatch:
   push:
     branches:
       # Only build on pushes to the main branch, otherwise branches pushed for PR
       # are built twice
-      - main
+      - master
     tags:
 
 jobs:
