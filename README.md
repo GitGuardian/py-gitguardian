@@ -5,7 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pygitguardian?color=%231B2D55&style=for-the-badge)](https://pypi.org/project/pygitguardian/)
 [![License](https://img.shields.io/github/license/GitGuardian/py-gitguardian?color=%231B2D55&style=for-the-badge)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/gitguardian/py-gitguardian?color=%231B2D55&style=for-the-badge)](https://github.com/GitGuardian/py-gitguardian/stargazers)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/GitGuardian/py-gitguardian/Main?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/GitGuardian/py-gitguardian/test-lint.yml?branch=master&style=for-the-badge)
 [![Codecov](https://img.shields.io/codecov/c/github/GitGuardian/py-gitguardian?style=for-the-badge)](https://codecov.io/gh/GitGuardian/py-gitguardian/)
 
 API client library for the [GitGuardian API](https://api.gitguardian.com/).
