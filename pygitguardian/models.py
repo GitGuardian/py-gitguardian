@@ -100,7 +100,7 @@ class Document(Base):
             self.filename = filename
 
     def __repr__(self) -> str:
-        return "filename:{0}, document:{1}".format(self.filename, self.document)
+        return f"filename:{self.filename}, document:{self.document}"
 
 
 class DetailSchema(BaseSchema):
@@ -134,7 +134,7 @@ class Detail(Base):
         self.detail = detail
 
     def __repr__(self) -> str:
-        return "{0}:{1}".format(self.status_code, self.detail)
+        return f"{self.status_code}:{self.detail}"
 
 
 class MatchSchema(BaseSchema):
@@ -185,12 +185,12 @@ class Match(Base):
 
     def __repr__(self) -> str:
         return (
-            "match:{0}, "
-            "match_type:{1}, "
-            "line_start:{2}, "
-            "line_end:{3}, "
-            "index_start:{4}, "
-            "index_end:{5}".format(
+            "match:{}, "
+            "match_type:{}, "
+            "line_start:{}, "
+            "line_end:{}, "
+            "index_start:{}, "
+            "index_end:{}".format(
                 self.match,
                 self.match_type,
                 repr(self.line_start),
@@ -245,9 +245,9 @@ class PolicyBreak(Base):
 
     def __repr__(self) -> str:
         return (
-            "break_type:{0}, "
-            "policy:{1}, "
-            "matches: {2}".format(self.break_type, self.policy, repr(self.matches))
+            "break_type:{}, "
+            "policy:{}, "
+            "matches: {}".format(self.break_type, self.policy, repr(self.matches))
         )
 
 
@@ -319,15 +319,15 @@ class ScanResult(Base):
 
     def __repr__(self) -> str:
         return (
-            "policy_break_count:{0}, "
-            "policies:{1}, "
-            "policy_breaks: {2}".format(
+            "policy_break_count:{}, "
+            "policies:{}, "
+            "policy_breaks: {}".format(
                 self.policy_break_count, self.policies, self.policy_breaks
             )
         )
 
     def __str__(self) -> str:
-        return "{0} policy breaks from the evaluated policies: {1}".format(
+        return "{} policy breaks from the evaluated policies: {}".format(
             self.policy_break_count,
             ", ".join(policy_break.policy for policy_break in self.policy_breaks),
         )
@@ -391,10 +391,10 @@ class MultiScanResult(Base):
         return any(scan_result.has_secrets for scan_result in self.scan_results)
 
     def __repr__(self) -> str:
-        return "scan_results:{0}".format(self.scan_results)
+        return f"scan_results:{self.scan_results}"
 
     def __str__(self) -> str:
-        return "{0} scan results containing {1} policy breaks".format(
+        return "{} scan results containing {} policy breaks".format(
             len(self.scan_results),
             len(
                 [
@@ -441,10 +441,10 @@ class Quota(Base):
 
     def __repr__(self) -> str:
         return (
-            "count:{0}, "
-            "limit:{1}, "
-            "remaining:{2}, "
-            "since:{3}".format(
+            "count:{}, "
+            "limit:{}, "
+            "remaining:{}, "
+            "since:{}".format(
                 self.count, self.limit, self.remaining, self.since.isoformat()
             )
         )
@@ -479,7 +479,7 @@ class QuotaResponse(Base):
         self.content = content
 
     def __repr__(self) -> str:
-        return "content:{0}".format(repr(self.content))
+        return f"content:{repr(self.content)}"
 
 
 class HealthCheckResponseSchema(BaseSchema):
@@ -508,10 +508,10 @@ class HealthCheckResponse(Base):
 
     def __repr__(self) -> str:
         return (
-            "detail:{0}, "
-            "status_code:{1}, "
-            "app version:{2}, "
-            "secrets engine version:{3}".format(
+            "detail:{}, "
+            "status_code:{}, "
+            "app version:{}, "
+            "secrets engine version:{}".format(
                 self.detail,
                 self.status_code,
                 self.app_version or "",
