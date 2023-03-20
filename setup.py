@@ -33,8 +33,8 @@ setup(
     author_email="support@gitguardian.com",
     maintainer="GitGuardian",
     install_requires=[
-        "marshmallow>=3.5",
-        "requests>=2",
+        "marshmallow>=3.5, <4",
+        "requests>=2, <3",
         "marshmallow-dataclass >=8.5.8, <8.6.0",
     ],
     include_package_data=True,
