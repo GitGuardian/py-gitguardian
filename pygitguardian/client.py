@@ -6,7 +6,6 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
 
-import click
 import requests
 from requests import Response, Session, codes
 
@@ -34,6 +33,14 @@ from .models import (
 
 # max files size to create a tar from
 MAX_TAR_CONTENT_SIZE = 30 * 1024 * 1024
+
+
+class ContentTooLarge(Exception):
+    """
+    Raised if the total size of files sent by the client exceeds MAX_TAR_CONTENT_SIZE
+    """
+
+    pass
 
 
 class Versions:
@@ -86,7 +93,7 @@ def _create_tar(root_path: Path, filenames: List[str]) -> bytes:
             full_path = root_path / filename
             current_dir_size += os.path.getsize(full_path)
             if current_dir_size > MAX_TAR_CONTENT_SIZE:
-                raise click.ClickException(
+                raise ContentTooLarge(
                     f"The total size of the files processed exceeds {MAX_TAR_CONTENT_SIZE / (1024 * 1024):.0f}MB, "
                     f"please try again with less files"
                 )
@@ -393,7 +400,6 @@ class GGClient:
         scan_parameters: IaCScanParameters,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, IaCScanResult]:
-
         tar = _create_tar(directory, filenames)
         result: Union[Detail, IaCScanResult]
         try:

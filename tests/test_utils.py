@@ -2,10 +2,9 @@ import tarfile
 from io import BytesIO
 from unittest import mock
 
-import click
 import pytest
 
-from pygitguardian.client import _create_tar
+from pygitguardian.client import ContentTooLarge, _create_tar
 
 
 def test_create_tar(tmp_path):
@@ -44,7 +43,7 @@ def test_create_tar_cannot_exceed_max_tar_content_size(tmp_path):
         (tmp_path / file2_name).write_text("")
 
         with pytest.raises(
-            click.ClickException,
+            ContentTooLarge,
             match=r"The total size of the files processed exceeds \d+MB, please try again with less files",
         ):
             _create_tar(tmp_path, [file1_name, file2_name])
