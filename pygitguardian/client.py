@@ -153,7 +153,7 @@ class GGClient:
         self.api_key = api_key
         self.session = session if isinstance(session, Session) else Session()
         self.timeout = timeout
-        self.user_agent = "pygitguardian/{0} ({1};py{2})".format(
+        self.user_agent = "pygitguardian/{} ({};py{})".format(
             self._version, platform.system(), platform.python_version()
         )
 
@@ -163,7 +163,7 @@ class GGClient:
         self.session.headers.update(
             {
                 "User-Agent": self.user_agent,
-                "Authorization": "Token {0}".format(api_key),
+                "Authorization": f"Token {api_key}",
             },
         )
 
@@ -334,9 +334,7 @@ class GGClient:
         """
         if len(documents) > MULTI_DOCUMENT_LIMIT:
             raise ValueError(
-                "too many documents submitted for scan (max={0})".format(
-                    MULTI_DOCUMENT_LIMIT
-                )
+                f"too many documents submitted for scan (max={MULTI_DOCUMENT_LIMIT})"
             )
 
         if all(isinstance(doc, dict) for doc in documents):

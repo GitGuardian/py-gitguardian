@@ -1,4 +1,3 @@
-import io
 import os
 import re
 
@@ -11,7 +10,7 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 
 def read(*args: str) -> str:
     """Reads complete file contents."""
-    return io.open(os.path.join(HERE, *args), encoding="utf-8").read()
+    return open(os.path.join(HERE, *args), encoding="utf-8").read()
 
 
 def get_version() -> str:

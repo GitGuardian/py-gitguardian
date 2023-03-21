@@ -221,7 +221,7 @@ def test_client_creation(
         assert client.api_key == api_key
         assert client.timeout == timeout
         assert user_agent in client.session.headers["User-Agent"]
-        assert client.session.headers["Authorization"] == "Token {0}".format(api_key)
+        assert client.session.headers["Authorization"] == f"Token {api_key}"
 
 
 @pytest.mark.parametrize(
@@ -257,7 +257,7 @@ def test_client__url_from_endpoint(base_uries, version, endpoints_and_urls):
         for endpoint, expected_url in endpoints_and_urls:
             assert (
                 client._url_from_endpoint(endpoint, version) == expected_url
-            ), "Could not get the expected URL for base_uri=`{}`".format(base_uri)
+            ), f"Could not get the expected URL for base_uri=`{base_uri}`"
 
 
 @my_vcr.use_cassette
