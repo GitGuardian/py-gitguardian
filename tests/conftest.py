@@ -7,8 +7,6 @@ import vcr
 from pygitguardian import GGClient
 
 
-base_uri = os.environ.get("TEST_LIVE_SERVER_URL", "https://api.gitguardian.com")
-
 my_vcr = vcr.VCR(
     cassette_library_dir=join(dirname(realpath(__file__)), "cassettes"),
     path_transformer=vcr.VCR.ensure_suffix(".yaml"),
@@ -20,11 +18,8 @@ my_vcr = vcr.VCR(
     filter_headers=["Authorization"],
 )
 
-if os.environ.get("TEST_LIVE_SERVER", "false").lower() == "true":
-    my_vcr.record_mode = "all"
-
 
 @pytest.fixture
 def client():
-    api_key = os.environ.get("TEST_LIVE_SERVER_TOKEN", "sample_api_key")
-    return GGClient(base_uri=base_uri, api_key=api_key)
+    api_key = os.environ["GITGUARDIAN_API_KEY"]
+    return GGClient(api_key=api_key)

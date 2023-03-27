@@ -18,7 +18,7 @@ from pygitguardian.config import (
 )
 from pygitguardian.models import Detail, MultiScanResult, QuotaResponse, ScanResult
 
-from .conftest import base_uri, my_vcr
+from .conftest import my_vcr
 
 
 FILENAME = ".env"
@@ -257,7 +257,7 @@ def test_client__url_from_endpoint(base_uries, version, endpoints_and_urls):
         for endpoint, expected_url in endpoints_and_urls:
             assert (
                 client._url_from_endpoint(endpoint, version) == expected_url
-            ), f"Could not get the expected URL for base_uri=`{base_uri}`"
+            ), f"Could not get the expected URL for base_uri=`{curr_base_uri}`"
 
 
 @my_vcr.use_cassette
@@ -371,7 +371,7 @@ def test_multi_content_exceptions(
 @my_vcr.use_cassette
 def test_multi_content_not_ok():
     req = [{"document": "valid"}]
-    client = GGClient(base_uri=base_uri, api_key="invalid")
+    client = GGClient(api_key="invalid")
 
     obj = client.multi_content_scan(req)
 
@@ -383,7 +383,7 @@ def test_multi_content_not_ok():
 @my_vcr.use_cassette
 def test_content_not_ok():
     req = {"document": "valid", "filename": "valid"}
-    client = GGClient(base_uri=base_uri, api_key="invalid")
+    client = GGClient(api_key="invalid")
 
     obj = client.content_scan(**req)
 
@@ -603,7 +603,7 @@ def test_quota_overview(client: GGClient):
         if isinstance(quota_response, QuotaResponse):
             content = quota_response.content
             assert content.count + content.remaining == content.limit
-            assert content.limit == 10000
+            assert content.limit > 0
             assert 2021 <= content.since.year <= date.today().year
         else:
             pytest.fail("returned should be a QuotaResponse")
