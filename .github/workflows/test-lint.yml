@@ -77,6 +77,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Read info
+        id: tags
+        shell: bash
+        run: |
+          echo "tag=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
