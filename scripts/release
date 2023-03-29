@@ -190,7 +190,9 @@ def tag() -> None:
     tag = get_tag(version)
     message = f"Releasing {version}"
     check_run(["git", "tag", "--annotate", tag, "--message", message])
-    check_run(["git", "push", "origin", "main:main", f"{tag}:{tag}"])
+    check_run(
+        ["git", "push", "origin", f"{RELEASE_BRANCH}:{RELEASE_BRANCH}", f"{tag}:{tag}"]
+    )
 
 
 def get_release_notes(version: str) -> str:
