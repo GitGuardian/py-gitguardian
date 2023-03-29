@@ -41,20 +41,26 @@ jobs:
         python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade pipenv==2022.10.4
           pipenv install --system --dev --skip-lock
+
       - name: Test with pytest
         run: |
           pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings
           pipenv run coverage report --fail-under=80
           pipenv run coverage xml
+        env:
+          GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
+
       - uses: codecov/codecov-action@v1
         with:
           file: ./coverage.xml
@@ -70,21 +76,31 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
+
       - name: Install dependencies
         run: python -m pip install --upgrade pip setuptools wheel
       - name: Build distribution
         run: >-
           python setup.py sdist bdist_wheel
+
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
           user: __token__
           password: ${{ secrets.pypi_password }}
-      - name: Release Notary Action
-        uses: docker://aevea/release-notary:0.9.1
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tags.outputs.tag }}
+          release_name: ${{ steps.tags.outputs.tag }}
+          draft: true
+          prerelease: false
