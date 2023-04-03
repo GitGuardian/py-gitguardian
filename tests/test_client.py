@@ -586,7 +586,6 @@ def test_multiscan_parameters(
 
     client.multi_content_scan(
         [{"filename": FILENAME, "document": DOCUMENT}],
-        ignore_known_secrets=True,
     )
 
     assert request_mock.called

@@ -15,7 +15,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.3.4 (Linux;py3.8.10)
       method: POST
-      uri: https://api.gitguardian.com/v1/multiscan
+      uri: https://api.gitguardian.com/v1/multiscan?ignore_known_secrets=True
     response:
       body:
         string: '{"detail":"Invalid API key."}'
