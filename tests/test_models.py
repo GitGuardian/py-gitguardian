@@ -8,6 +8,8 @@ from pygitguardian.models import (
     Document,
     DocumentSchema,
     HealthCheckResponseSchema,
+    HoneytokenResponse,
+    HoneytokenResponseSchema,
     Match,
     MatchSchema,
     MultiScanResult,
@@ -134,6 +136,30 @@ class TestModel:
                 DetailSchema,
                 Detail,
                 {"detail": "Fail"},
+            ),
+            (
+                HoneytokenResponseSchema,
+                HoneytokenResponse,
+                {
+                    "id": 141,
+                    "name": "honeytoken A",
+                    "description": "honeytoken used in the repository AA",
+                    "created_at": "2019-08-22T14:15:22Z",
+                    "status": "active",
+                    "triggered_at": "2019-08-22T14:15:22Z",
+                    "revoked_at": None,
+                    "open_events_count": 2,
+                    "type": "AWS",
+                    "creator_id": 122,
+                    "revoker_id": None,
+                    "creator_api_token_id": None,
+                    "revoker_api_token_id": None,
+                    "token": {
+                        "access_token_id": "AAAA",
+                        "secret_key": "BBB"
+                    },
+                    "tags": ["publicly_exposed"]
+                },
             ),
         ],
     )

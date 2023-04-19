@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Any, ClassVar, Dict, List, Optional, cast
 
 from marshmallow import (
@@ -483,6 +483,99 @@ class QuotaResponse(Base):
 
     def __repr__(self) -> str:
         return f"content:{repr(self.content)}"
+
+
+class HoneytokenResponseSchema(BaseSchema):
+    id = fields.Int()
+    name = fields.String()
+    description = fields.String(allow_none=True)
+    created_at = fields.AwareDateTime()
+    status = fields.String()
+    triggered_at = fields.AwareDateTime(allow_none=True)
+    revoked_at = fields.AwareDateTime(allow_none=True)
+    open_events_count = fields.Int(allow_none=True)
+    type_ = fields.String(data_key="type")
+    creator_id = fields.Int(allow_none=True)
+    revoker_id = fields.Int(allow_none=True)
+    creator_api_token_id = fields.String(allow_none=True)
+    revoker_api_token_id = fields.String(allow_none=True)
+    token = fields.Mapping(key=fields.String(), value=fields.String())
+    tags = fields.List(fields.String())
+
+    @post_load
+    def make_honeytoken_response(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> "HoneytokenResponse":
+        return HoneytokenResponse(**data)
+
+
+class HoneytokenResponse(Base):
+    """
+    honeytoken creation in the GitGuardian API.
+    Allows users to create and get a honeytoken.
+    Example:
+        {
+            "id": 141,
+            "name": "honeytoken A",
+            "description": "honeytoken used in the repository AA",
+            "created_at": "2019-08-22T14:15:22Z",
+            "status": "active",
+            "triggered_at": "2019-08-22T14:15:22Z",
+            "revoked_at": "2019-08-22T14:15:22Z",
+            "open_events_count": 122,
+            "type": "AWS",
+            "creator_id": 122,
+            "revoker_id": 122,
+            "creator_api_token_id": null,
+            "revoker_api_token_id": null,
+            "token": {
+                "access_token_id": "AAAA",
+                "secret_key": "BBB"
+            },
+        "tags": ["publicly_exposed"]
+        }
+    """
+
+    SCHEMA = HoneytokenResponseSchema()
+
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        description: Optional[str],
+        created_at: datetime,
+        status: str,
+        triggered_at: Optional[datetime],
+        revoked_at: Optional[datetime],
+        open_events_count: Optional[int],
+        type_: str,
+        creator_id: Optional[int],
+        revoker_id: Optional[int],
+        creator_api_token_id: Optional[str],
+        revoker_api_token_id: Optional[str],
+        token: Dict[str, str],
+        tags: List[str],
+        **kwargs: Any,
+    ) -> None:
+        super().__init__()
+        self.id = id
+        self.name = name
+        self.description = description
+        self.created_at = created_at
+        self.status = status
+        self.triggered_at = triggered_at
+        self.revoked_at = revoked_at
+        self.open_events_count = open_events_count
+        self.type_ = type_
+        self.creator_id = creator_id
+        self.revoker_id = revoker_id
+        self.creator_api_token_id = creator_api_token_id
+        self.revoker_api_token_id = revoker_api_token_id
+        self.token = token
+        self.tags = tags
+
+    def __repr__(self) -> str:
+        return f"honeytoken:{self.id} {self.name}"
 
 
 class HealthCheckResponseSchema(BaseSchema):
