@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.6.0'></a>
+
+## 1.6.0 — 2023-04-20
+
+### Added
+
+- The `PolicyBreak` class now includes the URL of the policy break if the dashboard already knows about it.
+
 <a id='changelog-1.5.1'></a>
 
 ## 1.5.1 — 2023-03-29
