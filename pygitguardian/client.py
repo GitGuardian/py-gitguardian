@@ -25,6 +25,7 @@ from .models import (
     Detail,
     Document,
     HealthCheckResponse,
+    HoneytokenResponse,
     MultiScanResult,
     QuotaResponse,
     ScanResult,
@@ -77,6 +78,17 @@ def is_ok(resp: Response) -> bool:
     return (
         resp.headers["content-type"] == "application/json"
         and resp.status_code == codes.ok
+    )
+
+
+def is_create_ok(resp: Response) -> bool:
+    """
+    is_create_ok returns True if the API returns code 201
+    and the content type is JSON.
+    """
+    return (
+        resp.headers["content-type"] == "application/json"
+        and resp.status_code == codes.created
     )
 
 
@@ -389,6 +401,43 @@ class GGClient:
         obj.status_code = resp.status_code
 
         return obj
+
+    def create_honeytoken(
+        self,
+        name: Optional[str],
+        type_: str,
+        description: Optional[str],
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, HoneytokenResponse]:
+        """
+        Create a honeytoken via the /honeytokens endpoint of the API
+
+        :param name: the honeytoken name
+        :param type_: the honeytoken type
+        :param description: the honeytoken description
+        :param extra_headers: additional headers to add to the request
+        :return: Detail or Honeytoken response and status code
+        """
+        try:
+            resp = self.post(
+                endpoint="honeytokens",
+                extra_headers=extra_headers,
+                data={
+                    "name": name,
+                    "type": type_,
+                    "description": description,
+                },
+            )
+        except requests.exceptions.ReadTimeout:
+            result = Detail("The request timed out.")
+            result.status_code = 504
+        else:
+            if is_create_ok(resp):
+                result = HoneytokenResponse.SCHEMA.load(resp.json())
+            else:
+                result = load_detail(resp)
+            result.status_code = resp.status_code
+        return result
 
     # For IaC Scans
     def iac_directory_scan(
