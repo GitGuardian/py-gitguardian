@@ -15,6 +15,7 @@ isort = "*"
 pre-commit = "*"
 pytest = "*"
 vcrpy = "*"
+urllib3 = "<2" # pin until https://github.com/kevin1024/vcrpy/issues/688 is fixed
 mypy = "==0.961"
 types-requests = "*"
 scriv = { version = "*", extras = ["toml"] }
