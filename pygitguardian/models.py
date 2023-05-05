@@ -1,5 +1,6 @@
 from datetime import date, datetime
 from typing import Any, ClassVar, Dict, List, Optional, cast
+from uuid import UUID
 
 from marshmallow import (
     EXCLUDE,
@@ -486,10 +487,11 @@ class QuotaResponse(Base):
 
 
 class HoneytokenResponseSchema(BaseSchema):
-    id = fields.Int()
+    id = fields.UUID()
     name = fields.String()
     description = fields.String(allow_none=True)
     created_at = fields.AwareDateTime()
+    gitguardian_url = fields.URL()
     status = fields.String()
     triggered_at = fields.AwareDateTime(allow_none=True)
     revoked_at = fields.AwareDateTime(allow_none=True)
@@ -515,10 +517,12 @@ class HoneytokenResponse(Base):
     Allows users to create and get a honeytoken.
     Example:
         {
-            "id": 141,
+            "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
             "name": "honeytoken A",
             "description": "honeytoken used in the repository AA",
             "created_at": "2019-08-22T14:15:22Z",
+            "gitguardian_url":
+                "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",
             "status": "active",
             "triggered_at": "2019-08-22T14:15:22Z",
             "revoked_at": "2019-08-22T14:15:22Z",
@@ -540,10 +544,11 @@ class HoneytokenResponse(Base):
 
     def __init__(
         self,
-        id: int,
+        id: UUID,
         name: str,
         description: Optional[str],
         created_at: datetime,
+        gitguardian_url: str,
         status: str,
         triggered_at: Optional[datetime],
         revoked_at: Optional[datetime],
@@ -562,6 +567,7 @@ class HoneytokenResponse(Base):
         self.name = name
         self.description = description
         self.created_at = created_at
+        self.gitguardian_url = gitguardian_url
         self.status = status
         self.triggered_at = triggered_at
         self.revoked_at = revoked_at
