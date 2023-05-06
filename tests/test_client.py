@@ -668,10 +668,12 @@ def test_create_honeytoken(
     mock_response.headers = {"content-type": "application/json"}
     mock_response.status_code = 201
     mock_response.json.return_value = {
-        "id": 141,
+        "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
         "name": "honeytoken A",
         "description": "honeytoken used in the repository AA",
         "created_at": "2019-08-22T14:15:22Z",
+        "gitguardian_url":
+            "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",
         "status": "active",
         "triggered_at": "2019-08-22T14:15:22Z",
         "revoked_at": None,
