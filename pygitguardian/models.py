@@ -26,8 +26,8 @@ class BaseSchema(Schema):
 class Base:
     SCHEMA: ClassVar[BaseSchema]
 
-    def __init__(self) -> None:
-        self.status_code: Optional[int] = None
+    def __init__(self, status_code: Optional[int] = None) -> None:
+        self.status_code = status_code
 
     def to_json(self) -> str:
         """
@@ -132,8 +132,8 @@ class Detail(Base):
 
     SCHEMA = DetailSchema()
 
-    def __init__(self, detail: str, **kwargs: Any) -> None:
-        super().__init__()
+    def __init__(self, detail: str, status_code: Optional[int] = None, **kwargs: Any) -> None:
+        super().__init__(status_code=status_code)
         self.detail = detail
 
     def __repr__(self) -> str:
