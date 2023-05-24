@@ -9,12 +9,7 @@ from typing import Any, Dict, List, Optional, Union, cast
 import requests
 from requests import Response, Session, codes
 
-from .config import (
-    DEFAULT_API_VERSION,
-    DEFAULT_BASE_URI,
-    DEFAULT_TIMEOUT,
-    MULTI_DOCUMENT_LIMIT,
-)
+from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
 from .iac_models import (
     IaCScanParameters,
     IaCScanParametersSchema,
@@ -29,6 +24,8 @@ from .models import (
     MultiScanResult,
     QuotaResponse,
     ScanResult,
+    SecretScanPreferences,
+    ServerMetadata,
 )
 
 
@@ -121,6 +118,7 @@ class GGClient:
     timeout: Optional[float]
     user_agent: str
     extra_headers: Dict
+    secret_scan_preferences: SecretScanPreferences
 
     def __init__(
         self,
@@ -178,6 +176,7 @@ class GGClient:
                 "Authorization": f"Token {api_key}",
             },
         )
+        self.secret_scan_preferences = SecretScanPreferences()
 
     def request(
         self,
@@ -308,6 +307,9 @@ class GGClient:
             doc_dict["filename"] = filename
 
         request_obj = Document.SCHEMA.load(doc_dict)
+        Document.SCHEMA.validate_size(
+            request_obj, self.secret_scan_preferences.maximum_document_size
+        )
 
         resp = self.post(
             endpoint="scan",
@@ -344,15 +346,21 @@ class GGClient:
         :param ignore_known_secrets: indicates whether known secrets should be ignored
         :return: Detail or ScanResult response and status code
         """
-        if len(documents) > MULTI_DOCUMENT_LIMIT:
+        max_documents = self.secret_scan_preferences.maximum_documents_per_scan
+        if len(documents) > max_documents:
             raise ValueError(
-                f"too many documents submitted for scan (max={MULTI_DOCUMENT_LIMIT})"
+                f"too many documents submitted for scan (max={max_documents})"
             )
 
         if all(isinstance(doc, dict) for doc in documents):
             request_obj = Document.SCHEMA.load(documents, many=True)
         else:
             raise TypeError("each document must be a dict")
+
+        for document in request_obj:
+            Document.SCHEMA.validate_size(
+                document, self.secret_scan_preferences.maximum_document_size
+            )
 
         params = (
             {"ignore_known_secrets": ignore_known_secrets}
@@ -472,3 +480,23 @@ class GGClient:
             result.status_code = resp.status_code
 
         return result
+
+    def read_metadata(self) -> Optional[Detail]:
+        """
+        Fetch server preferences and store them in `self.secret_scan_preferences`.
+        These preferences are then used by all future secret scans.
+
+        Note that the call fails if the API key is not valid.
+
+        :return: a Detail instance in case of error, None otherwise
+        """
+        resp = self.get("metadata")
+
+        if not is_ok(resp):
+            result = load_detail(resp)
+            result.status_code = resp.status_code
+            return result
+        metadata = ServerMetadata.SCHEMA.load(resp.json())
+
+        self.secret_scan_preferences = metadata.secret_scan_preferences
+        return None

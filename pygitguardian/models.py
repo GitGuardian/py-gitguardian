@@ -1,7 +1,9 @@
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, ClassVar, Dict, List, Optional, cast
 from uuid import UUID
 
+import marshmallow_dataclass
 from marshmallow import (
     EXCLUDE,
     Schema,
@@ -10,10 +12,9 @@ from marshmallow import (
     post_load,
     pre_load,
     validate,
-    validates,
 )
 
-from .config import DOCUMENT_SIZE_THRESHOLD_BYTES
+from .config import DOCUMENT_SIZE_THRESHOLD_BYTES, MULTI_DOCUMENT_LIMIT
 
 
 class BaseSchema(Schema):
@@ -25,8 +26,8 @@ class BaseSchema(Schema):
 class Base:
     SCHEMA: ClassVar[BaseSchema]
 
-    def __init__(self) -> None:
-        self.status_code: Optional[int] = None
+    def __init__(self, status_code: Optional[int] = None) -> None:
+        self.status_code = status_code
 
     def to_json(self) -> str:
         """
@@ -52,17 +53,18 @@ class DocumentSchema(BaseSchema):
     filename = fields.String(validate=validate.Length(max=256), allow_none=True)
     document = fields.String(required=True)
 
-    @validates("document")
-    def validate_document(self, document: str) -> None:
+    @staticmethod
+    def validate_size(document: Dict[str, Any], maximum_size: int) -> None:
+        """Raises a ValidationError if the content of the document is longer than
+        `maximum_size`.
+
+        This is not implemented as a Marshmallow validator because the maximum size can
+        vary.
         """
-        validate that document is smaller than scan limit
-        """
-        encoded = document.encode("utf-8", errors="replace")
-        if len(encoded) > DOCUMENT_SIZE_THRESHOLD_BYTES:
+        encoded = document["document"].encode("utf-8", errors="replace")
+        if len(encoded) > maximum_size:
             raise ValidationError(
-                "file exceeds the maximum allowed size of {}B".format(
-                    DOCUMENT_SIZE_THRESHOLD_BYTES
-                )
+                f"file exceeds the maximum allowed size of {maximum_size}B"
             )
 
     @post_load
@@ -130,8 +132,8 @@ class Detail(Base):
 
     SCHEMA = DetailSchema()
 
-    def __init__(self, detail: str, **kwargs: Any) -> None:
-        super().__init__()
+    def __init__(self, detail: str, status_code: Optional[int] = None, **kwargs: Any) -> None:
+        super().__init__(status_code=status_code)
         self.detail = detail
 
     def __repr__(self) -> str:
@@ -620,3 +622,23 @@ class HealthCheckResponse(Base):
                 self.secrets_engine_version or "",
             )
         )
+
+
+@dataclass
+class SecretScanPreferences:
+    maximum_document_size: int = DOCUMENT_SIZE_THRESHOLD_BYTES
+    maximum_documents_per_scan: int = MULTI_DOCUMENT_LIMIT
+
+
+@dataclass
+class ServerMetadata(Base):
+    version: str
+    preferences: Dict[str, Any]
+    secret_scan_preferences: SecretScanPreferences = field(
+        default_factory=SecretScanPreferences
+    )
+
+
+ServerMetadata.SCHEMA = marshmallow_dataclass.class_schema(
+    ServerMetadata, base_schema=BaseSchema
+)()
