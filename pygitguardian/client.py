@@ -252,7 +252,7 @@ class GGClient:
     def post(
         self,
         endpoint: str,
-        data: Optional[Dict[str, str]] = None,
+        data: Optional[Dict[str, Any]] = None,
         version: str = DEFAULT_API_VERSION,
         extra_headers: Optional[Dict[str, str]] = None,
         **kwargs: Any,

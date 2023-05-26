@@ -5,12 +5,10 @@ SHELL :=/bin/bash
 test ?= tests
 
 all:
-	echo "Usage :"
-	echo "      make test"           # Run tests
-	echo "      make coverage"           # Run tests and coverage
-	echo "      make black"          # Run black formatter on python code
-	echo "      make flake8"          # Run flake8 linter on python code
-	echo "      make isort"          # Run isort linter on python code
+	echo "Targets:"
+	echo "  test            Run tests"
+	echo "  coverage        Run tests with coverage"
+	echo "  lint            Run all linters"
 
 test:
 	pipenv run pytest --disable-pytest-warnings -vvv $(test)
@@ -18,11 +16,5 @@ test:
 coverage:
 	pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings && pipenv run coverage report --fail-under=80
 
-black:
-	pipenv run black .
-
-flake8:
-	pipenv run flake8
-
-isort:
-	pipenv run isort **/*.py
+lint:
+	pre-commit run --all
