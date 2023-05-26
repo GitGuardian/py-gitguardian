@@ -118,7 +118,7 @@ class DetailSchema(BaseSchema):
         return data
 
     @post_load
-    def make_detail_response(self, data: Dict[str, str], **kwargs: Any) -> "Detail":
+    def make_detail_response(self, data: Dict[str, Any], **kwargs: Any) -> "Detail":
         return Detail(**data)
 
 
