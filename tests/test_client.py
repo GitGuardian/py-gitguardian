@@ -672,8 +672,7 @@ def test_create_honeytoken(
         "name": "honeytoken A",
         "description": "honeytoken used in the repository AA",
         "created_at": "2019-08-22T14:15:22Z",
-        "gitguardian_url":
-            "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",  # noqa: E501
         "status": "active",
         "triggered_at": "2019-08-22T14:15:22Z",
         "revoked_at": None,
@@ -683,18 +682,17 @@ def test_create_honeytoken(
         "revoker_id": None,
         "creator_api_token_id": None,
         "revoker_api_token_id": None,
-        "token": {
-            "access_token_id": "AAAA",
-            "secret_key": "BBB"
-        },
-        "tags": ["publicly_exposed"]
+        "token": {"access_token_id": "AAAA", "secret_key": "BBB"},
+        "tags": ["publicly_exposed"],
     }
 
     request_mock.return_value = mock_response
 
-    result = client.create_honeytoken(name="honeytoken A",
-                                      description="honeytoken used in the repository AA",
-                                      type_="AWS")
+    result = client.create_honeytoken(
+        name="honeytoken A",
+        description="honeytoken used in the repository AA",
+        type_="AWS",
+    )
 
     assert request_mock.called
     assert isinstance(result, HoneytokenResponse)
@@ -719,9 +717,11 @@ def test_create_honeytoken_error(
 
     request_mock.return_value = mock_response
 
-    result = client.create_honeytoken(name="honeytoken A",
-                                      description="honeytoken used in the repository AA",
-                                      type_="AWS")
+    result = client.create_honeytoken(
+        name="honeytoken A",
+        description="honeytoken used in the repository AA",
+        type_="AWS",
+    )
 
     assert request_mock.called
     assert isinstance(result, Detail)

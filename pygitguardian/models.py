@@ -132,7 +132,9 @@ class Detail(Base):
 
     SCHEMA = DetailSchema()
 
-    def __init__(self, detail: str, status_code: Optional[int] = None, **kwargs: Any) -> None:
+    def __init__(
+        self, detail: str, status_code: Optional[int] = None, **kwargs: Any
+    ) -> None:
         super().__init__(status_code=status_code)
         self.detail = detail
 
