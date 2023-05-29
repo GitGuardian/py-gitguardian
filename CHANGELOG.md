@@ -1,5 +1,15 @@
 # Changelog
 
+<a id='changelog-1.7.0'></a>
+
+## 1.7.0 — 2023-05-29
+
+### Added
+
+- Added `GGClient.create_honeytoken()` method.
+
+- Added `GGClient.read_metadata()` to read metadata from the server. The metadata is then used by further secret scan calls and is available in a new `GGClient.secret_scan_preferences` attribute.
+
 <a id='changelog-1.6.0'></a>
 
 ## 1.6.0 — 2023-04-20
