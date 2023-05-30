@@ -3,11 +3,12 @@ import re
 from collections import OrderedDict
 from datetime import date
 from typing import Any, Dict, List, Optional, Type
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
+import responses
 from marshmallow import ValidationError
-from requests.models import Response
+from responses import matchers
 
 from pygitguardian import GGClient
 from pygitguardian.client import is_ok, load_detail
@@ -518,10 +519,8 @@ def test_assert_content_type():
         ),
     ],
 )
-@patch("requests.Session.request")
-@my_vcr.use_cassette
+@responses.activate
 def test_extra_headers(
-    request_mock: Mock,
     client: GGClient,
     session_headers: Any,
     extra_headers: Optional[Dict[str, str]],
@@ -534,29 +533,34 @@ def test_extra_headers(
     """
     client.session.headers = session_headers
 
-    mock_response = Mock(spec=Response)
-    mock_response.headers = {"content-type": "text"}
-    mock_response.text = "some error"
-    mock_response.status_code = 400
-    request_mock.return_value = mock_response
+    mock_response = responses.post(
+        url=client._url_from_endpoint("multiscan", "v1"),
+        content_type="text/plain",
+        body="some error",
+        status=400,
+        match=[matchers.header_matcher(extra_headers)] if extra_headers else [],
+    )
 
     client.multi_content_scan(
         [{"filename": FILENAME, "document": DOCUMENT}],
         extra_headers=extra_headers,
     )
-    assert request_mock.called
-    _, kwargs = request_mock.call_args
-    assert expected_headers == kwargs["headers"]
+    assert mock_response.call_count == 1
 
+    # Same test for content_scan
+    mock_response = responses.post(
+        url=client._url_from_endpoint("scan", "v1"),
+        content_type="text/plain",
+        body="some error",
+        status=400,
+        match=[matchers.header_matcher(extra_headers)] if extra_headers else [],
+    )
     client.content_scan("some_string", extra_headers=extra_headers)
-    assert request_mock.called
-    _, kwargs = request_mock.call_args
-    assert expected_headers == kwargs["headers"]
+    assert mock_response.call_count == 1
 
 
-@patch("requests.Session.request")
+@responses.activate
 def test_multiscan_parameters(
-    request_mock: Mock,
     client: GGClient,
 ):
     """
@@ -564,40 +568,37 @@ def test_multiscan_parameters(
     WHEN calling multi_content_scan with parameters
     THEN the parameters are passed in the request
     """
-    mock_response = Mock(spec=Response)
-    mock_response.headers = {"content-type": "application/json"}
-    mock_response.status_code = 200
-    mock_response.json.return_value = [
-        {
-            "policy_break_count": 1,
-            "policies": ["pol"],
-            "policy_breaks": [
-                {
-                    "type": "break",
-                    "policy": "mypol",
-                    "matches": [
-                        {
-                            "match": "hello",
-                            "type": "hello",
-                        }
-                    ],
-                }
-            ],
-        }
-    ]
 
-    request_mock.return_value = mock_response
-
-    params = {"ignore_known_secrets": True}
+    mock_response = responses.post(
+        url=client._url_from_endpoint("multiscan", "v1"),
+        status=200,
+        match=[matchers.query_param_matcher({"ignore_known_secrets": True})],
+        json=[
+            {
+                "policy_break_count": 1,
+                "policies": ["pol"],
+                "policy_breaks": [
+                    {
+                        "type": "break",
+                        "policy": "mypol",
+                        "matches": [
+                            {
+                                "match": "hello",
+                                "type": "hello",
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    )
 
     client.multi_content_scan(
         [{"filename": FILENAME, "document": DOCUMENT}],
         ignore_known_secrets=True,
     )
 
-    assert request_mock.called
-    # 1 is for kwargs
-    assert request_mock.call_args[1]["params"] == params
+    assert mock_response.call_count == 1
 
 
 def test_quota_overview(client: GGClient):
@@ -620,73 +621,84 @@ def test_quota_overview(client: GGClient):
         assert type(json.loads(quota_response_json)) == dict
 
 
-@pytest.mark.parametrize("method", ["get", "post"])
-@patch("requests.Session.request")
-def test_versions_from_headers(request_mock: Mock, client: GGClient, method):
+@pytest.mark.parametrize("method", ["GET", "POST"])
+@responses.activate
+def test_versions_from_headers(client: GGClient, method):
+    """
+    GIVEN a GGClient instance
+    WHEN an HTTP request to GitGuardian API is made
+    THEN the app_version and secrets_engine_version fields are set from the headers of
+         the HTTP response
+    """
+    url = client._url_from_endpoint("endpoint", "v1")
     app_version_value = "1.0"
     secrets_engine_version_value = "2.0"
 
-    mock_response = Mock(spec=Response)
-    mock_response.headers = {
-        "X-App-Version": app_version_value,
-        "X-Secrets-Engine-Version": secrets_engine_version_value,
-    }
-    request_mock.return_value = mock_response
+    mock_response = responses.add(
+        method=method,
+        url=url,
+        headers={
+            "X-App-Version": app_version_value,
+            "X-Secrets-Engine-Version": secrets_engine_version_value,
+        },
+    )
 
     client.request(method=method, endpoint="endpoint")
-    assert request_mock.called
+    assert mock_response.call_count == 1
 
-    assert client.app_version is app_version_value
-    assert client.secrets_engine_version is secrets_engine_version_value
+    assert client.app_version == app_version_value
+    assert client.secrets_engine_version == secrets_engine_version_value
 
-    mock_response = Mock(spec=Response)
-    mock_response.headers = {}
-    request_mock.return_value = mock_response
-
+    # WHEN making another HTTP call whose response headers does not contain the version
+    # fields
+    # THEN known version fields remain set
+    mock_response = responses.add(method=method, url=url)
     client.request(method=method, endpoint="endpoint")
-    assert request_mock.called
+    assert mock_response.call_count == 1
 
-    assert client.app_version is app_version_value
-    assert client.secrets_engine_version is secrets_engine_version_value
+    assert client.app_version == app_version_value
+    assert client.secrets_engine_version == secrets_engine_version_value
 
+    # WHEN creating another GGClient instance
+    # THEN it already has the fields set
     other_client = GGClient(api_key="")
-    assert other_client.app_version is app_version_value
-    assert other_client.secrets_engine_version is secrets_engine_version_value
+    assert other_client.app_version == app_version_value
+    assert other_client.secrets_engine_version == secrets_engine_version_value
 
 
-@patch("requests.Session.request")
+@responses.activate
 def test_create_honeytoken(
-    request_mock: Mock,
     client: GGClient,
 ):
     """
     GIVEN a ggclient
     WHEN calling create_honeytoken with parameters
-    THEN the parameters are passed in the request and the returned honeytoken use the parameters
+    THEN the parameters are passed in the request
+    AND the returned honeytoken use the parameters
     """
-    mock_response = Mock(spec=Response)
-    mock_response.headers = {"content-type": "application/json"}
-    mock_response.status_code = 201
-    mock_response.json.return_value = {
-        "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
-        "name": "honeytoken A",
-        "description": "honeytoken used in the repository AA",
-        "created_at": "2019-08-22T14:15:22Z",
-        "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",  # noqa: E501
-        "status": "active",
-        "triggered_at": "2019-08-22T14:15:22Z",
-        "revoked_at": None,
-        "open_events_count": 2,
-        "type": "AWS",
-        "creator_id": 122,
-        "revoker_id": None,
-        "creator_api_token_id": None,
-        "revoker_api_token_id": None,
-        "token": {"access_token_id": "AAAA", "secret_key": "BBB"},
-        "tags": ["publicly_exposed"],
-    }
-
-    request_mock.return_value = mock_response
+    mock_response = responses.post(
+        url=client._url_from_endpoint("honeytokens", "v1"),
+        content_type="application/json",
+        status=201,
+        json={
+            "id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+            "name": "honeytoken A",
+            "description": "honeytoken used in the repository AA",
+            "created_at": "2019-08-22T14:15:22Z",
+            "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",  # noqa: E501
+            "status": "active",
+            "triggered_at": "2019-08-22T14:15:22Z",
+            "revoked_at": None,
+            "open_events_count": 2,
+            "type": "AWS",
+            "creator_id": 122,
+            "revoker_id": None,
+            "creator_api_token_id": None,
+            "revoker_api_token_id": None,
+            "token": {"access_token_id": "AAAA", "secret_key": "BBB"},
+            "tags": ["publicly_exposed"],
+        },
+    )
 
     result = client.create_honeytoken(
         name="honeytoken A",
@@ -694,28 +706,27 @@ def test_create_honeytoken(
         type_="AWS",
     )
 
-    assert request_mock.called
+    assert mock_response.call_count == 1
     assert isinstance(result, HoneytokenResponse)
 
 
-@patch("requests.Session.request")
+@responses.activate
 def test_create_honeytoken_error(
-    request_mock: Mock,
     client: GGClient,
 ):
     """
     GIVEN a ggclient
     WHEN calling create_honeytoken with parameters without the right access
-    THEN I get a Detail objects containing the error detail
+    THEN I get a Detail object containing the error detail
     """
-    mock_response = Mock(spec=Response)
-    mock_response.headers = {"content-type": "application/json"}
-    mock_response.status_code = 400
-    mock_response.json.return_value = {
-        "detail": "Not authorized",
-    }
-
-    request_mock.return_value = mock_response
+    mock_response = responses.post(
+        url=client._url_from_endpoint("honeytokens", "v1"),
+        content_type="application/json",
+        status=400,
+        json={
+            "detail": "Not authorized",
+        },
+    )
 
     result = client.create_honeytoken(
         name="honeytoken A",
@@ -723,6 +734,5 @@ def test_create_honeytoken_error(
         type_="AWS",
     )
 
-    assert request_mock.called
+    assert mock_response.call_count == 1
     assert isinstance(result, Detail)
-    result.status_code == 400

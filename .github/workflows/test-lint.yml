@@ -63,7 +63,7 @@ jobs:
 
       - name: Test with pytest
         run: |
-          pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings
+          pipenv run coverage run --source pygitguardian -m pytest
           pipenv run coverage report --fail-under=80
           pipenv run coverage xml
         env:
