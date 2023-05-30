@@ -19,3 +19,4 @@ urllib3 = "<2" # pin until https://github.com/kevin1024/vcrpy/issues/688 is fixe
 mypy = "==0.961"
 types-requests = "*"
 scriv = { version = "*", extras = ["toml"] }
+responses = ">=0.23.1,<0.24.0"
