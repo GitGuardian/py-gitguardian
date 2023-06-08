@@ -10,12 +10,7 @@ import requests
 from requests import Response, Session, codes
 
 from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
-from .iac_models import (
-    IaCScanParameters,
-    IaCScanParametersSchema,
-    IaCScanResult,
-    IaCScanResultSchema,
-)
+from .iac_models import IaCScanParameters, IaCScanParametersSchema, IaCScanResult
 from .models import (
     Detail,
     Document,
@@ -65,7 +60,7 @@ def load_detail(resp: Response) -> Detail:
     else:
         data = {"detail": resp.text}
 
-    return cast(Detail, Detail.SCHEMA.load(data))
+    return Detail.from_dict(data)
 
 
 def is_ok(resp: Response) -> bool:
@@ -307,7 +302,7 @@ class GGClient:
         if filename:
             doc_dict["filename"] = filename
 
-        request_obj = Document.SCHEMA.load(doc_dict)
+        request_obj = cast(Dict[str, Any], Document.SCHEMA.load(doc_dict))
         DocumentSchema.validate_size(
             request_obj, self.secret_scan_preferences.maximum_document_size
         )
@@ -320,7 +315,7 @@ class GGClient:
 
         obj: Union[Detail, ScanResult]
         if is_ok(resp):
-            obj = ScanResult.SCHEMA.load(resp.json())
+            obj = ScanResult.from_dict(resp.json())
         else:
             obj = load_detail(resp)
 
@@ -354,7 +349,9 @@ class GGClient:
             )
 
         if all(isinstance(doc, dict) for doc in documents):
-            request_obj = Document.SCHEMA.load(documents, many=True)
+            request_obj = cast(
+                List[Dict[str, Any]], Document.SCHEMA.load(documents, many=True)
+            )
         else:
             raise TypeError("each document must be a dict")
 
@@ -377,7 +374,7 @@ class GGClient:
 
         obj: Union[Detail, MultiScanResult]
         if is_ok(resp):
-            obj = MultiScanResult.SCHEMA.load(dict(scan_results=resp.json()))
+            obj = MultiScanResult.from_dict({"scan_results": resp.json()})
         else:
             obj = load_detail(resp)
 
@@ -403,7 +400,7 @@ class GGClient:
 
         obj: Union[Detail, QuotaResponse]
         if is_ok(resp):
-            obj = QuotaResponse.SCHEMA.load(resp.json())
+            obj = QuotaResponse.from_dict(resp.json())
         else:
             obj = load_detail(resp)
 
@@ -442,7 +439,7 @@ class GGClient:
             result.status_code = 504
         else:
             if is_create_ok(resp):
-                result = HoneytokenResponse.SCHEMA.load(resp.json())
+                result = HoneytokenResponse.from_dict(resp.json())
             else:
                 result = load_detail(resp)
             result.status_code = resp.status_code
@@ -474,7 +471,7 @@ class GGClient:
             result.status_code = 504
         else:
             if is_ok(resp):
-                result = IaCScanResultSchema().load(resp.json())
+                result = IaCScanResult.from_dict(resp.json())
             else:
                 result = load_detail(resp)
 
@@ -497,7 +494,7 @@ class GGClient:
             result = load_detail(resp)
             result.status_code = resp.status_code
             return result
-        metadata = ServerMetadata.SCHEMA.load(resp.json())
+        metadata = ServerMetadata.from_dict(resp.json())
 
         self.secret_scan_preferences = metadata.secret_scan_preferences
         return None
