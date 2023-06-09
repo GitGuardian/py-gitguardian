@@ -1,6 +1,8 @@
+import logging
 import os
 import platform
 import tarfile
+import time
 import urllib.parse
 from io import BytesIO
 from pathlib import Path
@@ -27,6 +29,9 @@ from .models import (
     SecretScanPreferences,
     ServerMetadata,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 # max files size to create a tar from
@@ -193,8 +198,17 @@ class GGClient:
             if extra_headers
             else self.session.headers
         )
+        start = time.time()
         response: Response = self.session.request(
             method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
+        )
+        duration = time.time() - start
+        logger.debug(
+            "method=%s endpoint=%s status_code=%s duration=%f",
+            method,
+            endpoint,
+            response.status_code,
+            duration,
         )
 
         self.app_version = response.headers.get("X-App-Version", self.app_version)
