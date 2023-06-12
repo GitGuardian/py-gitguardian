@@ -19,6 +19,7 @@ from .iac_models import (
 from .models import (
     Detail,
     Document,
+    DocumentSchema,
     HealthCheckResponse,
     HoneytokenResponse,
     MultiScanResult,
@@ -252,7 +253,7 @@ class GGClient:
     def post(
         self,
         endpoint: str,
-        data: Optional[Dict[str, Any]] = None,
+        data: Union[Dict[str, Any], List[Dict[str, Any]], None] = None,
         version: str = DEFAULT_API_VERSION,
         extra_headers: Optional[Dict[str, str]] = None,
         **kwargs: Any,
@@ -307,7 +308,7 @@ class GGClient:
             doc_dict["filename"] = filename
 
         request_obj = Document.SCHEMA.load(doc_dict)
-        Document.SCHEMA.validate_size(
+        DocumentSchema.validate_size(
             request_obj, self.secret_scan_preferences.maximum_document_size
         )
 
@@ -358,7 +359,7 @@ class GGClient:
             raise TypeError("each document must be a dict")
 
         for document in request_obj:
-            Document.SCHEMA.validate_size(
+            DocumentSchema.validate_size(
                 document, self.secret_scan_preferences.maximum_document_size
             )
 
