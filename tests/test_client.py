@@ -20,6 +20,8 @@ from pygitguardian.config import (
 from pygitguardian.models import (
     Detail,
     HoneytokenResponse,
+    JWTResponse,
+    JWTService,
     MultiScanResult,
     QuotaResponse,
     ScanResult,
@@ -736,3 +738,26 @@ def test_create_honeytoken_error(
 
     assert mock_response.call_count == 1
     assert isinstance(result, Detail)
+
+
+@responses.activate
+def test_get_wt(
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling create_jwt
+    THEN we receive a token
+    """
+    mock_response = responses.post(
+        url=client._url_from_endpoint("auth/jwt", "v1"),
+        content_type="application/json",
+        status=200,
+        json={"token": "dummy_token"},
+    )
+
+    result = client.create_jwt("dummy_audience", JWTService.HMSL)
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, JWTResponse)
+    assert result.token == "dummy_token"

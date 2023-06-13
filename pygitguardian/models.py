@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
+from enum import Enum
 from typing import Any, ClassVar, Dict, List, Optional, cast
 from uuid import UUID
 
@@ -668,3 +669,34 @@ ServerMetadata.SCHEMA = cast(
     BaseSchema,
     marshmallow_dataclass.class_schema(ServerMetadata, base_schema=BaseSchema)(),
 )
+
+
+class JWTResponseSchema(BaseSchema):
+    token = fields.String(required=True)
+
+    @post_load
+    def make_response(self, data: Dict[str, str], **kwargs: Any) -> "JWTResponse":
+        return JWTResponse(**data)
+
+
+class JWTResponse(Base, FromDictMixin):
+    """Token to use the HasMySecretLeaked service.
+
+    Attributes:
+        token (str): the JWT token
+    """
+
+    SCHEMA = JWTResponseSchema()
+
+    def __init__(self, token: str, **kwargs: Any) -> None:
+        super().__init__()
+        self.token = token
+
+    def __repr__(self) -> str:
+        return self.token
+
+
+class JWTService(Enum):
+    """Enum for the different services GIM can generate a JWT for."""
+
+    HMSL = "hmsl"
