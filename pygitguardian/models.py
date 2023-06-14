@@ -13,8 +13,39 @@ from marshmallow import (
     pre_load,
     validate,
 )
+from typing_extensions import Self
 
 from .config import DOCUMENT_SIZE_THRESHOLD_BYTES, MULTI_DOCUMENT_LIMIT
+
+
+class ToDictMixin:
+    """
+    Provides a type-safe `to_dict()` method for classes using Marshmallow
+    """
+
+    SCHEMA: ClassVar[Schema]
+
+    def to_dict(self) -> Dict[str, Any]:
+        return cast(Dict[str, Any], self.SCHEMA.dump(self))
+
+
+class FromDictMixin:
+    """This class must be used as an additional base class for all classes whose schema
+    implements a `post_load` function turning the received dict into a class instance.
+
+    It makes it possible to deserialize an object using `MyClass.from_dict(dct)` instead
+    of `MyClass.SCHEMA.load(dct)`. The `from_dict()` method is shorter, but more
+    importantly, type-safe: its return type is an instance of `MyClass`, not
+    `list[Any] | Any`.
+
+    Reference: https://marshmallow.readthedocs.io/en/stable/quickstart.html#deserializing-to-objects  E501
+    """
+
+    SCHEMA: ClassVar[Schema]
+
+    @classmethod
+    def from_dict(cls, dct: Dict[str, Any]) -> Self:
+        return cast(Self, cls.SCHEMA.load(dct))
 
 
 class BaseSchema(Schema):
@@ -23,9 +54,7 @@ class BaseSchema(Schema):
         unknown = EXCLUDE
 
 
-class Base:
-    SCHEMA: ClassVar[BaseSchema]
-
+class Base(ToDictMixin):
     def __init__(self, status_code: Optional[int] = None) -> None:
         self.status_code = status_code
 
@@ -34,12 +63,6 @@ class Base:
         to_json converts model to JSON string.
         """
         return cast(str, self.SCHEMA.dumps(self))
-
-    def to_dict(self) -> Dict:
-        """
-        to_dict converts model to a dictionary representation.
-        """
-        return cast(Dict, self.SCHEMA.dump(self))
 
     @property
     def success(self) -> bool:
@@ -122,7 +145,7 @@ class DetailSchema(BaseSchema):
         return Detail(**data)
 
 
-class Detail(Base):
+class Detail(Base, FromDictMixin):
     """Detail is a response object mostly returned on error or when the
     api output is a simple string.
 
@@ -155,7 +178,7 @@ class MatchSchema(BaseSchema):
         return Match(**data)
 
 
-class Match(Base):
+class Match(Base, FromDictMixin):
     """
     Match describes a found issue by GitGuardian.
     With info such as match location and type.
@@ -219,7 +242,7 @@ class PolicyBreakSchema(BaseSchema):
         return PolicyBreak(**data)
 
 
-class PolicyBreak(Base):
+class PolicyBreak(Base, FromDictMixin):
     """
     PolicyBreak describes a GitGuardian policy break found
     in a scan.
@@ -269,7 +292,7 @@ class ScanResultSchema(BaseSchema):
         return ScanResult(**data)
 
 
-class ScanResult(Base):
+class ScanResult(Base, FromDictMixin):
     """ScanResult is a response object returned on a Content Scan
 
     Attributes:
@@ -355,7 +378,7 @@ class MultiScanResultSchema(BaseSchema):
         return MultiScanResult(**data)
 
 
-class MultiScanResult(Base):
+class MultiScanResult(Base, FromDictMixin):
     """ScanResult is a response object returned on a Content Scan
 
     Attributes:
@@ -425,7 +448,7 @@ class QuotaSchema(BaseSchema):
         return Quota(**data)
 
 
-class Quota(Base):
+class Quota(Base, FromDictMixin):
     """
     Quota describes a quota category in the GitGuardian API.
     Allows you to check your current available quota.
@@ -468,7 +491,7 @@ class QuotaResponseSchema(BaseSchema):
         return QuotaResponse(**data)
 
 
-class QuotaResponse(Base):
+class QuotaResponse(Base, FromDictMixin):
     """
     Quota describes a quota category in the GitGuardian API.
     Allows you to check your current available quota.
@@ -515,7 +538,7 @@ class HoneytokenResponseSchema(BaseSchema):
         return HoneytokenResponse(**data)
 
 
-class HoneytokenResponse(Base):
+class HoneytokenResponse(Base, FromDictMixin):
     """
     honeytoken creation in the GitGuardian API.
     Allows users to create and get a honeytoken.
@@ -633,7 +656,7 @@ class SecretScanPreferences:
 
 
 @dataclass
-class ServerMetadata(Base):
+class ServerMetadata(Base, FromDictMixin):
     version: str
     preferences: Dict[str, Any]
     secret_scan_preferences: SecretScanPreferences = field(
@@ -641,6 +664,7 @@ class ServerMetadata(Base):
     )
 
 
-ServerMetadata.SCHEMA = marshmallow_dataclass.class_schema(
-    ServerMetadata, base_schema=BaseSchema
-)()
+ServerMetadata.SCHEMA = cast(
+    BaseSchema,
+    marshmallow_dataclass.class_schema(ServerMetadata, base_schema=BaseSchema)(),
+)

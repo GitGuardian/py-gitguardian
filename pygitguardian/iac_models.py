@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Type, cast
 
 import marshmallow_dataclass
 
-from pygitguardian.models import Base, BaseSchema
+from pygitguardian.models import Base, BaseSchema, FromDictMixin
 
 
 @dataclass
-class IaCVulnerability(Base):
+class IaCVulnerability(Base, FromDictMixin):
     policy: str
     policy_id: str
     line_end: int
@@ -18,37 +18,48 @@ class IaCVulnerability(Base):
     severity: str = ""
 
 
-IaCVulnerabilitySchema = marshmallow_dataclass.class_schema(
-    IaCVulnerability, BaseSchema
+IaCVulnerabilitySchema = cast(
+    Type[BaseSchema], marshmallow_dataclass.class_schema(IaCVulnerability, BaseSchema)
 )
+
+IaCVulnerability.SCHEMA = IaCVulnerabilitySchema()
 
 
 @dataclass
-class IaCFileResult(Base):
+class IaCFileResult(Base, FromDictMixin):
     filename: str
     incidents: List[IaCVulnerability]
 
 
-IaCFileResultSchema = marshmallow_dataclass.class_schema(IaCFileResult, BaseSchema)
+IaCFileResultSchema = cast(
+    Type[BaseSchema], marshmallow_dataclass.class_schema(IaCFileResult, BaseSchema)
+)
+
+IaCFileResult.SCHEMA = IaCFileResultSchema()
 
 
 @dataclass
-class IaCScanParameters(Base):
+class IaCScanParameters(Base, FromDictMixin):
     ignored_policies: List[str] = field(default_factory=list)
     minimum_severity: Optional[str] = None
 
 
-IaCScanParametersSchema = marshmallow_dataclass.class_schema(
-    IaCScanParameters, BaseSchema
+IaCScanParametersSchema = cast(
+    Type[BaseSchema], marshmallow_dataclass.class_schema(IaCScanParameters, BaseSchema)
 )
+
+IaCScanParameters.SCHEMA = IaCScanParametersSchema()
 
 
 @dataclass
-class IaCScanResult(Base):
+class IaCScanResult(Base, FromDictMixin):
     id: str = ""
     type: str = ""
     iac_engine_version: str = ""
     entities_with_incidents: List[IaCFileResult] = field(default_factory=list)
 
 
-IaCScanResultSchema = marshmallow_dataclass.class_schema(IaCScanResult, BaseSchema)
+IaCScanResultSchema = cast(
+    Type[BaseSchema], marshmallow_dataclass.class_schema(IaCScanResult, BaseSchema)
+)
+IaCScanResult.SCHEMA = IaCScanResultSchema()

@@ -35,6 +35,7 @@ setup(
         "marshmallow>=3.5, <4",
         "requests>=2, <3",
         "marshmallow-dataclass >=8.5.8, <8.6.0",
+        "typing-extensions",
     ],
     include_package_data=True,
     zip_safe=True,
