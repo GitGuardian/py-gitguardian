@@ -19,6 +19,8 @@ from .models import (
     DocumentSchema,
     HealthCheckResponse,
     HoneytokenResponse,
+    JWTResponse,
+    JWTService,
     MultiScanResult,
     QuotaResponse,
     ScanResult,
@@ -512,3 +514,27 @@ class GGClient:
 
         self.secret_scan_preferences = metadata.secret_scan_preferences
         return None
+
+    def create_jwt(
+        self,
+        jwt_audience: str,
+        service: JWTService,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, JWTResponse]:
+        """
+        Create a JWT token for other GitGuardian services.
+        :return: Detail or JWT response and status code
+        """
+
+        resp = self.post(
+            endpoint="auth/jwt",
+            data={"audience": jwt_audience, "audience_type": service.value},
+            extra_headers=extra_headers,
+        )
+        obj: Union[Detail, JWTResponse]
+        if is_ok(resp):
+            obj = JWTResponse.from_dict(resp.json())
+        else:
+            obj = load_detail(resp)
+        obj.status_code = resp.status_code
+        return obj
