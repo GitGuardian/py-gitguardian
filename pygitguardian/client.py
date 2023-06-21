@@ -269,6 +269,7 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
         **kwargs: Any,
     ) -> Response:
+        # Be aware that self.iac_directory_scan bypass this method and calls self.request directly.
         return self.request(
             "post",
             endpoint=endpoint,
@@ -472,7 +473,9 @@ class GGClient:
         tar = _create_tar(directory, filenames)
         result: Union[Detail, IaCScanResult]
         try:
-            resp = self.post(
+            # bypass self.post because data argument is needed in self.request and self.post use it as json
+            resp = self.request(
+                "post",
                 endpoint="iac_scan",
                 extra_headers=extra_headers,
                 files={
