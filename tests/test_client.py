@@ -741,7 +741,7 @@ def test_create_honeytoken_error(
 
 
 @responses.activate
-def test_get_wt(
+def test_create_jwt(
     client: GGClient,
 ):
     """
@@ -751,6 +751,14 @@ def test_get_wt(
     """
     mock_response = responses.post(
         url=client._url_from_endpoint("auth/jwt", "v1"),
+        match=[
+            matchers.json_params_matcher(
+                {
+                    "audience": "dummy_audience",
+                    "audience_type": "hmsl",
+                }
+            )
+        ],
         content_type="application/json",
         status=200,
         json={"token": "dummy_token"},
