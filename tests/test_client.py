@@ -741,7 +741,7 @@ def test_create_honeytoken_error(
 
 
 @responses.activate
-def test_get_wt(
+def test_create_jwt(
     client: GGClient,
 ):
     """
