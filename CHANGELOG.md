@@ -1,5 +1,23 @@
 # Changelog
 
+<a id='changelog-1.8.0'></a>
+
+## 1.8.0 — 2023-06-26
+
+### Added
+
+- Added `GGClient.create_jwt()` method. This is only used to interact with HasMySecretLeaked for now.
+
+- py-gitguardian is now fully type-hinted (#49).
+
+### Changed
+
+- All HTTP requests are now logged using Python logger. The log message includes the HTTP method, endpoint, status code and duration.
+
+### Fixed
+
+- `GGClient.iac_directory_scan()` was not correctly sending the files to scan.
+
 <a id='changelog-1.7.0'></a>
 
 ## 1.7.0 — 2023-05-29
