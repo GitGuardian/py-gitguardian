@@ -63,3 +63,25 @@ IaCScanResultSchema = cast(
     Type[BaseSchema], marshmallow_dataclass.class_schema(IaCScanResult, BaseSchema)
 )
 IaCScanResult.SCHEMA = IaCScanResultSchema()
+
+
+@dataclass
+class IaCDiffScanEntities(Base):
+    unchanged: List[IaCFileResult] = field(default_factory=list)
+    new: List[IaCFileResult] = field(default_factory=list)
+    deleted: List[IaCFileResult] = field(default_factory=list)
+
+
+@dataclass
+class IaCDiffScanResult(Base):
+    id: str = ""
+    type: str = ""
+    iac_engine_version: str = ""
+    entities_with_incidents: IaCDiffScanEntities = field(
+        default_factory=IaCDiffScanEntities
+    )
+
+
+IaCDiffScanResultSchema = marshmallow_dataclass.class_schema(
+    IaCDiffScanResult, BaseSchema
+)

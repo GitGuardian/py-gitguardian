@@ -12,7 +12,13 @@ import requests
 from requests import Response, Session, codes
 
 from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
-from .iac_models import IaCScanParameters, IaCScanParametersSchema, IaCScanResult
+from .iac_models import (
+    IaCDiffScanResult,
+    IaCDiffScanResultSchema,
+    IaCScanParameters,
+    IaCScanParametersSchema,
+    IaCScanResult,
+)
 from .models import (
     Detail,
     Document,
@@ -270,6 +276,7 @@ class GGClient:
         **kwargs: Any,
     ) -> Response:
         # Be aware that self.iac_directory_scan bypass this method and calls self.request directly.
+        # self.iac_diff_scan also bypass this method
         return self.request(
             "post",
             endpoint=endpoint,
@@ -496,6 +503,41 @@ class GGClient:
 
             result.status_code = resp.status_code
 
+        return result
+
+    # For IaC diff Scans
+    def iac_diff_scan(
+        self,
+        reference: bytes,
+        current: bytes,
+        scan_parameters: IaCScanParameters,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, IaCDiffScanResult]:
+        result: Union[Detail, IaCDiffScanResult]
+        try:
+            # bypass self.post because data argument is needed in self.request and self.post use it as json
+            resp = self.request(
+                "post",
+                endpoint="iac_diff_scan",
+                extra_headers=extra_headers,
+                files={
+                    "reference": reference,
+                    "current": current,
+                },
+                data={
+                    "scan_parameters": IaCScanParametersSchema().dumps(scan_parameters),
+                },
+            )
+        except requests.exceptions.ReadTimeout:
+            result = Detail("The request timed out.")
+            result.status_code = 504
+        else:
+            if is_ok(resp):
+                result = IaCDiffScanResultSchema.from_dict(resp.json())  # type: ignore
+            else:
+                result = load_detail(resp)
+
+            result.status_code = resp.status_code
         return result
 
     def read_metadata(self) -> Optional[Detail]:
