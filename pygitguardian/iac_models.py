@@ -73,7 +73,7 @@ class IaCDiffScanEntities(Base):
 
 
 @dataclass
-class IaCDiffScanResult(Base):
+class IaCDiffScanResult(Base, FromDictMixin):
     id: str = ""
     type: str = ""
     iac_engine_version: str = ""
@@ -82,6 +82,7 @@ class IaCDiffScanResult(Base):
     )
 
 
-IaCDiffScanResultSchema = marshmallow_dataclass.class_schema(
-    IaCDiffScanResult, BaseSchema
+IaCDiffScanResultSchema = cast(
+    Type[BaseSchema], marshmallow_dataclass.class_schema(IaCDiffScanResult, BaseSchema)
 )
+IaCDiffScanResult.SCHEMA = IaCDiffScanResultSchema()

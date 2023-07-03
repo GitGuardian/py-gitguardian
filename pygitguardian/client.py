@@ -14,7 +14,6 @@ from requests import Response, Session, codes
 from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
 from .iac_models import (
     IaCDiffScanResult,
-    IaCDiffScanResultSchema,
     IaCScanParameters,
     IaCScanParametersSchema,
     IaCScanResult,
@@ -533,7 +532,7 @@ class GGClient:
             result.status_code = 504
         else:
             if is_ok(resp):
-                result = IaCDiffScanResultSchema.from_dict(resp.json())  # type: ignore
+                result = IaCDiffScanResult.from_dict(resp.json())
             else:
                 result = load_detail(resp)
 
