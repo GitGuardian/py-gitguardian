@@ -468,7 +468,6 @@ class GGClient:
             result.status_code = resp.status_code
         return result
 
-    # For IaC Scans
     def iac_directory_scan(
         self,
         directory: Path,
@@ -476,6 +475,16 @@ class GGClient:
         scan_parameters: IaCScanParameters,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, IaCScanResult]:
+        """
+        iac_directory_scan handles the /iac_scan endpoint of the API.
+
+        :param directory: path to the directory to scan
+        :param filenames: filenames of the directory to include in the scan
+        :param scan_parameters: minimum severities wanted and policies to ignore
+            example: {"ignored_policies":["GG_IAC_0003"],"minimum_severity":"HIGH"}
+        :param extra_headers: optional extra headers to add to the request
+        :return: ScanResult response and status code
+        """
         tar = _create_tar(directory, filenames)
         result: Union[Detail, IaCScanResult]
         try:
@@ -504,7 +513,6 @@ class GGClient:
 
         return result
 
-    # For IaC diff Scans
     def iac_diff_scan(
         self,
         reference: bytes,
@@ -512,6 +520,21 @@ class GGClient:
         scan_parameters: IaCScanParameters,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, IaCDiffScanResult]:
+        """
+        iac_diff_scan handles the /iac_diff_scan endpoint of the API.
+
+        Scan two directories and compare their vulnerabilities.
+        Vulnerabilities in reference but not in current are considered "new".
+        Vulnerabilities in both reference and current are considered "unchanged".
+        Vulnerabilities in current but not in reference are considered "deleted".
+
+        :param reference: tar file containing the reference directory. Usually an incoming commit
+        :param current: tar file of the current directory. Usually HEAD
+        :param scan_parameters: minimum severities wanted and policies to ignore
+            example: {"ignored_policies":["GG_IAC_0003"],"minimum_severity":"HIGH"}
+        :param extra_headers: optional extra headers to add to the request
+        :return: ScanResult response and status code
+        """
         result: Union[Detail, IaCDiffScanResult]
         try:
             # bypass self.post because data argument is needed in self.request and self.post use it as json
