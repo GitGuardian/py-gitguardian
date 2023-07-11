@@ -94,8 +94,12 @@ class DocumentSchema(BaseSchema):
     @post_load
     def replace_0_bytes(self, in_data: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
         doc = in_data["document"]
-        # Our API does not accept 0 bytes in documents, so replace them with the replacement character
-        in_data["document"] = doc.replace("\0", "\uFFFD")
+        # Our API does not accept 0 bytes in documents so replace them with
+        # the ASCII substitute character.
+        # We no longer uses the Unicode replacement character (U+FFFD) because
+        # it makes the encoded string one byte longer, making it possible to
+        # hit the maximum size limit.
+        in_data["document"] = doc.replace("\0", "\x1a")
         return in_data
 
     @post_load

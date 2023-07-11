@@ -312,8 +312,8 @@ class GGClient:
         """
         content_scan handles the /scan endpoint of the API.
 
-        If document contains `0` bytes, they will be replaced with the Unicode
-        replacement character.
+        If document contains `0` bytes, they will be replaced with the ASCII substitute
+        character.
 
         :param filename: name of file, example: "intro.py"
         :param document: content of file
@@ -355,8 +355,8 @@ class GGClient:
         """
         multi_content_scan handles the /multiscan endpoint of the API.
 
-        If documents contain `0` bytes, they will be replaced with the Unicode
-        replacement character.
+        If documents contain `0` bytes, they will be replaced with the ASCII substitute
+        character.
 
         :param documents: List of dictionaries containing the keys document
         and, optionally, filename.

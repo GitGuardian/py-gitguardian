@@ -40,7 +40,7 @@ class TestModel:
         document = Document.SCHEMA.load(
             {"filename": "name", "document": "hello\0world"}
         )
-        assert document["document"] == "hello\uFFFDworld"
+        assert document["document"] == "hello\x1aworld"
 
     def test_document_handle_surrogates(self):
         document = Document.SCHEMA.load(
