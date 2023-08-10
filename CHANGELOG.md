@@ -1,5 +1,17 @@
 # Changelog
 
+<a id='changelog-1.9.0'></a>
+
+## 1.9.0 — 2023-08-10
+
+### Added
+
+- Added the `GGClient.iac_diff_scan()` method. This allows scanning two directories for IaC vulnerabilities and categorizing incidents as new, unchanged or deleted.
+
+### Fixed
+
+- Fixed a bug where py-gitguardian would sometimes increase the length of a document when preparing it to be sent to the secret scan API.
+
 <a id='changelog-1.8.0'></a>
 
 ## 1.8.0 — 2023-06-26
