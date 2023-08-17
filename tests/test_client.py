@@ -1,8 +1,10 @@
 import json
 import re
+import tarfile
 from collections import OrderedDict
 from datetime import date
-from typing import Any, Dict, List, Optional, Type
+from io import BytesIO
+from typing import Any, Dict, List, Optional, Tuple, Type
 from unittest.mock import patch
 
 import pytest
@@ -25,6 +27,12 @@ from pygitguardian.models import (
     MultiScanResult,
     QuotaResponse,
     ScanResult,
+)
+from pygitguardian.sca_models import (
+    ComputeSCAFilesResult,
+    SCAScanAllOutput,
+    SCAScanDiffOutput,
+    SCAScanParameters,
 )
 
 from .conftest import my_vcr
@@ -769,3 +777,126 @@ def test_create_jwt(
     assert mock_response.call_count == 1
     assert isinstance(result, JWTResponse)
     assert result.token == "dummy_token"
+
+
+def make_tar_bytes(files: List[Tuple[str, str]]) -> bytes:
+    """
+    util to generate tars in client tests
+    """
+    buffer = BytesIO()
+    with tarfile.open(fileobj=buffer, mode="w") as tar_file:
+        for name, content in files:
+            raw_content = content.encode()
+            info = tarfile.TarInfo(name=name)
+            info.size = len(raw_content)
+            tar_file.addfile(info, BytesIO(raw_content))
+    buffer.seek(0)
+    return buffer.getvalue()
+
+
+reference_files = [
+    (
+        "Pipfile.lock",
+        """
+        {
+            "default": {
+                "foo": {
+                    "version": "==1.2.3"
+                },
+                "bar": {
+                    "version": "==3.4.5"
+                }
+            }
+        }
+        """,
+    ),
+]
+current_files = [
+    (
+        "Pipfile",
+        "# This Pipfile is empty",
+    ),
+    (
+        "Pipfile.lock",
+        # With a vulnerable package
+        """
+        {
+            "default": {
+                "foo": {
+                    "version": "==1.2.4"
+                },
+                "vyper": {
+                    "version": "==0.2.10"
+                }
+            }
+        }
+        """,
+    ),
+]
+
+
+@my_vcr.use_cassette("test_sca_scan_compute_files.yaml", ignore_localhost=False)
+def test_compute_sca_files(client: GGClient):
+    result = client.compute_sca_files(files=["Pipfile", "something_else"])
+    assert isinstance(result, ComputeSCAFilesResult)
+    assert result.sca_files == ["Pipfile"]
+    assert result.potential_siblings == ["Pipfile.lock"]
+
+
+@my_vcr.use_cassette("test_sca_scan_directory_valid.yaml", ignore_localhost=False)
+def test_sca_scan_directory(client: GGClient):
+    """
+    GIVEN a directory with a Pipfile.lock containing vulnerabilities
+    WHEN calling sca_scan_directory on this directory
+    THEN we get the expected vulnerabilities
+    """
+
+    scan_params = SCAScanParameters()
+
+    response = client.sca_scan_directory(make_tar_bytes(current_files), scan_params)
+    assert isinstance(response, SCAScanAllOutput)
+    assert response.status_code == 200
+    assert len(response.scanned_files) == 2
+    vuln_pkg = next(
+        (
+            package_vuln
+            for package_vuln in response.found_package_vulns[0].package_vulns
+            if package_vuln.package_full_name == "vyper"
+        ),
+        None,
+    )
+    assert vuln_pkg is not None
+    assert len(vuln_pkg.vulns) == 13
+
+
+@my_vcr.use_cassette("test_sca_scan_directory_invalid_tar.yaml", ignore_localhost=False)
+def test_sca_scan_directory_invalid_tar(client: GGClient):
+    """
+    GIVEN an invalid tar argument
+    WHEN calling sca_scan_directory
+    THEN we get a 400 status code
+    """
+    tar = ""
+    scan_params = SCAScanParameters()
+
+    response = client.sca_scan_directory(tar, scan_params)
+    assert isinstance(response, Detail)
+    assert response.status_code == 400
+
+
+@my_vcr.use_cassette("test_sca_client_scan_diff.yaml", ignore_localhost=False)
+def test_sca_client_scan_diff(client: GGClient):
+    """
+    GIVEN a directory in two different states
+    WHEN calling scan_diff on it
+    THEN the scan succeeds
+    """
+    scan_params = SCAScanParameters()
+
+    result = client.scan_diff(
+        reference=make_tar_bytes(reference_files),
+        current=make_tar_bytes(current_files),
+        scan_parameters=scan_params,
+    )
+    assert isinstance(result, SCAScanDiffOutput), result.content
+    assert result.scanned_files == ["Pipfile", "Pipfile.lock"]
