@@ -90,7 +90,7 @@ class TestModel:
         GIVEN the right kwargs and an extra field in dict format
         WHEN loading using the schema
         THEN the extra field is not taken into account
-            AND the result should be an instance of the expected class
+        AND the result should be an instance of the expected class
         """
         schema = schema_klass()
 
