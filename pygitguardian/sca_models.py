@@ -44,7 +44,6 @@ SCAScanParameters.SCHEMA = cast(
 @dataclass
 class ComputeSCAFilesResult(Base, FromDictMixin):
     sca_files: List[str]
-    potential_siblings: List[str]
 
 
 ComputeSCAFilesResult.SCHEMA = cast(
