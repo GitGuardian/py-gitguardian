@@ -618,7 +618,7 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, ComputeSCAFilesResult]:
         if len(files) == 0:
-            result = ComputeSCAFilesResult(sca_files=[], potential_siblings=[])
+            result = ComputeSCAFilesResult(sca_files=[])
             result.status_code = 200
             return result
 

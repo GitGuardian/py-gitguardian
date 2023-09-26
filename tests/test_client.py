@@ -840,7 +840,6 @@ def test_compute_sca_files(client: GGClient):
     result = client.compute_sca_files(files=["Pipfile", "something_else"])
     assert isinstance(result, ComputeSCAFilesResult)
     assert result.sca_files == ["Pipfile"]
-    assert result.potential_siblings == ["Pipfile.lock"]
 
 
 @my_vcr.use_cassette("test_sca_scan_directory_valid.yaml", ignore_localhost=False)

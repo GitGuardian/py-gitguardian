@@ -37,10 +37,7 @@ class TestModel:
             ),
             (
                 ComputeSCAFilesResult,
-                {
-                    "sca_files": ["Pipfile", "package-lock.json"],
-                    "potential_siblings": ["Pipfile.lock", "package.json"],
-                },
+                {"sca_files": ["Pipfile", "package-lock.json"]},
             ),
             (
                 SCAVulnerability,
