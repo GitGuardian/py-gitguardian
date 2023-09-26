@@ -13,25 +13,25 @@ interactions:
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.9.0 (Linux;py3.10.12)
+          - pygitguardian/1.9.0 (Linux;py3.10.13)
       method: POST
       uri: https://api.gitguardian.com/v1/sca/compute_sca_files/
     response:
       body:
-        string: '{"sca_files":["Pipfile"],"potential_siblings":["Pipfile.lock"]}'
+        string: '{"sca_files":["Pipfile"],"potential_siblings":[]}'
       headers:
         access-control-expose-headers:
           - X-App-Version
         allow:
           - POST, OPTIONS
         content-length:
-          - '63'
+          - '49'
         content-type:
           - application/json
         cross-origin-opener-policy:
           - same-origin
         date:
-          - Thu, 17 Aug 2023 08:43:29 GMT
+          - Tue, 26 Sep 2023 09:58:56 GMT
         referrer-policy:
           - strict-origin-when-cross-origin
         server:
@@ -41,7 +41,7 @@ interactions:
         vary:
           - Cookie
         x-app-version:
-          - v2.36.1
+          - v2.39.1
         x-content-type-options:
           - nosniff
           - nosniff
@@ -51,9 +51,9 @@ interactions:
           - DENY
           - SAMEORIGIN
         x-sca-engine-version:
-          - 1.16.1
+          - 1.17.0
         x-secrets-engine-version:
-          - 2.95.0
+          - 2.97.0
         x-xss-protection:
           - 1; mode=block
       status:
