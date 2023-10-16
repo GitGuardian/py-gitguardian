@@ -2,7 +2,7 @@
 from .client import ContentTooLarge, GGClient
 
 
-__version__ = "1.10.0"
+__version__ = "1.11.0"
 GGClient._version = __version__
 
 __all__ = ["GGClient", "ContentTooLarge"]

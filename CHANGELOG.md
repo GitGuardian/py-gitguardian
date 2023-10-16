@@ -1,5 +1,21 @@
 # Changelog
 
+<a id='changelog-1.11.0'></a>
+
+## 1.11.0 — 2023-10-16
+
+### Added
+
+- Added `extra_headers` to SCA diff scans.
+
+<a id='changelog-1.10.0'></a>
+
+## 1.10.0 — 2023-09-26
+
+### Fixed
+
+- Remove `potential_siblings` from models.
+
 <a id='changelog-1.9.0'></a>
 
 ## 1.9.0 — 2023-08-10
