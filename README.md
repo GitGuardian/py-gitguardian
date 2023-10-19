@@ -55,7 +55,7 @@ Check [examples/](examples/) for full examples on how to use py-gitguardian.
 
 ```py
 # please don't hardcode your gg_api_key in source code :)
-API_KEY = os.getenv("GG_API_KEY")
+API_KEY = os.getenv("GITGUARDIAN_API_KEY")
 DOCUMENT = """
     import urllib.request
     url = 'http://jen_barber:correcthorsebatterystaple@cake.gitguardian.com/isreal.json'
@@ -81,7 +81,7 @@ else:
 ### Scanning multiple files
 
 ```py
-API_KEY = os.getenv("GG_API_KEY")
+API_KEY = os.getenv("GITGUARDIAN_API_KEY")
 client = GGClient(api_key=API_KEY)
 
 # Create a list of dictionaries for scanning
