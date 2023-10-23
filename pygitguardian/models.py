@@ -138,7 +138,7 @@ class DetailSchema(BaseSchema):
     detail = fields.String(required=True)
 
     @pre_load
-    def rename_errors(self, data: Dict, many: bool, **kwargs: Any) -> Dict:
+    def rename_errors(self, data: Dict[str, Any], many: bool, **kwargs: Any) -> Dict:
         error = data.pop("error", None)
         if error is not None:
             data["detail"] = str(error)
