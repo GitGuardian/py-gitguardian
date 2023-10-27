@@ -8,6 +8,10 @@ lines_after_imports = 2
 
 [tool.pyright]
 include = ["pygitguardian"]
+reportIncompatibleMethodOverride = true
+reportMissingParameterType = true
+reportUnknownParameterType = true
+reportUnnecessaryTypeIgnoreComment = true
 
 [tool.scriv]
 version = "literal: pygitguardian/__init__.py: __version__"
