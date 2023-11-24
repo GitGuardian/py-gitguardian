@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import List, Optional, Type, cast
 
 import marshmallow_dataclass
@@ -14,8 +15,13 @@ class IaCVulnerability(Base, FromDictMixin):
     line_start: int
     description: str
     documentation_url: str
-    component: str = ""
-    severity: str = ""
+    component: str
+    severity: str
+    url: Optional[str] = None
+    status: Optional[str] = None
+    ignored_until: Optional[datetime] = None
+    ignore_reason: Optional[str] = None
+    ignore_comment: Optional[str] = None
 
 
 IaCVulnerabilitySchema = cast(
@@ -55,6 +61,7 @@ IaCScanParameters.SCHEMA = IaCScanParametersSchema()
 class IaCScanResult(Base, FromDictMixin):
     id: str = ""
     type: str = ""
+    source_found: bool = False
     iac_engine_version: str = ""
     entities_with_incidents: List[IaCFileResult] = field(default_factory=list)
 
@@ -76,6 +83,7 @@ class IaCDiffScanEntities(Base):
 class IaCDiffScanResult(Base, FromDictMixin):
     id: str = ""
     type: str = ""
+    source_found: bool = False
     iac_engine_version: str = ""
     entities_with_incidents: IaCDiffScanEntities = field(
         default_factory=IaCDiffScanEntities
