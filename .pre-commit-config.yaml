@@ -50,7 +50,7 @@ repos:
       - id: prettier
 
   - repo: https://github.com/gitguardian/ggshield
-    rev: v1.21.0
+    rev: v1.22.0
     hooks:
       - id: ggshield
         language_version: python3
