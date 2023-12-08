@@ -1,5 +1,6 @@
 import os
 from os.path import dirname, join, realpath
+from typing import Any
 
 import pytest
 import vcr
@@ -19,7 +20,12 @@ my_vcr = vcr.VCR(
 )
 
 
+def create_client(**kwargs: Any) -> GGClient:
+    """Create a GGClient using $GITGUARDIAN_API_KEY"""
+    api_key = os.environ["GITGUARDIAN_API_KEY"]
+    return GGClient(api_key=api_key, **kwargs)
+
+
 @pytest.fixture
 def client():
-    api_key = os.environ["GITGUARDIAN_API_KEY"]
-    return GGClient(api_key=api_key)
+    return create_client()

@@ -4,6 +4,7 @@ import platform
 import tarfile
 import time
 import urllib.parse
+from abc import ABC, abstractmethod
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
@@ -45,6 +46,8 @@ logger = logging.getLogger(__name__)
 
 # max files size to create a tar from
 MAX_TAR_CONTENT_SIZE = 30 * 1024 * 1024
+
+HTTP_TOO_MANY_REQUESTS = 429
 
 
 class ContentTooLarge(Exception):
@@ -124,6 +127,15 @@ def _create_tar(root_path: Path, filenames: List[str]) -> bytes:
     return tar_stream.getvalue()
 
 
+class GGClientCallbacks(ABC):
+    """Abstract class used to notify GGClient users of events"""
+
+    @abstractmethod
+    def on_rate_limited(self, delay: int) -> None:
+        """Called when GGClient hits a rate-limit."""
+        ...  # pragma: no cover
+
+
 class GGClient:
     _version = "undefined"
     session: Session
@@ -133,6 +145,7 @@ class GGClient:
     user_agent: str
     extra_headers: Dict
     secret_scan_preferences: SecretScanPreferences
+    callbacks: Optional[GGClientCallbacks]
 
     def __init__(
         self,
@@ -141,6 +154,7 @@ class GGClient:
         session: Optional[Session] = None,
         user_agent: Optional[str] = None,
         timeout: Optional[float] = DEFAULT_TIMEOUT,
+        callbacks: Optional[GGClientCallbacks] = None,
     ):
         """
         :param api_key: API Key to be added to requests
@@ -148,6 +162,7 @@ class GGClient:
         :param session: custom requests session, defaults to requests.Session()
         :param user_agent: user agent to identify requests, defaults to ""
         :param timeout: request timeout, defaults to 20s
+        :param callbacks: object used to receive callbacks from the client, defaults to None
 
         :raises ValueError: if the protocol or the api_key is invalid
         """
@@ -177,6 +192,7 @@ class GGClient:
         self.api_key = api_key
         self.session = session if isinstance(session, Session) else Session()
         self.timeout = timeout
+        self.callbacks = callbacks
         self.user_agent = "pygitguardian/{} ({};py{})".format(
             self._version, platform.system(), platform.python_version()
         )
@@ -207,18 +223,35 @@ class GGClient:
             if extra_headers
             else self.session.headers
         )
-        start = time.time()
-        response: Response = self.session.request(
-            method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
-        )
-        duration = time.time() - start
-        logger.debug(
-            "method=%s endpoint=%s status_code=%s duration=%f",
-            method,
-            endpoint,
-            response.status_code,
-            duration,
-        )
+        while True:
+            start = time.time()
+            response: Response = self.session.request(
+                method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
+            )
+            duration = time.time() - start
+            logger.debug(
+                "method=%s endpoint=%s status_code=%s duration=%f",
+                method,
+                endpoint,
+                response.status_code,
+                duration,
+            )
+            if response.status_code == HTTP_TOO_MANY_REQUESTS:
+                logger.warning("Rate-limit hit")
+                try:
+                    delay = int(response.headers["Retry-After"])
+                except (ValueError, KeyError):
+                    # We failed to parse the Retry-After header, return the response as
+                    # is so the caller handles it as an error
+                    logger.error("Could not get the retry-after value")
+                    return response
+
+                if self.callbacks:
+                    self.callbacks.on_rate_limited(delay)
+                logger.warning("Waiting for %d seconds before retrying", delay)
+                time.sleep(delay)
+            else:
+                break
 
         self.app_version = response.headers.get("X-App-Version", self.app_version)
         self.secrets_engine_version = response.headers.get(
