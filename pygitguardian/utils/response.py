@@ -1,5 +1,8 @@
+from typing import Union
+
 from requests import Response, codes
 
+from ..incident_models import Incident
 from ..models import Detail
 
 
@@ -43,3 +46,27 @@ def is_create_ok(resp: Response) -> bool:
     )
 
 
+def load_incident_response(
+    incident_response: Response,
+) -> Union[Detail, Incident]:
+    obj: Union[Detail, Incident]
+    if is_ok(incident_response):
+        obj = Incident.from_dict(incident_response.json())
+    else:
+        obj = load_detail(incident_response)
+
+    obj.status_code = incident_response.status_code
+
+    return obj
+
+
+def load_no_content_response(
+    response: Response,
+) -> Union[Detail, bool]:
+    if response.status_code == codes.no_content:
+        return True
+    obj = load_detail(response)
+
+    obj.status_code = response.status_code
+
+    return obj

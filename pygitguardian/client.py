@@ -4,24 +4,35 @@ import platform
 import tarfile
 import time
 import urllib.parse
+from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, Generator, List, Optional, Union, cast
 
 import requests
 from requests import Response, Session
 
 from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
-from .utils.response import (
-    is_ok,
-    is_create_ok,
-    load_detail,
-)
 from .iac_models import (
     IaCDiffScanResult,
     IaCScanParameters,
     IaCScanParametersSchema,
     IaCScanResult,
+)
+from .incident_models import (
+    Incident,
+    IncidentIdOrIncident,
+    ListIncidentResult,
+    SharedIncidentDetails,
+)
+from .incident_models.constants import (
+    IncidentIgnoreReason,
+    IncidentOrdering,
+    IncidentPermission,
+    IncidentSeverity,
+    IncidentStatus,
+    IncidentTag,
+    IncidentValidity,
 )
 from .models import (
     Detail,
@@ -43,6 +54,14 @@ from .sca_models import (
     SCAScanDiffOutput,
     SCAScanParameters,
 )
+from .utils.response import (
+    is_create_ok,
+    is_ok,
+    load_detail,
+    load_incident_response,
+    load_no_content_response,
+)
+from .utils.tools import dict_filter_none, ensure_mutually_exclusive
 
 
 logger = logging.getLogger(__name__)
@@ -160,12 +179,18 @@ class GGClient:
     def request(
         self,
         method: str,
-        endpoint: str,
+        endpoint: Optional[str] = None,
         version: Optional[str] = DEFAULT_API_VERSION,
+        url: Optional[str] = None,
         extra_headers: Optional[Dict[str, str]] = None,
         **kwargs: Any,
     ) -> Response:
-        url = self._url_from_endpoint(endpoint, version)
+        if endpoint is not None:
+            _url = self._url_from_endpoint(endpoint, version)
+        elif str is not None:
+            _url = cast(str, url)
+        else:
+            raise ValueError("Request error: 'ednpoint' and 'url' cannot both be None")
 
         headers = (
             {**self.session.headers, **extra_headers}
@@ -174,7 +199,7 @@ class GGClient:
         )
         start = time.time()
         response: Response = self.session.request(
-            method=method, url=url, timeout=self.timeout, headers=headers, **kwargs
+            method=method, url=_url, timeout=self.timeout, headers=headers, **kwargs
         )
         duration = time.time() - start
         logger.debug(
@@ -249,6 +274,23 @@ class GGClient:
         # self.iac_diff_scan also bypass this method
         return self.request(
             "post",
+            endpoint=endpoint,
+            json=data,
+            version=version,
+            extra_headers=extra_headers,
+            **kwargs,
+        )
+
+    def patch(
+        self,
+        endpoint: str,
+        data: Optional[Dict[str, str]] = None,
+        version: str = DEFAULT_API_VERSION,
+        extra_headers: Optional[Dict[str, str]] = None,
+        **kwargs: Any,
+    ) -> Response:
+        return self.request(
+            "patch",
             endpoint=endpoint,
             json=data,
             version=version,
@@ -664,3 +706,359 @@ class GGClient:
                 result = load_detail(response)
             result.status_code = response.status_code
         return result
+
+    # Incidents management
+    def list_secret_incidents(
+        self,
+        per_page: Optional[int] = None,
+        date_before: Optional[datetime] = None,
+        date_after: Optional[datetime] = None,
+        assignee_email: Optional[str] = None,
+        assignee_id: Optional[int] = None,
+        status: Optional[IncidentStatus] = None,
+        severity: Optional[IncidentSeverity] = None,
+        validity: Optional[IncidentValidity] = None,
+        tags: Optional[List[IncidentTag]] = None,
+        ordering: Optional[IncidentOrdering] = None,
+        detector_group_name: Optional[str] = None,
+        ignorer_id: Optional[int] = None,
+        ignorer_api_token_id: Optional[str] = None,
+        resolver_id: Optional[int] = None,
+        resolver_api_token_id: Optional[str] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+        _url: Optional[str] = None,
+    ) -> Union[Detail, ListIncidentResult]:
+        """
+        List secret incidents detected by the GitGuardian dashboard.
+        Occurrences are not returned by this method.
+        """
+        if _url is not None:
+            resp = self.request(
+                method="get",
+                url=_url,
+                extra_headers=extra_headers,
+            )
+        else:
+            params = dict_filter_none(
+                {
+                    "per_page": per_page,
+                    "date_before": date_before,
+                    "date_after": date_after,
+                    "assignee_email": assignee_email,
+                    "assignee_id": assignee_id,
+                    "status": status,
+                    "severity": severity,
+                    "validity": validity,
+                    "tags": tags,
+                    "ordering": ordering,
+                    "detector_group_name": detector_group_name,
+                    "ignorer_id": ignorer_id,
+                    "ignorer_api_token_id": ignorer_api_token_id,
+                    "resolver_id": resolver_id,
+                    "resolver_api_token_id": resolver_api_token_id,
+                }
+            )
+
+            resp = self.get(
+                endpoint="incidents/secrets",
+                extra_headers=extra_headers,
+                params=params,
+            )
+
+        obj: Union[Detail, ListIncidentResult]
+        if is_ok(resp):
+            obj = ListIncidentResult.from_dict(
+                {
+                    "incidents": resp.json(),
+                    "links": resp.links,
+                }
+            )
+        else:
+            obj = load_detail(resp)  # pragma: no cover
+
+        obj.status_code = resp.status_code
+
+        return obj
+
+    def iter_incidents(self, **kwargs: Any) -> Generator[Incident, None, None]:
+        page = self.list_secret_incidents(**kwargs)
+        if "extra_headers" in kwargs:
+            extra_headers = {"extra_headers": kwargs["extra_headers"]}
+        else:
+            extra_headers = {}
+        while True:
+            if isinstance(page, Detail):
+                raise Exception(
+                    "Received an error response before iteration completed."
+                )
+            if len(page.incidents) == 0:
+                break
+            yield from page.incidents
+            if page.links is None:
+                break  # pragma: no cover
+            if page.links is not None and page.links.next is None:
+                break
+            if page.links is not None and page.links.next is not None:
+                page = self.list_secret_incidents(
+                    _url=page.links.next.url,
+                    **extra_headers,
+                )
+
+    def get_secret_incident(
+        self,
+        incident_id: int,
+        with_occurrences: Optional[int] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Retrieve secret incident detected by the GitGuardian dashboard with or
+        without its occurrences.
+        """
+        params = dict_filter_none({"with_occurrences": with_occurrences})
+        return load_incident_response(
+            self.get(
+                endpoint=f"incidents/secrets/{int(incident_id)}",
+                extra_headers=extra_headers,
+                params=params,
+            )
+        )
+
+    def update_incident_severity(
+        self,
+        incident_id: IncidentIdOrIncident,
+        severity: IncidentSeverity,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Set a secret incident's severity.
+        """
+        if isinstance(incident_id, Incident):
+            incident_id = incident_id.id
+
+        return load_incident_response(
+            self.patch(
+                endpoint=f"incidents/secrets/{int(incident_id)}",
+                extra_headers=extra_headers,
+                data={"severity": severity},
+            )
+        )
+
+    def assign_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        email: Optional[str] = None,
+        member_id: Optional[int] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Assign s secret incident detected by the GitGuardian dashboard to a
+        workspace member by email or member ID.
+        """
+        ensure_mutually_exclusive(
+            "You must supply 'email' or 'member_id', but not both.",
+            email,
+            member_id,
+        )
+
+        return load_incident_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/assign",
+                extra_headers=extra_headers,
+                params=dict_filter_none({"email": email, "member_id": member_id}),
+            )
+        )
+
+    def unassign_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Unassign a secret incident previously assigned to a workspace member.
+        """
+        return load_incident_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/unassign",
+                extra_headers=extra_headers,
+            )
+        )
+
+    def resolve_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        secret_revoked: bool,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Resolve a secret incident detected by the GitGuardian dashboard and
+        specicy whether or not the secret was revoked.
+        """
+        return load_incident_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/resolve",
+                extra_headers=extra_headers,
+                params={"secret_revoked": secret_revoked},
+            )
+        )
+
+    def ignore_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        ignore_reason: IncidentIgnoreReason,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Ignore a secret incident detected by the GitGuardian dashboard and
+        specicy whether it is a test credential, a false positive or a low risk
+        secret.
+        """
+        return load_incident_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/ignore",
+                extra_headers=extra_headers,
+                params={"ignore_reason": ignore_reason},
+            )
+        )
+
+    def reopen_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Incident]:
+        """
+        Reopen a secret incident detected by the GitGuardian dashboard that was
+        previously resolved or ignored.
+        """
+        return load_incident_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/reopen",
+                extra_headers=extra_headers,
+            )
+        )
+
+    def share_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        auto_healing: Optional[bool] = None,
+        feedback_collection: Optional[bool] = None,
+        lifespan: Optional[int] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, SharedIncidentDetails]:
+        """
+        Share a secret incident by creating a public link that expires.
+        Optionally, allow someone with the link to resolve/ignore the secret
+        and/or leave feedback about the secret.
+        """
+        resp = self.post(
+            endpoint=f"incidents/secrets/{int(incident_id)}/share",
+            extra_headers=extra_headers,
+            params=dict_filter_none(
+                {
+                    "auto_healing": auto_healing,
+                    "feedback_collection": feedback_collection,
+                    "lifespan": lifespan,
+                }
+            ),
+        )
+
+        obj: Union[Detail, SharedIncidentDetails]
+        if is_ok(resp):
+            obj = SharedIncidentDetails.from_dict(resp.json())
+        else:  # pragma: no cover
+            obj = load_detail(resp)
+
+        obj.status_code = resp.status_code
+
+        return obj
+
+    def unshare_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, bool]:
+        """
+        Unshare a secret incident by revoking its public link before it
+        expires.
+        """
+        return load_no_content_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/unshare",
+                extra_headers=extra_headers,
+            )
+        )
+
+    def grant_access_to_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        incident_permission: IncidentPermission,
+        email: Optional[str] = None,
+        member_id: Optional[int] = None,
+        invitation_id: Optional[int] = None,
+        team_id: Optional[int] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, bool]:
+        """
+        Grant a user, an existing invitee or a team access to a secret
+        incident.
+        """
+        ensure_mutually_exclusive(
+            "'email', 'member_id', 'invitation_id' and 'team_id' "
+            "are mutually exclusive--you can only provide one.",
+            email,
+            member_id,
+            invitation_id,
+            team_id,
+        )
+
+        return load_no_content_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/grant_access",
+                extra_headers=extra_headers,
+                params=dict_filter_none(
+                    {
+                        "email": email,
+                        "member_id": member_id,
+                        "invitation_id": invitation_id,
+                        "team_id": team_id,
+                        "incident_permission": incident_permission,
+                    }
+                ),
+            )
+        )
+
+    def revoke_access_to_incident(
+        self,
+        incident_id: IncidentIdOrIncident,
+        email: Optional[str] = None,
+        member_id: Optional[int] = None,
+        invitation_id: Optional[int] = None,
+        team_id: Optional[int] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, bool]:
+        """
+        Revoke access of a user, an existing invitee or a team to a secret
+        incident.
+        """
+        ensure_mutually_exclusive(
+            "'email', 'member_id', 'invitation_id' and 'team_id' "
+            "are mutually exclusive--you can only provide one.",
+            email,
+            member_id,
+            invitation_id,
+            team_id,
+        )
+
+        return load_no_content_response(
+            self.post(
+                endpoint=f"incidents/secrets/{int(incident_id)}/revoke_access",
+                extra_headers=extra_headers,
+                params=dict_filter_none(
+                    {
+                        "email": email,
+                        "member_id": member_id,
+                        "invitation_id": invitation_id,
+                        "team_id": team_id,
+                    }
+                ),
+            )
+        )
