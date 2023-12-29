@@ -5,6 +5,7 @@ verify_ssl = true
 
 [packages]
 pygitguardian = { editable = true, path = "." }
+strenum = "*"
 
 [dev-packages]
 black = "==22.3.0"
