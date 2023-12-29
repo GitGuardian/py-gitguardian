@@ -9,9 +9,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
 
 import requests
-from requests import Response, Session, codes
+from requests import Response, Session
 
 from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
+from .utils.response import (
+    is_ok,
+    is_create_ok,
+    load_detail,
+)
 from .iac_models import (
     IaCDiffScanResult,
     IaCScanParameters,
@@ -61,46 +66,6 @@ class Versions:
 
 
 VERSIONS = Versions()
-
-
-def load_detail(resp: Response) -> Detail:
-    """
-    load_detail loads a Detail from a response
-    be it JSON or html.
-
-    :param resp: API response
-    :type resp: Response
-    :return: detail object of response
-    :rtype: Detail
-    """
-    if resp.headers["content-type"] == "application/json":
-        data = resp.json()
-    else:
-        data = {"detail": resp.text}
-
-    return Detail.from_dict(data)
-
-
-def is_ok(resp: Response) -> bool:
-    """
-    is_ok returns True is the API responded with 200
-    and the content type is JSON.
-    """
-    return (
-        resp.headers["content-type"] == "application/json"
-        and resp.status_code == codes.ok
-    )
-
-
-def is_create_ok(resp: Response) -> bool:
-    """
-    is_create_ok returns True if the API returns code 201
-    and the content type is JSON.
-    """
-    return (
-        resp.headers["content-type"] == "application/json"
-        and resp.status_code == codes.created
-    )
 
 
 def _create_tar(root_path: Path, filenames: List[str]) -> bytes:
