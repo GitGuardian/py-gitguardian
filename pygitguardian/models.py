@@ -16,7 +16,11 @@ from marshmallow import (
 )
 from typing_extensions import Self
 
-from .config import DOCUMENT_SIZE_THRESHOLD_BYTES, MULTI_DOCUMENT_LIMIT
+from .config import (
+    DOCUMENT_SIZE_THRESHOLD_BYTES,
+    GENERAL_MAXIMUM_PAYLOAD,
+    MULTI_DOCUMENT_LIMIT,
+)
 
 
 class ToDictMixin:
@@ -658,6 +662,7 @@ class HealthCheckResponse(Base):
 class SecretScanPreferences:
     maximum_document_size: int = DOCUMENT_SIZE_THRESHOLD_BYTES
     maximum_documents_per_scan: int = MULTI_DOCUMENT_LIMIT
+    general__maximum_payload_size: int = GENERAL_MAXIMUM_PAYLOAD
 
 
 @dataclass
