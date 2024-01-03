@@ -584,9 +584,10 @@ class GGClient:
             result.status_code = resp.status_code
             return result
         metadata = ServerMetadata.from_dict(resp.json())
-        metadata.secret_scan_preferences.general__maximum_payload_size = (
-            metadata.preferences["general__maximum_payload_size"]
-        )
+        if "general__maximum_payload_size" in metadata.preferences:
+            metadata.secret_scan_preferences.general__maximum_payload_size = (
+                metadata.preferences["general__maximum_payload_size"]
+            )
         self.secret_scan_preferences = metadata.secret_scan_preferences
         return None
 
