@@ -5,7 +5,7 @@ from collections import OrderedDict
 from datetime import date
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple, Type
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 import responses
@@ -13,7 +13,7 @@ from marshmallow import ValidationError
 from responses import matchers
 
 from pygitguardian import GGClient
-from pygitguardian.client import is_ok, load_detail
+from pygitguardian.client import GGClientCallbacks, is_ok, load_detail
 from pygitguardian.config import (
     DEFAULT_BASE_URI,
     DOCUMENT_SIZE_THRESHOLD_BYTES,
@@ -36,7 +36,7 @@ from pygitguardian.sca_models import (
     SCAVulnerability,
 )
 
-from .conftest import my_vcr
+from .conftest import create_client, my_vcr
 
 
 FILENAME = ".env"
@@ -610,6 +610,75 @@ def test_multiscan_parameters(
     )
 
     assert mock_response.call_count == 1
+
+
+@responses.activate
+def test_rate_limit():
+    """
+    GIVEN a GGClient instance with callbacks
+    WHEN calling an API endpoint and we hit a rate-limit
+    THEN the client retries after the delay
+    AND the `on_rate_limited()` method of the callback is called
+    """
+    callbacks = Mock(spec=GGClientCallbacks)
+
+    client = create_client(callbacks=callbacks)
+    multiscan_url = client._url_from_endpoint("multiscan", "v1")
+
+    rate_limit_response = responses.post(
+        url=multiscan_url,
+        status=429,
+        headers={"Retry-After": "1"},
+    )
+    normal_response = responses.post(
+        url=multiscan_url,
+        status=200,
+        json=[
+            {
+                "policy_break_count": 0,
+                "policies": ["pol"],
+                "policy_breaks": [],
+            }
+        ],
+    )
+
+    result = client.multi_content_scan(
+        [{"filename": FILENAME, "document": DOCUMENT}],
+    )
+
+    assert rate_limit_response.call_count == 1
+    assert normal_response.call_count == 1
+    assert isinstance(result, MultiScanResult)
+    callbacks.on_rate_limited.assert_called_once_with(1)
+
+
+@responses.activate
+def test_bogus_rate_limit():
+    """
+    GIVEN a GGClient instance with callbacks
+    WHEN calling an API endpoint and we hit a rate-limit
+    AND we can't parse the rate-limit value
+    THEN the client just returns the error
+    AND the `on_rate_limited()` method of the callback is not called
+    """
+    callbacks = Mock(spec=GGClientCallbacks)
+
+    client = create_client(callbacks=callbacks)
+    multiscan_url = client._url_from_endpoint("multiscan", "v1")
+
+    rate_limit_response = responses.post(
+        url=multiscan_url,
+        status=429,
+        headers={"Retry-After": "later"},
+    )
+
+    result = client.multi_content_scan(
+        [{"filename": FILENAME, "document": DOCUMENT}],
+    )
+
+    assert rate_limit_response.call_count == 1
+    assert isinstance(result, Detail)
+    callbacks.on_rate_limited.assert_not_called()
 
 
 def test_quota_overview(client: GGClient):
