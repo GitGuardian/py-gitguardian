@@ -15,7 +15,10 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Set up Python 3.9
         uses: actions/setup-python@v1
         with:
@@ -40,15 +43,25 @@ jobs:
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
+      - name: Check commit messages
+        if: github.event_name == 'pull_request'
+        run: |
+          if git log --format=%s "origin/$GITHUB_BASE_REF..origin/$GITHUB_HEAD_REF" | grep '^fixup!' ; then
+              echo 'Error: this pull request contains fixup commits. Squash them.'
+              exit 1
+          fi
+          # In case `git log` fails
+          exit "${PIPESTATUS[0]}"
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ['3.7', '3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
@@ -81,7 +94,7 @@ jobs:
     needs: [lint, build]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
