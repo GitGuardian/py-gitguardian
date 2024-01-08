@@ -1,5 +1,15 @@
 # Changelog
 
+<a id='changelog-1.12.0'></a>
+
+## 1.12.0 — 2024-01-08
+
+### Added
+
+- `GGClient` now obeys rate-limits and can notify callers when hitting one.
+- Added the following attributes to `IaCVulnerability`: `url`, `status`, `ignored_until`, `ignore_reason`, `ignore_comment`.
+- Added the `source_found` attribute to `IaCScanParameters` and `IaCDiffScanEntities`.
+
 <a id='changelog-1.11.0'></a>
 
 ## 1.11.0 — 2023-10-16
