@@ -1,5 +1,12 @@
 name: Main
 
+# About steps requiring the GITGUARDIAN_API_KEY:
+#
+# For security reasons, secrets are not available when a workflow is triggered
+# by a pull request from a fork. This causes all steps requiring the
+# GITGUARDIAN_API_KEY to fail. To avoid this, we skip those steps when we are
+# triggered by a pull request from a fork.
+
 on:
   pull_request:
   workflow_dispatch:
@@ -37,6 +44,12 @@ jobs:
 
       - name: Install pre-commit hooks
         run: pre-commit install --install-hooks
+
+      - name: Skip ggshield hooks when running from a fork
+        # See note about steps requiring the GITGUARDIAN_API at the top of this file
+        if: ${{ github.event.pull_request.head.repo.fork }}
+        run: |
+          echo "SKIP=ggshield" >> $GITHUB_ENV
 
       - name: Run pre-commit checks
         run: pre-commit run --show-diff-on-failure --all-files
