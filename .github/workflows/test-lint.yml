@@ -82,7 +82,7 @@ jobs:
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
           flags: unittests
