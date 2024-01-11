@@ -12,7 +12,12 @@ from typing import Any, Dict, List, Optional, Union, cast
 import requests
 from requests import Response, Session, codes
 
-from .config import DEFAULT_API_VERSION, DEFAULT_BASE_URI, DEFAULT_TIMEOUT
+from .config import (
+    DEFAULT_API_VERSION,
+    DEFAULT_BASE_URI,
+    DEFAULT_TIMEOUT,
+    MAXIMUM_PAYLOAD_SIZE,
+)
 from .iac_models import (
     IaCDiffScanResult,
     IaCScanParameters,
@@ -206,6 +211,7 @@ class GGClient:
                 "Authorization": f"Token {api_key}",
             },
         )
+        self.maximum_payload_size = MAXIMUM_PAYLOAD_SIZE
         self.secret_scan_preferences = SecretScanPreferences()
 
     def request(
@@ -617,7 +623,9 @@ class GGClient:
             result.status_code = resp.status_code
             return result
         metadata = ServerMetadata.from_dict(resp.json())
-
+        self.maximum_payload_size = metadata.preferences.get(
+            "general__maximum_payload_size", MAXIMUM_PAYLOAD_SIZE
+        )
         self.secret_scan_preferences = metadata.secret_scan_preferences
         return None
 
