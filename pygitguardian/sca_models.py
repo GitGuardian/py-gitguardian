@@ -33,6 +33,8 @@ SCAIgnoredVulnerability.SCHEMA = cast(
 class SCAScanParameters(Base, FromDictMixin):
     minimum_severity: Optional[str] = None
     ignored_vulnerabilities: List[SCAIgnoredVulnerability] = field(default_factory=list)
+    ignore_no_fix: bool = False
+    ignore_fix_available: bool = False
 
 
 SCAScanParameters.SCHEMA = cast(
