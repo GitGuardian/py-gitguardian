@@ -26,13 +26,21 @@ class TestModel:
             (
                 SCAScanParameters,
                 {
-                    "miniumu_severity": "LOW",
+                    "minimum_severity": "LOW",
                     "ignored_vulnerabilities": [
                         {
                             "identifier": "GHSA-toto",
                             "path": "Pipfile",
                         }
                     ],
+                    "ignore_fix_available": True,
+                    "ignore_no_fix": False,
+                },
+            ),
+            (
+                SCAScanParameters,
+                {
+                    "ignore_no_fix": True,
                 },
             ),
             (
