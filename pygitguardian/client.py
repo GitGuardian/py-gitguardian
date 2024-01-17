@@ -722,7 +722,8 @@ class GGClient:
     ) -> Union[Detail, SCAScanDiffOutput]:
         result: Union[Detail, SCAScanDiffOutput]
         try:
-            response = self.post(
+            response = self.request(
+                "post",
                 endpoint="sca/sca_scan_diff/",
                 files={"reference": reference, "current": current},
                 data={
