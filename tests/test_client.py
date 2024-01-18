@@ -951,6 +951,35 @@ def test_sca_scan_directory(client: GGClient):
     )
 
 
+@my_vcr.use_cassette("test_sca_scan_all_with_params.yaml", ignore_localhost=False)
+def test_sca_scan_all_with_params(client: GGClient):
+    """
+    GIVEN a directory with a Pipfile.lock containing vulnerabilities
+    WHEN calling sca_scan_directory on this directory with a minimum severity
+    THEN we get the expected vulnerabilities
+    """
+
+    scan_params = SCAScanParameters(minimum_severity="HIGH")
+
+    response = client.sca_scan_directory(make_tar_bytes(current_files), scan_params)
+    assert isinstance(response, SCAScanAllOutput)
+    assert response.status_code == 200
+    assert len(response.scanned_files) == 2
+
+    vuln_pkg = next(
+        (
+            package_vuln
+            for package_vuln in response.found_package_vulns[0].package_vulns
+            if package_vuln.package_full_name == "vyper"
+        ),
+        None,
+    )
+    assert vuln_pkg is not None
+    assert all(vuln.severity in ("high", "critical") for vuln in vuln_pkg.vulns)
+    # Medium vuln identifier not in response
+    assert "GHSA-22wc-c9wj-6q2v" not in (vuln.identifier for vuln in vuln_pkg.vulns)
+
+
 @my_vcr.use_cassette("test_sca_scan_directory_invalid_tar.yaml", ignore_localhost=False)
 def test_sca_scan_directory_invalid_tar(client: GGClient):
     """
@@ -982,3 +1011,36 @@ def test_sca_client_scan_diff(client: GGClient):
     )
     assert isinstance(result, SCAScanDiffOutput), result.content
     assert result.scanned_files == ["Pipfile", "Pipfile.lock"]
+
+
+@my_vcr.use_cassette(
+    "test_sca_client_scan_diff_with_params.yaml", ignore_localhost=False
+)
+def test_sca_client_scan_diff_with_params(client: GGClient):
+    """
+    GIVEN a directory in two different states
+    WHEN calling scan_diff on it with a minimum severity parameter
+    THEN the scan succeeds
+    THEN the params are taken into account
+    """
+    scan_params = SCAScanParameters(minimum_severity="HIGH")
+
+    result = client.scan_diff(
+        reference=make_tar_bytes(reference_files),
+        current=make_tar_bytes(current_files),
+        scan_parameters=scan_params,
+    )
+    print(result.added_vulns)
+    assert isinstance(result, SCAScanDiffOutput), result.content
+    assert result.scanned_files == ["Pipfile", "Pipfile.lock"]
+    vyper_vulns = next(
+        (
+            package_vuln
+            for package_vuln in result.added_vulns[0].package_vulns
+            if package_vuln.package_full_name == "vyper"
+        ),
+        None,
+    )
+
+    assert vyper_vulns is not None
+    assert all(vuln.severity in ("high", "critical") for vuln in vyper_vulns.vulns)
