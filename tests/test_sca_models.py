@@ -33,8 +33,8 @@ class TestModel:
                             "path": "Pipfile",
                         }
                     ],
-                    "ignore_fix_available": True,
-                    "ignore_no_fix": False,
+                    "ignore_fixable": True,
+                    "ignore_not_fixable": False,
                 },
             ),
             (
