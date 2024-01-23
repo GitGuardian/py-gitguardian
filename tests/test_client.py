@@ -1030,7 +1030,7 @@ def test_sca_client_scan_diff_with_params(client: GGClient):
         current=make_tar_bytes(current_files),
         scan_parameters=scan_params,
     )
-    print(result.added_vulns)
+
     assert isinstance(result, SCAScanDiffOutput), result.content
     assert result.scanned_files == ["Pipfile", "Pipfile.lock"]
     vyper_vulns = next(
