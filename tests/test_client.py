@@ -22,6 +22,7 @@ from pygitguardian.config import (
 from pygitguardian.models import (
     Detail,
     HoneytokenResponse,
+    HoneytokenWithContextResponse,
     JWTResponse,
     JWTService,
     MultiScanResult,
@@ -812,6 +813,74 @@ def test_create_honeytoken_error(
         name="honeytoken A",
         description="honeytoken used in the repository AA",
         type_="AWS",
+    )
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, Detail)
+
+
+@responses.activate
+def test_create_honeytoken_with_context(
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling create_honeytoken_with_context with parameters
+    THEN the parameters are passed in the request
+    AND the returned honeytoken use the parameters
+    """
+    mock_response = responses.post(
+        url=client._url_from_endpoint("honeytokens/with-context", "v1"),
+        content_type="application/json",
+        status=201,
+        json={
+            "content": "def return_aws_credentials():\n \
+                            aws_access_key_id = XXXXXXXX\n \
+                            aws_secret_access_key = XXXXXXXX\n \
+                            aws_region = us-west-2,\n \
+                            return (aws_access_key_id, aws_secret_access_key, aws_region)\n",
+            "filename": "aws.py",
+            "language": "python",
+            "suggested_commit_message": "Add AWS credentials",
+            "honeytoken_id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+            "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",  # noqa: E501
+        },
+    )
+
+    result = client.create_honeytoken_with_context(
+        name="honeytoken A",
+        description="honeytoken used in the repository AA",
+        type_="AWS",
+        filename="aws.yaml",
+    )
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, HoneytokenWithContextResponse)
+
+
+@responses.activate
+def test_create_honeytoken_with_context_error(
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling create_honeytoken_with_context with parameters without the right access
+    THEN I get a Detail object containing the error detail
+    """
+    mock_response = responses.post(
+        url=client._url_from_endpoint("honeytokens/with-context", "v1"),
+        content_type="application/json",
+        status=400,
+        json={
+            "detail": "Not authorized",
+        },
+    )
+
+    result = client.create_honeytoken_with_context(
+        name="honeytoken A",
+        description="honeytoken used in the repository AA",
+        type_="AWS",
+        filename="aws.yaml",
     )
 
     assert mock_response.call_count == 1
