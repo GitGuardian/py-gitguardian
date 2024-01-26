@@ -21,6 +21,7 @@ def get_version() -> str:
 
 setup(
     name="pygitguardian",
+    python_requires=">=3.8",
     version=get_version(),
     packages=find_packages(exclude=["tests"]),
     description="Python Wrapper for GitGuardian's API -- Scan security "
@@ -48,7 +49,6 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
