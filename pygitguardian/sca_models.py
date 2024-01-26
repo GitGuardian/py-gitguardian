@@ -62,6 +62,11 @@ class SCAVulnerability(Base, FromDictMixin):
     cve_ids: List[str] = field(default_factory=list)
     created_at: Optional[datetime] = None
     fixed_version: Optional[str] = None
+    url: Optional[str] = None
+    status: Optional[str] = None
+    ignored_until: Optional[datetime] = None
+    ignore_reason: Optional[str] = None
+    ignore_comment: Optional[str] = None
 
 
 SCAVulnerability.SCHEMA = cast(
@@ -106,6 +111,7 @@ SCALocationVulnerability.SCHEMA = cast(
 @dataclass
 class SCAScanAllOutput(Base, FromDictMixin):
     scanned_files: List[str] = field(default_factory=list)
+    source_found: bool = False
     found_package_vulns: List[SCALocationVulnerability] = field(default_factory=list)
 
 
@@ -118,6 +124,7 @@ SCAScanAllOutput.SCHEMA = cast(
 @dataclass
 class SCAScanDiffOutput(Base, FromDictMixin):
     scanned_files: List[str] = field(default_factory=list)
+    source_found: bool = False
     added_vulns: List[SCALocationVulnerability] = field(default_factory=list)
     removed_vulns: List[SCALocationVulnerability] = field(default_factory=list)
 
