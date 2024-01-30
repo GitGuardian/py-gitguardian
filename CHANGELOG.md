@@ -1,5 +1,17 @@
 # Changelog
 
+<a id='changelog-1.13.0'></a>
+
+## 1.13.0 — 2024-01-30
+
+### Added
+
+- Added maximum payload size as a property of GGClient
+
+### Changed
+
+- Set minimum Python version to >=3.8
+
 <a id='changelog-1.12.0'></a>
 
 ## 1.12.0 — 2024-01-08
