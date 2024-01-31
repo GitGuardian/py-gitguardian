@@ -10,6 +10,8 @@ from pygitguardian.models import (
     HealthCheckResponseSchema,
     HoneytokenResponse,
     HoneytokenResponseSchema,
+    HoneytokenWithContextResponse,
+    HoneytokenWithContextResponseSchema,
     Match,
     MatchSchema,
     MultiScanResult,
@@ -157,6 +159,22 @@ class TestModel:
                     "revoker_api_token_id": None,
                     "token": {"access_token_id": "AAAA", "secret_key": "BBB"},
                     "tags": ["publicly_exposed"],
+                },
+            ),
+            (
+                HoneytokenWithContextResponseSchema,
+                HoneytokenWithContextResponse,
+                {
+                    "content": "def return_aws_credentials():\n \
+                                    aws_access_key_id = XXXXXXXX\n \
+                                    aws_secret_access_key = XXXXXXXX\n \
+                                    aws_region = us-west-2\n \
+                                    return (aws_access_key_id, aws_secret_access_key, aws_region)\n",
+                    "filename": "aws.py",
+                    "language": "python",
+                    "suggested_commit_message": "Add AWS credentials",
+                    "honeytoken_id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+                    "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",  # noqa: E501
                 },
             ),
         ],

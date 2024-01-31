@@ -30,6 +30,7 @@ from .models import (
     DocumentSchema,
     HealthCheckResponse,
     HoneytokenResponse,
+    HoneytokenWithContextResponse,
     JWTResponse,
     JWTService,
     MultiScanResult,
@@ -508,6 +509,54 @@ class GGClient:
         else:
             if is_create_ok(resp):
                 result = HoneytokenResponse.from_dict(resp.json())
+            else:
+                result = load_detail(resp)
+            result.status_code = resp.status_code
+        return result
+
+    def create_honeytoken_with_context(
+        self,
+        *,
+        name: str,
+        type_: str,
+        description: Optional[str] = None,
+        project_extensions: List[str] = [],
+        filename: Optional[str] = None,
+        language: Optional[str] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, HoneytokenWithContextResponse]:
+        """
+        Create a honeytoken via the /honeytokens/with-context endpoint of the API,
+        the honeytoken is inserted in a file.
+
+        :param name: the honeytoken name
+        :param type_: the honeytoken type
+        :param description: the honeytoken description
+        :param project_extensions: list of file extensions in the project
+        :param filename: name of requested file
+        :param language: language of requested file
+        :param extra_headers: additional headers to add to the request
+        :return: Detail or Honeytoken with context response and status code
+        """
+        try:
+            resp = self.post(
+                endpoint="honeytokens/with-context",
+                extra_headers=extra_headers,
+                data={
+                    "name": name,
+                    "type": type_,
+                    "description": description,
+                    "project_extensions": ",".join(project_extensions),
+                    "filename": filename,
+                    "language": language,
+                },
+            )
+        except requests.exceptions.ReadTimeout:
+            result = Detail("The request timed out.")
+            result.status_code = 504
+        else:
+            if resp.ok:
+                result = HoneytokenWithContextResponse.from_dict(resp.json())
             else:
                 result = load_detail(resp)
             result.status_code = resp.status_code

@@ -616,6 +616,65 @@ class HoneytokenResponse(Base, FromDictMixin):
         return f"honeytoken:{self.id} {self.name}"
 
 
+class HoneytokenWithContextResponseSchema(BaseSchema):
+    content = fields.String()
+    filename = fields.String()
+    language = fields.String()
+    suggested_commit_message = fields.String()
+    honeytoken_id = fields.UUID()
+    gitguardian_url = fields.URL()
+
+    @post_load
+    def make_honeytoken_with_context_response(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> "HoneytokenWithContextResponse":
+        return HoneytokenWithContextResponse(**data)
+
+
+class HoneytokenWithContextResponse(Base, FromDictMixin):
+    """
+    honeytoken creation with context in the GitGuardian API.
+    Allows users to get a file where a new honeytoken is.
+    Example:
+        {
+            "content": "def return_aws_credentials():\n \
+                            aws_access_key_id = XXXXXXXX\n \
+                            aws_secret_access_key = XXXXXXXX\n \
+                            aws_region = us-west-2",\n \
+                            return (aws_access_key_id, aws_secret_access_key, aws_region)\n",
+            "filename": "aws.py",
+            "language": "python",
+            "suggested_commit_message": "Add AWS credentials",
+            "honeytoken_id": "d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+            "gitguardian_url":
+                "https://dashboard.gitguardian.com/workspace/1/honeytokens/d45a123f-b15d-4fea-abf6-ff2a8479de5b",
+        }
+    """
+
+    SCHEMA = HoneytokenWithContextResponseSchema()
+
+    def __init__(
+        self,
+        content: str,
+        filename: str,
+        language: str,
+        suggested_commit_message: str,
+        honeytoken_id: UUID,
+        gitguardian_url: str,
+        **kwargs: Any,
+    ) -> None:
+        super().__init__()
+        self.content = content
+        self.filename = filename
+        self.language = language
+        self.suggested_commit_message = suggested_commit_message
+        self.honeytoken_id = honeytoken_id
+        self.gitguardian_url = gitguardian_url
+
+    def __repr__(self) -> str:
+        return f"honeytoken_context:{self.filename}"
+
+
 class HealthCheckResponseSchema(BaseSchema):
     detail = fields.String(allow_none=False)
     status_code = fields.Int(allow_none=False)
