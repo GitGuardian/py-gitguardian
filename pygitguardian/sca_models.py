@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional, cast
+from typing import List, Optional, Type, cast
 
 import marshmallow_dataclass
 from typing_extensions import Literal
@@ -21,12 +21,11 @@ class SCAIgnoredVulnerability(Base, FromDictMixin):
     path: str
 
 
-SCAIgnoredVulnerability.SCHEMA = cast(
-    BaseSchema,
-    marshmallow_dataclass.class_schema(
-        SCAIgnoredVulnerability, base_schema=BaseSchema
-    )(),
+SCAIgnoredVulnerabilitySchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SCAIgnoredVulnerability, base_schema=BaseSchema),
 )
+SCAIgnoredVulnerability.SCHEMA = SCAIgnoredVulnerabilitySchema()
 
 
 @dataclass
@@ -37,10 +36,11 @@ class SCAScanParameters(Base, FromDictMixin):
     ignore_fixable: bool = False
 
 
-SCAScanParameters.SCHEMA = cast(
-    BaseSchema,
-    marshmallow_dataclass.class_schema(SCAScanParameters, base_schema=BaseSchema)(),
+SCAScanParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SCAScanParameters, base_schema=BaseSchema),
 )
+SCAScanParameters.SCHEMA = SCAScanParametersSchema()
 
 
 @dataclass
@@ -48,10 +48,11 @@ class ComputeSCAFilesResult(Base, FromDictMixin):
     sca_files: List[str]
 
 
-ComputeSCAFilesResult.SCHEMA = cast(
-    BaseSchema,
-    marshmallow_dataclass.class_schema(ComputeSCAFilesResult, base_schema=BaseSchema)(),
+ComputeSCAFilesResultSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(ComputeSCAFilesResult, base_schema=BaseSchema),
 )
+ComputeSCAFilesResult.SCHEMA = ComputeSCAFilesResultSchema()
 
 
 @dataclass
@@ -69,10 +70,11 @@ class SCAVulnerability(Base, FromDictMixin):
     ignore_comment: Optional[str] = None
 
 
-SCAVulnerability.SCHEMA = cast(
-    BaseSchema,
-    marshmallow_dataclass.class_schema(SCAVulnerability, base_schema=BaseSchema)(),
+SCAVulnerabilitySchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SCAVulnerability, base_schema=BaseSchema),
 )
+SCAVulnerability.SCHEMA = SCAVulnerabilitySchema()
 
 SCADependencyType = Literal["direct", "transitive"]
 
@@ -86,12 +88,13 @@ class SCAVulnerablePackageVersion(Base, FromDictMixin):
     vulns: List[SCAVulnerability] = field(default_factory=list)
 
 
-SCAVulnerablePackageVersion.SCHEMA = cast(
-    BaseSchema,
+SCAVulnerablePackageVersionSchema = cast(
+    Type[BaseSchema],
     marshmallow_dataclass.class_schema(
         SCAVulnerablePackageVersion, base_schema=BaseSchema
-    )(),
+    ),
 )
+SCAVulnerablePackageVersion.SCHEMA = SCAVulnerablePackageVersionSchema()
 
 
 @dataclass
@@ -100,12 +103,13 @@ class SCALocationVulnerability(Base, FromDictMixin):
     package_vulns: List[SCAVulnerablePackageVersion] = field(default_factory=list)
 
 
-SCALocationVulnerability.SCHEMA = cast(
-    BaseSchema,
+SCALocationVulnerabilitySchema = cast(
+    Type[BaseSchema],
     marshmallow_dataclass.class_schema(
         SCALocationVulnerability, base_schema=BaseSchema
-    )(),
+    ),
 )
+SCALocationVulnerability.SCHEMA = SCALocationVulnerabilitySchema()
 
 
 @dataclass
@@ -115,10 +119,11 @@ class SCAScanAllOutput(Base, FromDictMixin):
     found_package_vulns: List[SCALocationVulnerability] = field(default_factory=list)
 
 
-SCAScanAllOutput.SCHEMA = cast(
-    BaseSchema,
-    marshmallow_dataclass.class_schema(SCAScanAllOutput, base_schema=BaseSchema)(),
+SCAScanAllOutputSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SCAScanAllOutput, base_schema=BaseSchema),
 )
+SCAScanAllOutput.SCHEMA = SCAScanAllOutputSchema()
 
 
 @dataclass
@@ -129,7 +134,8 @@ class SCAScanDiffOutput(Base, FromDictMixin):
     removed_vulns: List[SCALocationVulnerability] = field(default_factory=list)
 
 
-SCAScanDiffOutput.SCHEMA = cast(
-    BaseSchema,
-    marshmallow_dataclass.class_schema(SCAScanDiffOutput, base_schema=BaseSchema)(),
+SCAScanDiffOutputSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SCAScanDiffOutput, base_schema=BaseSchema),
 )
+SCAScanDiffOutput.SCHEMA = SCAScanDiffOutputSchema()
