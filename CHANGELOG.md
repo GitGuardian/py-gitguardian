@@ -1,5 +1,14 @@
 # Changelog
 
+<a id='changelog-1.14.0'></a>
+
+## 1.14.0 — 2024-02-26
+
+### Added
+
+- Add `GGClient.create_honeytoken_with_context()` method
+- Export scan schemas in addition to dataclasses for sca
+
 <a id='changelog-1.13.0'></a>
 
 ## 1.13.0 — 2024-01-30
