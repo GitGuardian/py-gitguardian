@@ -1,4 +1,5 @@
 """PyGitGuardian API Client"""
+
 from .client import ContentTooLarge, GGClient, GGClientCallbacks
 
 
