@@ -13,7 +13,7 @@ class SCAIgnoredVulnerability(Base, FromDictMixin):
     """
     A model of an ignored vulnerability for SCA. This allows to ignore all occurrences
     of a given vulnerability in a given dependency file.
-    - identifier: identifier (currently: GHSA id) of the vulnerability to ignore
+    - identifier: identifier (GHSA id or CVE id) of the vulnerability to ignore
     - path: the path to the file in which ignore the vulnerability
     """
 
