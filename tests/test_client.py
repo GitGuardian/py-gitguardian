@@ -1113,3 +1113,38 @@ def test_sca_client_scan_diff_with_params(client: GGClient):
 
     assert vyper_vulns is not None
     assert all(vuln.severity in ("high", "critical") for vuln in vyper_vulns.vulns)
+
+
+def test_is_ok_bad_response():
+    """
+    GIVEN a 500 response with no content-type header
+    WHEN is_ok() is called
+    THEN it does not fail
+    AND returns false
+    """
+    resp = Mock()
+    resp.headers = {}
+    resp.status_code = 500
+    resp.text = "Failed"
+
+    assert not is_ok(resp)
+
+
+@responses.activate
+def test_read_metadata_bad_response(client: GGClient):
+    """
+    GIVEN a /metadata endpoint that returns a 500 error with no content-type
+    THEN a call to read_metadata() does not fail
+    AND returns a valid Detail instance
+    """
+    mock_response = responses.get(
+        url=client._url_from_endpoint("metadata", "v1"),
+        status=500,
+        body="Failed",
+    )
+
+    detail = client.read_metadata()
+
+    assert mock_response.call_count == 1
+    assert detail.status_code == 500
+    assert detail.detail == "Failed"
