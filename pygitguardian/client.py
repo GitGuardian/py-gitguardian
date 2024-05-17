@@ -82,7 +82,7 @@ def load_detail(resp: Response) -> Detail:
     :return: detail object of response
     :rtype: Detail
     """
-    if resp.headers["content-type"] == "application/json":
+    if resp.headers.get("content-type") == "application/json":
         data = resp.json()
     else:
         data = {"detail": resp.text}
@@ -96,7 +96,7 @@ def is_ok(resp: Response) -> bool:
     and the content type is JSON.
     """
     return (
-        resp.headers["content-type"] == "application/json"
+        resp.headers.get("content-type") == "application/json"
         and resp.status_code == codes.ok
     )
 
@@ -107,7 +107,7 @@ def is_create_ok(resp: Response) -> bool:
     and the content type is JSON.
     """
     return (
-        resp.headers["content-type"] == "application/json"
+        resp.headers.get("content-type") == "application/json"
         and resp.status_code == codes.created
     )
 
