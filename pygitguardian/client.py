@@ -7,7 +7,7 @@ import urllib.parse
 from abc import ABC, abstractmethod
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, Iterator, List, Optional, Union, cast
 
 import requests
 from requests import Response, Session, codes
@@ -39,6 +39,7 @@ from .models import (
     SecretScanPreferences,
     ServerMetadata,
 )
+from .remediation_models import ListSourcesResponse
 from .sca_models import (
     ComputeSCAFilesResult,
     SCAScanAllOutput,
@@ -268,10 +269,22 @@ class GGClient:
         return response
 
     def _url_from_endpoint(self, endpoint: str, version: Optional[str]) -> str:
+        if endpoint.startswith(self.base_uri):
+            return endpoint
+
         if version:
             endpoint = urllib.parse.urljoin(version + "/", endpoint)
 
         return urllib.parse.urljoin(self.base_uri + "/", endpoint)
+
+    def get_all_pages(self, endpoint: str, **kwargs: Any) -> Iterator[Response]:
+        last_response = self.request("get", endpoint, **kwargs)
+        yield last_response
+        while "next" in last_response.links:
+            last_response = self.request(
+                "get", last_response.links["next"]["url"], **kwargs
+            )
+            yield last_response
 
     @property
     def app_version(self) -> Optional[str]:
@@ -789,4 +802,27 @@ class GGClient:
             else:
                 result = load_detail(response)
             result.status_code = response.status_code
+        return result
+
+    def list_sources(
+        self,
+        params: Union[Dict[str, Any], None] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, ListSourcesResponse]:
+        result: Union[Detail, ListSourcesResponse]
+        responses = []
+        try:
+            for response in self.get_all_pages(
+                endpoint="sources", params=params, extra_headers=extra_headers
+            ):
+                if not is_ok(response):
+                    return load_detail(response)
+                responses.append(response)
+        except requests.exceptions.ReadTimeout:
+            result = Detail("The request timed out.")
+            result.status_code = 504
+        else:
+            sources = [source for response in responses for source in response.json()]
+            result = ListSourcesResponse.from_dict({"sources": sources})
+            result.status_code = responses[-1].status_code
         return result
