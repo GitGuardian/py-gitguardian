@@ -185,15 +185,25 @@ class MatchSchema(BaseSchema):
 
 class Match(Base, FromDictMixin):
     """
-    Match describes a found issue by GitGuardian.
-    With info such as match location and type.
-    Example:
-    { "match": "cake.gitguardian.com",
-    "index_end": 96,
-    "index_start": 77,
-    "type": "host",
-    "line_end": 2,
-    "line_start": 2 }
+    Match describes an issue found by GitGuardian.
+
+    Fields:
+
+    - match: the matched string
+
+    - match_type: the "label" of the matched string ("username", "password"...)
+
+    - index_start: 0-based index of the first character of the match inside the
+      document.
+
+    - index_end: 0-based index of the last character of the match inside the
+      document (not the index of the character after the last character!)
+
+    - line_start: 1-based index of the line where the first character of the
+      match is.
+
+    - line_end: 1-based index of the line where the last character of the
+      match is.
     """
 
     SCHEMA = MatchSchema()
