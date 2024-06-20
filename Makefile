@@ -11,10 +11,10 @@ all:
 	echo "  lint            Run all linters"
 
 test:
-	pipenv run pytest --disable-pytest-warnings -vvv $(test)
+	pdm run pytest --disable-pytest-warnings -vvv $(test)
 
 coverage:
-	pipenv run coverage run --source pygitguardian -m pytest --disable-pytest-warnings && pipenv run coverage report --fail-under=80
+	pdm run coverage run --source pygitguardian -m pytest --disable-pytest-warnings && pdm run coverage report --fail-under=80
 
 lint:
 	pre-commit run --all

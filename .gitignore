@@ -126,3 +126,7 @@ secrets
 
 dist/
 .cache_ggshield
+
+#pdm
+.pdm-python
+pdm.lock

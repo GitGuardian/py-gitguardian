@@ -17,8 +17,8 @@ When submitting a bug report be sure that:
 ## Dev environment
 
 ```bash
-pipenv install --dev
-pipenv run pre-commit install -f --hook-type commit-msg --hook-type pre-commit
+pdm install -G dev
+pdm run pre-commit install -f --hook-type commit-msg --hook-type pre-commit
 ```
 
 ## Testing
@@ -48,6 +48,6 @@ Line length in the one enforced by Black: 88 characters.
 
 ### Changelog
 
-We use [scriv](https://github.com/nedbat/scriv) to manage our changelog. It is automatically installed by `pipenv install --dev`.
+We use [scriv](https://github.com/nedbat/scriv) to manage our changelog. It is automatically installed by `pdm install -G dev`.
 
 All user visible changes must be documented in a changelog fragment. You can create one with `scriv create`. If your pull request only contains non-visible changes (such as refactors or fixes for regressions introduced _after_ the latest release), then apply the `skip-changelog` label to the pull request.

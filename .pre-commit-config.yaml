@@ -18,7 +18,7 @@ repos:
     hooks:
       - id: pyright
         name: pyright
-        entry: 'pipenv run pyright'
+        entry: 'pdm run pyright'
         language: system
         types: [python]
         # do not pass filenames, otherwise Pyright might scan files we don't want it to scan
@@ -35,7 +35,6 @@ repos:
     rev: v5.10.1
     hooks:
       - id: isort
-        args: [--settings-path, setup.cfg]
 
   - repo: https://github.com/Woile/commitizen
     rev: v2.27.1
