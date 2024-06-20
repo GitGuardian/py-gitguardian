@@ -41,6 +41,12 @@ pip3 install --upgrade pygitguardian
 pipenv install pygitguardian
 ```
 
+**pdm**
+
+```bash
+pdm add pygitguardian
+```
+
 **poetry**
 
 ```bash
