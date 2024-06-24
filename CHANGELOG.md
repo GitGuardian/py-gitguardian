@@ -1,16 +1,8 @@
 # Changelog
 
-<a id='changelog-1.15.1'></a>
+<a id='changelog-1.15.2'></a>
 
-## 1.15.1 — 2024-06-24
-
-### Fixed
-
-- Fix release CI job failure.
-
-<a id='changelog-1.15.0'></a>
-
-## 1.15.0 — 2024-06-24
+## 1.15.2 — 2024-06-24
 
 ### Changed
 
@@ -19,6 +11,18 @@
 ### Fixed
 
 - `GGClient` no longer crashes when it receives a server response with no Content-Type header.
+
+<a id='changelog-1.15.1'></a>
+
+## 1.15.1 — 2024-06-24
+
+Yanked: release process issue.
+
+<a id='changelog-1.15.0'></a>
+
+## 1.15.0 — 2024-06-24
+
+Yanked: release process issue.
 
 <a id='changelog-1.14.0'></a>
 
