@@ -1,6 +1,6 @@
 [project]
 name = "pygitguardian"
-version = "1.14.0"
+dynamic = ['version']
 description = "Python Wrapper for GitGuardian's API -- Scan security policy breaks everywhere"
 keywords = [
     "api-client devsecops secrets-detection security-tools library gitguardian",
@@ -59,6 +59,10 @@ dev = [
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
+
+[tool.pdm.version]
+source = "file"
+path = "pygitguardian/__init__.py"
 
 [tool.black]
 target-version = ['py39']
