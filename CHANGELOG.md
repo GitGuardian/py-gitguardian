@@ -1,13 +1,26 @@
 # Changelog
 
+<a id='changelog-1.15.0'></a>
+
+## 1.15.0 — 2024-06-24
+
+### Changed
+
+- The project now uses [pdm](https://pdm-project.org/) instead of pipenv.
+
+### Fixed
+
+- `GGClient` no longer crashes when it receives a server response with no Content-Type header.
+
 <a id='changelog-1.14.0'></a>
 
 ## 1.14.0 — 2024-02-26
 
 ### Added
 
-- Add `GGClient.create_honeytoken_with_context()` method
-- Export scan schemas in addition to dataclasses for sca
+- Add `GGClient.create_honeytoken_with_context()` method.
+
+- Export scan schemas in addition to dataclasses for sca.
 
 <a id='changelog-1.13.0'></a>
 
@@ -15,11 +28,11 @@
 
 ### Added
 
-- Added maximum payload size as a property of GGClient
+- Added maximum payload size as a property of GGClient.
 
 ### Changed
 
-- Set minimum Python version to >=3.8
+- Set minimum Python version to >=3.8.
 
 <a id='changelog-1.12.0'></a>
 
@@ -28,7 +41,9 @@
 ### Added
 
 - `GGClient` now obeys rate-limits and can notify callers when hitting one.
+
 - Added the following attributes to `IaCVulnerability`: `url`, `status`, `ignored_until`, `ignore_reason`, `ignore_comment`.
+
 - Added the `source_found` attribute to `IaCScanParameters` and `IaCDiffScanEntities`.
 
 <a id='changelog-1.11.0'></a>
