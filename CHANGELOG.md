@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.15.1'></a>
+
+## 1.15.1 — 2024-06-24
+
+### Fixed
+
+- Fix release CI job failure.
+
 <a id='changelog-1.15.0'></a>
 
 ## 1.15.0 — 2024-06-24
