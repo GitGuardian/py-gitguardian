@@ -35,6 +35,7 @@ from .models import (
     JWTService,
     MultiScanResult,
     QuotaResponse,
+    RemediationMessages,
     ScanResult,
     SecretScanPreferences,
     ServerMetadata,
@@ -151,6 +152,7 @@ class GGClient:
     user_agent: str
     extra_headers: Dict
     secret_scan_preferences: SecretScanPreferences
+    remediation_messages: RemediationMessages
     callbacks: Optional[GGClientCallbacks]
 
     def __init__(
@@ -214,6 +216,7 @@ class GGClient:
         )
         self.maximum_payload_size = MAXIMUM_PAYLOAD_SIZE
         self.secret_scan_preferences = SecretScanPreferences()
+        self.remediation_messages = RemediationMessages()
 
     def request(
         self,
@@ -676,6 +679,7 @@ class GGClient:
             "general__maximum_payload_size", MAXIMUM_PAYLOAD_SIZE
         )
         self.secret_scan_preferences = metadata.secret_scan_preferences
+        self.remediation_messages = metadata.remediation_messages
         return None
 
     def create_jwt(
