@@ -19,7 +19,13 @@ from marshmallow import (
 )
 from typing_extensions import Self
 
-from .config import DOCUMENT_SIZE_THRESHOLD_BYTES, MULTI_DOCUMENT_LIMIT
+from .config import (
+    DEFAULT_PRE_COMMIT_MESSAGE,
+    DEFAULT_PRE_PUSH_MESSAGE,
+    DEFAULT_PRE_RECEIVE_MESSAGE,
+    DOCUMENT_SIZE_THRESHOLD_BYTES,
+    MULTI_DOCUMENT_LIMIT,
+)
 
 
 class ToDictMixin:
@@ -735,11 +741,21 @@ class SecretScanPreferences:
 
 
 @dataclass
+class RemediationMessages:
+    pre_commit: str = DEFAULT_PRE_COMMIT_MESSAGE
+    pre_push: str = DEFAULT_PRE_PUSH_MESSAGE
+    pre_receive: str = DEFAULT_PRE_RECEIVE_MESSAGE
+
+
+@dataclass
 class ServerMetadata(Base, FromDictMixin):
     version: str
     preferences: Dict[str, Any]
     secret_scan_preferences: SecretScanPreferences = field(
         default_factory=SecretScanPreferences
+    )
+    remediation_messages: RemediationMessages = field(
+        default_factory=RemediationMessages
     )
 
 

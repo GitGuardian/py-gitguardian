@@ -16,6 +16,9 @@ from pygitguardian import GGClient
 from pygitguardian.client import GGClientCallbacks, is_ok, load_detail
 from pygitguardian.config import (
     DEFAULT_BASE_URI,
+    DEFAULT_PRE_COMMIT_MESSAGE,
+    DEFAULT_PRE_PUSH_MESSAGE,
+    DEFAULT_PRE_RECEIVE_MESSAGE,
     DOCUMENT_SIZE_THRESHOLD_BYTES,
     MULTI_DOCUMENT_LIMIT,
 )
@@ -1148,3 +1151,67 @@ def test_read_metadata_bad_response(client: GGClient):
     assert mock_response.call_count == 1
     assert detail.status_code == 500
     assert detail.detail == "Failed"
+
+
+METADATA_RESPONSE_NO_REMEDIATION_MESSAGES = {
+    "version": "dev",
+    "preferences": {
+        "general__maximum_payload_size": 26214400,
+    },
+    "secret_scan_preferences": {
+        "maximum_documents_per_scan": 20,
+        "maximum_document_size": 1048576,
+    },
+}
+
+
+@responses.activate
+def test_read_metadata_no_remediation_message(client: GGClient):
+    """
+    GIVEN a /metadata endpoint that returns a 200 status code but no remediation message
+    THEN a call to read_metadata() does not fail
+    AND remediation_message are the default ones
+    """
+    mock_response = responses.get(
+        url=client._url_from_endpoint("metadata", "v1"),
+        body=json.dumps(METADATA_RESPONSE_NO_REMEDIATION_MESSAGES),
+        content_type="application/json",
+    )
+
+    client.read_metadata()
+
+    assert mock_response.call_count == 1
+    assert client.remediation_messages.pre_commit == DEFAULT_PRE_COMMIT_MESSAGE
+    assert client.remediation_messages.pre_push == DEFAULT_PRE_PUSH_MESSAGE
+    assert client.remediation_messages.pre_receive == DEFAULT_PRE_RECEIVE_MESSAGE
+
+
+@responses.activate
+def test_read_metadata_remediation_message(client: GGClient):
+    """
+    GIVEN a /metadata endpoint that returns a 200 status code with a correct body with remediation message
+    THEN a call to read_metadata() does not fail
+    AND returns a valid Detail instance
+    """
+    messages = {
+        "pre_commit": "message for pre-commit",
+        "pre_push": "message for pre-push",
+        "pre_receive": "message for pre-receive",
+    }
+    mock_response = responses.get(
+        content_type="application/json",
+        url=client._url_from_endpoint("metadata", "v1"),
+        body=json.dumps(
+            {
+                **METADATA_RESPONSE_NO_REMEDIATION_MESSAGES,
+                "remediation_messages": messages,
+            }
+        ),
+    )
+
+    client.read_metadata()
+
+    assert mock_response.call_count == 1
+    assert client.remediation_messages.pre_commit == messages["pre_commit"]
+    assert client.remediation_messages.pre_push == messages["pre_push"]
+    assert client.remediation_messages.pre_receive == messages["pre_receive"]
