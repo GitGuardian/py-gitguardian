@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.16.0'></a>
+
+## 1.16.0 — 2024-07-29
+
+### Added
+
+- GGClient now contains remediation messages obtained from the API `/metadata` endpoint.
+
 <a id='changelog-1.15.2'></a>
 
 ## 1.15.2 — 2024-06-24
