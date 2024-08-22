@@ -4,7 +4,7 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Optional, cast
+from typing import Any, ClassVar, Dict, List, Literal, Optional, Type, cast
 from uuid import UUID
 
 import marshmallow_dataclass
@@ -794,3 +794,179 @@ class JWTService(Enum):
     """Enum for the different services GIM can generate a JWT for."""
 
     HMSL = "hmsl"
+
+
+@dataclass
+class Detector(Base, FromDictMixin):
+    name: str
+    display_name: str
+    nature: str
+    family: str
+    detector_group_name: str
+    detector_group_display_name: str
+
+
+Severity = Literal["low", "medium", "high", "critical", "unknown"]
+ValidityStatus = Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
+IncidentStatus = Literal["IGNORED", "TRIGGERED", "RESOLVED", "ASSIGNED"]
+Tag = Literal[
+    "DEFAULT_BRANCH",
+    "FROM_HISTORICAL_SCAN",
+    "CHECK_RUN_SKIP_FALSE_POSITIVE",
+    "CHECK_RUN_SKIP_LOW_RISK",
+    "CHECK_RUN_SKIP_TEST_CRED",
+    "IGNORED_IN_CHECK_RUN",
+    "FALSE_POSITIVE",
+    "PUBLICLY_EXPOSED",
+    "PUBLICLY_LEAKED",
+    "REGRESSION",
+    "SENSITIVE_FILE",
+    "TEST_FILE",
+]
+IgnoreReason = Literal["test_credential", "false_positive", "low_risk"]
+OccurrenceKind = Literal["realtime", "historical"]
+OccurrencePresence = Literal["present", "removed"]
+Visibility = Literal["private", "internal", "public"]
+
+
+@dataclass
+class SecretPresence(Base, FromDictMixin):
+    files_requiring_code_fix: int
+    files_pending_merge: int
+    files_fixed: int
+    outside_vcs: int
+    removed_outside_vcs: int
+    in_vcs: int
+    removed_in_vcs: int
+
+
+@dataclass
+class Answer(Base, FromDictMixin):
+    type: str
+    field_ref: str
+    field_label: str
+    boolean: Optional[bool] = None
+    text: Optional[str] = None
+
+
+@dataclass
+class Feedback(Base, FromDictMixin):
+    created_at: datetime
+    updated_at: datetime
+    member_id: int
+    email: str
+    answers: List[Answer]
+
+
+@dataclass
+class Source(Base, FromDictMixin):
+    id: int
+    url: str
+    type: str
+    full_name: str
+    health: Literal["safe", "unknown", "at_risk"]
+    default_branch: Optional[str]
+    default_branch_head: Optional[str]
+    open_incidents_count: int
+    closed_incidents_count: int
+    secret_incidents_breakdown: Dict[str, Any]  # TODO: add SecretIncidentsBreakdown
+    visibility: Visibility
+    external_id: str
+    source_criticality: str
+    last_scan: Optional[Dict[str, Any]]  # TODO: add LastScan
+    monitored: bool
+
+
+@dataclass
+class OccurrenceMatch(Base, FromDictMixin):
+    """
+    Describes the match of an occurrence, different from the Match return as part of a PolicyBreak.
+
+    name: type of the match such as "api_key", "password", "client_id", "client_secret"...
+    indice_start: start index of the match in the document (0-based)
+    indice_end: end index of the match in the document (0-based, strictly greater than indice_start)
+    pre_line_start: Optional start line number (1-based) of the match in the document (before the git patch)
+    pre_line_end: Optional end line number (1-based) of the match in the document (before the git patch)
+    post_line_start: Optional start line number (1-based) of the match in the document (after the git patch)
+    post_line_end: Optional end line number (1-based) of the match in the document (after the git patch)
+    """
+
+    name: str
+    indice_start: int
+    indice_end: int
+    pre_line_start: Optional[int]
+    pre_line_end: Optional[int]
+    post_line_start: Optional[int]
+    post_line_end: Optional[int]
+
+
+@dataclass
+class SecretOccurrence(Base, FromDictMixin):
+    id: int
+    incident_id: int
+    kind: OccurrenceKind
+    source: Source
+    author_name: str
+    author_info: str
+    date: datetime  # Publish date
+    url: str
+    matches: List[OccurrenceMatch]
+    tags: List[str]
+    sha: Optional[str]  # Commit sha
+    presence: OccurrencePresence
+    filepath: Optional[str]
+
+
+SecretOccurrenceSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SecretOccurrence, base_schema=BaseSchema),
+)
+SecretOccurrence.SCHEMA = SecretOccurrenceSchema()
+
+
+@dataclass(repr=False)  # the default repr would be too long
+class SecretIncident(Base, FromDictMixin):
+    """
+    Secret Incident describes a leaked secret incident.
+    """
+
+    id: int
+    date: datetime
+    detector: Detector
+    secret_hash: str
+    hmsl_hash: str
+    gitguardian_url: str
+    regression: bool
+    status: IncidentStatus
+    assignee_id: Optional[int]
+    assignee_email: Optional[str]
+    occurrences_count: int
+    secret_presence: SecretPresence
+    ignore_reason: Optional[IgnoreReason]
+    triggered_at: Optional[datetime]
+    ignored_at: Optional[datetime]
+    ignorer_id: Optional[int]
+    ignorer_api_token_id: Optional[UUID]
+    resolver_id: Optional[int]
+    resolver_api_token_id: Optional[UUID]
+    secret_revoked: bool
+    severity: Severity
+    validity: ValidityStatus
+    resolved_at: Optional[datetime]
+    share_url: Optional[str]
+    tags: List[Tag]
+    feedback_list: List[Feedback]
+    occurrences: Optional[List[SecretOccurrence]]
+
+    def __repr__(self) -> str:
+        return (
+            f"id:{self.id}, detector_name:{self.detector.name},"
+            f"  url:{self.gitguardian_url}"
+        )
+
+
+SecretIncidentSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SecretIncident, base_schema=BaseSchema),
+)
+SecretIncident.SCHEMA = SecretIncidentSchema()

@@ -37,6 +37,7 @@ from .models import (
     QuotaResponse,
     RemediationMessages,
     ScanResult,
+    SecretIncident,
     SecretScanPreferences,
     ServerMetadata,
 )
@@ -452,6 +453,30 @@ class GGClient:
 
         obj.status_code = resp.status_code
 
+        return obj
+
+    def retrieve_secret_incident(
+        self, incident_id: int, with_occurrences: int = 20
+    ) -> Union[Detail, SecretIncident]:
+        """
+        retrieve_secret_incident handles the /incidents/secret/{incident_id} endpoint of the API
+
+        :param incident_id: incident id
+        :param with_occurrences: number of occurrences of the incident to retrieve (default 20)
+        """
+
+        resp = self.get(
+            endpoint=f"incidents/secrets/{incident_id}",
+            params={"with_occurrences": with_occurrences},
+        )
+
+        obj: Union[Detail, SecretIncident]
+        if is_ok(resp):
+            obj = SecretIncident.from_dict(resp.json())
+        else:
+            obj = load_detail(resp)
+
+        obj.status_code = resp.status_code
         return obj
 
     def quota_overview(
