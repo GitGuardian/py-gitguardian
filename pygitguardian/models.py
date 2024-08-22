@@ -255,6 +255,88 @@ class Match(Base, FromDictMixin):
         )
 
 
+class SecretIncidentSchema(BaseSchema):
+    id = fields.Integer(required=True)
+    date = fields.AwareDateTime(required=True, allow_none=True)
+    detector = fields.Dict(required=False, allow_none=True)
+    secret_hash = fields.String(required=False)
+    hmsl_hash = fields.String(required=False, allow_none=True)
+    gitguardian_url = fields.String(required=False)
+    status = fields.String(required=True)
+    assignee_id = fields.Integer(required=False, allow_none=True)
+    assignee_email = fields.String(required=False, allow_none=True)
+    occurrences_count = fields.Integer(required=True)
+    ignore_reason = fields.String(required=False, allow_none=True)
+    triggered_at = fields.AwareDateTime(required=False)
+    ignored_at = fields.AwareDateTime(required=False, allow_none=True)
+    secret_revoked = fields.Boolean(required=False)
+    severity = fields.String(required=False)
+    validity = fields.String(required=False)
+    resolved_at = fields.AwareDateTime(required=False, allow_none=True)
+    share_url = fields.String(required=False, allow_none=True)
+    tags = fields.List(fields.String(), required=False)
+
+    @post_load
+    def make_incident(self, data: Dict[str, Any], **kwargs: Any) -> "SecretIncident":
+        return SecretIncident(**data)
+
+
+class SecretIncident(Base, FromDictMixin):
+    """
+    Secret Incident describes a leaked secret incident.
+    """
+
+    SCHEMA = SecretIncidentSchema()
+
+    def __init__(
+        self,
+        id: int,
+        date: date,
+        detector: Optional[Dict[str, Any]] = None,
+        secret_hash: Optional[str] = None,
+        hmsl_hash: Optional[str] = None,
+        gitguardian_url: Optional[str] = None,
+        status: Optional[str] = None,
+        assignee_id: Optional[int] = None,
+        assignee_email: Optional[str] = None,
+        occurrences_count: Optional[int] = None,
+        ignore_reason: Optional[str] = None,
+        triggered_at: Optional[datetime] = None,
+        ignored_at: Optional[datetime] = None,
+        secret_revoked: Optional[bool] = None,
+        severity: Optional[str] = None,
+        validity: Optional[str] = None,
+        resolved_at: Optional[datetime] = None,
+        share_url: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+    ):
+        super().__init__()
+        self.id = id
+        self.date = date
+        self.detector = detector
+        self.secret_hash = secret_hash
+        self.hmsl_hash = hmsl_hash
+        self.gitguardian_url = gitguardian_url
+        self.status = status
+        self.assignee_id = assignee_id
+        self.assignee_email = assignee_email
+        self.occurrences_count = occurrences_count
+        self.ignore_reason = ignore_reason
+        self.triggered_at = triggered_at
+        self.ignored_at = ignored_at
+        self.secret_revoked = secret_revoked
+        self.severity = severity
+        self.validity = validity
+        self.resolved_at = resolved_at
+        self.share_url = share_url
+
+    def __repr__(self) -> str:
+        return (
+            f"id:{self.id}, detector_name:{self.detector.get('name') if self.detector else None},"
+            f"secret_hash:{self.secret_hash}, url:{self.gitguardian_url}"
+        )
+
+
 class PolicyBreakSchema(BaseSchema):
     break_type = fields.String(data_key="type", required=True)
     policy = fields.String(required=True)
