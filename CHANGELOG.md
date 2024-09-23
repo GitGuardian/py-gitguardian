@@ -1,12 +1,20 @@
 # Changelog
 
+<a id='changelog-1.17.0'></a>
+
+## 1.17.0 — 2024-09-23
+
+### Added
+
+- `GGClient` now provides a `retrieve_secret_incident()` method to retrieve the dashboard incident associated with a secret (see https://api.gitguardian.com/docs#tag/Secret-Incidents/operation/retrieve-incidents).
+
 <a id='changelog-1.16.0'></a>
 
 ## 1.16.0 — 2024-07-29
 
 ### Added
 
-- GGClient now contains remediation messages obtained from the API `/metadata` endpoint.
+- `GGClient` now contains remediation messages obtained from the API `/metadata` endpoint.
 
 <a id='changelog-1.15.2'></a>
 
