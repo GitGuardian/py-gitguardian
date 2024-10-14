@@ -260,7 +260,7 @@ class PolicyBreakSchema(BaseSchema):
     policy = fields.String(required=True)
     validity = fields.String(required=False, load_default=None, dump_default=None)
     known_secret = fields.Boolean(required=False, load_default=False, dump_default=None)
-    incident_url = fields.String(required=False, load_default=False, dump_default=None)
+    incident_url = fields.String(required=False, load_default=None, dump_default=None)
     matches = fields.List(fields.Nested(MatchSchema), required=True)
 
     @post_load
