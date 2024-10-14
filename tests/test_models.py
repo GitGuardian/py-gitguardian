@@ -112,6 +112,34 @@ class TestModel:
                 },
             ),
             (
+                PolicyBreakSchema,
+                PolicyBreak,
+                {
+                    "type": "hello",
+                    "policy": "hello",
+                    "validity": "hey",
+                    "known_secret": True,
+                    "incident_url": "https://api.gitguardian.com/workspace/2/incidents/3",
+                    "matches": [{"match": "hello", "type": "hello"}],
+                    "is_excluded": True,
+                    "exclude_reason": "bad secret",
+                },
+            ),
+            (
+                PolicyBreakSchema,
+                PolicyBreak,
+                {
+                    "type": "hello",
+                    "policy": "hello",
+                    "validity": "hey",
+                    "known_secret": True,
+                    "incident_url": "https://api.gitguardian.com/workspace/2/incidents/3",
+                    "matches": [{"match": "hello", "type": "hello"}],
+                    "is_excluded": False,
+                    "exclude_reason": None,
+                },
+            ),
+            (
                 QuotaSchema,
                 Quota,
                 {
