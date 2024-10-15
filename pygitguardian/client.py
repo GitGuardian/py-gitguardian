@@ -357,6 +357,7 @@ class GGClient:
         self,
         document: str,
         filename: Optional[str] = None,
+        all_secrets: Optional[bool] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, ScanResult]:
         """
@@ -368,6 +369,7 @@ class GGClient:
         :param filename: name of file, example: "intro.py"
         :param document: content of file
         :param extra_headers: additional headers to add to the request
+        :param all_secrets: indicates whether all secrets should be returned
         :return: Detail or ScanResult response and status code
         """
 
@@ -379,6 +381,9 @@ class GGClient:
         DocumentSchema.validate_size(
             request_obj, self.secret_scan_preferences.maximum_document_size
         )
+        params = {}
+        if all_secrets is not None:
+            params["all_secrets"] = all_secrets
 
         resp = self.post(
             endpoint="scan",
@@ -401,6 +406,7 @@ class GGClient:
         documents: List[Dict[str, str]],
         extra_headers: Optional[Dict[str, str]] = None,
         ignore_known_secrets: Optional[bool] = None,
+        all_secrets: Optional[bool] = None,
     ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API.
@@ -413,6 +419,7 @@ class GGClient:
             example: [{"document":"example content","filename":"intro.py"}]
         :param extra_headers: additional headers to add to the request
         :param ignore_known_secrets: indicates whether known secrets should be ignored
+        :param all_secrets: indicates whether all secrets should be returned
         :return: Detail or ScanResult response and status code
         """
         max_documents = self.secret_scan_preferences.maximum_documents_per_scan
@@ -433,11 +440,13 @@ class GGClient:
                 document, self.secret_scan_preferences.maximum_document_size
             )
 
-        params = (
-            {"ignore_known_secrets": ignore_known_secrets}
-            if ignore_known_secrets
-            else {}
-        )
+        params = {}
+        if ignore_known_secrets is not None:
+            params["ignore_known_secrets"] = ignore_known_secrets
+        if all_secrets is not None:
+            params["all_secrets"] = all_secrets
+
+        print("PARAMS", params)
         resp = self.post(
             endpoint="multiscan",
             data=request_obj,
