@@ -389,6 +389,7 @@ class GGClient:
             endpoint="scan",
             data=request_obj,
             extra_headers=extra_headers,
+            params=params,
         )
 
         obj: Union[Detail, ScanResult]
