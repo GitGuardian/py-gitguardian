@@ -260,8 +260,10 @@ class PolicyBreakSchema(BaseSchema):
     policy = fields.String(required=True)
     validity = fields.String(required=False, load_default=None, dump_default=None)
     known_secret = fields.Boolean(required=False, load_default=False, dump_default=None)
-    incident_url = fields.String(required=False, load_default=False, dump_default=None)
+    incident_url = fields.String(required=False, load_default=None, dump_default=None)
     matches = fields.List(fields.Nested(MatchSchema), required=True)
+    is_excluded = fields.Boolean(required=False, load_default=False, dump_default=False)
+    exclude_reason = fields.String(required=False, load_default=None, dump_default=None)
 
     @post_load
     def make_policy_break(self, data: Dict[str, Any], **kwargs: Any) -> "PolicyBreak":
@@ -286,6 +288,8 @@ class PolicyBreak(Base, FromDictMixin):
         matches: List[Match],
         known_secret: bool = False,
         incident_url: Optional[str] = None,
+        is_excluded: bool = False,
+        exclude_reason: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__()
@@ -295,6 +299,8 @@ class PolicyBreak(Base, FromDictMixin):
         self.known_secret = known_secret
         self.incident_url = incident_url
         self.matches = matches
+        self.is_excluded = is_excluded
+        self.exclude_reason = exclude_reason
 
     @property
     def is_secret(self) -> bool:
