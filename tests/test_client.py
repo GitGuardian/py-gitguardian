@@ -575,19 +575,53 @@ def test_extra_headers(
 
 
 @responses.activate
-def test_multiscan_parameters(
-    client: GGClient,
-):
+@pytest.mark.parametrize("all_secrets", (None, True, False))
+def test_scan_parameters(client: GGClient, all_secrets):
+    """
+    GIVEN a ggclient
+    WHEN calling content_scan with parameters
+    THEN the parameters are passed in the request
+    """
+
+    to_match = {}
+    if all_secrets is not None:
+        to_match["all_secrets"] = all_secrets
+
+    mock_response = responses.post(
+        url=client._url_from_endpoint("scan", "v1"),
+        status=200,
+        match=[matchers.query_param_matcher(to_match)],
+    )
+
+    client.content_scan(
+        DOCUMENT,
+        FILENAME,
+        all_secrets=all_secrets,
+    )
+
+    assert mock_response.call_count == 1
+
+
+@responses.activate
+@pytest.mark.parametrize("ignore_known_secrets", (None, True, False))
+@pytest.mark.parametrize("all_secrets", (None, True, False))
+def test_multiscan_parameters(client: GGClient, ignore_known_secrets, all_secrets):
     """
     GIVEN a ggclient
     WHEN calling multi_content_scan with parameters
     THEN the parameters are passed in the request
     """
 
+    to_match = {}
+    if ignore_known_secrets is not None:
+        to_match["ignore_known_secrets"] = ignore_known_secrets
+    if all_secrets is not None:
+        to_match["all_secrets"] = all_secrets
+
     mock_response = responses.post(
         url=client._url_from_endpoint("multiscan", "v1"),
         status=200,
-        match=[matchers.query_param_matcher({"ignore_known_secrets": True})],
+        match=[matchers.query_param_matcher(to_match)],
         json=[
             {
                 "policy_break_count": 1,
@@ -610,7 +644,8 @@ def test_multiscan_parameters(
 
     client.multi_content_scan(
         [{"filename": FILENAME, "document": DOCUMENT}],
-        ignore_known_secrets=True,
+        ignore_known_secrets=ignore_known_secrets,
+        all_secrets=all_secrets,
     )
 
     assert mock_response.call_count == 1
