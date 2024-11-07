@@ -812,7 +812,7 @@ class Detector(Base, FromDictMixin):
     detector_group_display_name: str
 
 
-Severity = Literal["low", "medium", "high", "critical", "unknown"]
+Severity = Literal["info", "low", "medium", "high", "critical", "unknown"]
 ValidityStatus = Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
 IncidentStatus = Literal["IGNORED", "TRIGGERED", "RESOLVED", "ASSIGNED"]
 Tag = Literal[
