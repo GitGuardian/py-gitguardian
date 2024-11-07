@@ -31,7 +31,7 @@ Uncomment the section that is right (remove the HTML comment wrapper).
 
 ### Fixed
 
-- Add missing value "info" to Severity model.
+- Add missing value "info" to Severity model (#120).
 
 <!--
 ### Security
