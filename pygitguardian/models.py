@@ -255,6 +255,12 @@ class Match(Base, FromDictMixin):
         )
 
 
+class DiffKind(str, Enum):
+    ADDITION = "addition"
+    DELETION = "deletion"
+    CONTEXT = "context"
+
+
 class PolicyBreakSchema(BaseSchema):
     break_type = fields.String(data_key="type", required=True)
     policy = fields.String(required=True)
@@ -264,6 +270,9 @@ class PolicyBreakSchema(BaseSchema):
     matches = fields.List(fields.Nested(MatchSchema), required=True)
     is_excluded = fields.Boolean(required=False, load_default=False, dump_default=False)
     exclude_reason = fields.String(required=False, load_default=None, dump_default=None)
+    diff_kind = fields.Enum(
+        DiffKind, by_value=True, required=False, load_default=None, dump_default=None
+    )
 
     @post_load
     def make_policy_break(self, data: Dict[str, Any], **kwargs: Any) -> "PolicyBreak":
@@ -290,6 +299,7 @@ class PolicyBreak(Base, FromDictMixin):
         incident_url: Optional[str] = None,
         is_excluded: bool = False,
         exclude_reason: Optional[str] = None,
+        diff_kind: Optional[DiffKind] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__()
@@ -301,6 +311,7 @@ class PolicyBreak(Base, FromDictMixin):
         self.matches = matches
         self.is_excluded = is_excluded
         self.exclude_reason = exclude_reason
+        self.diff_kind = diff_kind
 
     @property
     def is_secret(self) -> bool:
@@ -318,6 +329,7 @@ class ScanResultSchema(BaseSchema):
     policy_break_count = fields.Integer(required=True)
     policies = fields.List(fields.String(), required=True)
     policy_breaks = fields.List(fields.Nested(PolicyBreakSchema), required=True)
+    is_diff = fields.Boolean(required=False, load_default=False, dump_default=None)
 
     @post_load
     def make_scan_result(self, data: Dict[str, Any], **kwargs: Any) -> "ScanResult":
@@ -341,6 +353,7 @@ class ScanResult(Base, FromDictMixin):
         policy_break_count: int,
         policy_breaks: List[PolicyBreak],
         policies: List[str],
+        is_diff: bool = False,
         **kwargs: Any,
     ) -> None:
         """
@@ -350,11 +363,14 @@ class ScanResult(Base, FromDictMixin):
         :type policy_breaks: List
         :param policies: string list of policies evaluated
         :type policies: List[str]
+        :param is_diff: true if the document scanned is a diff
+        :type is_diff: bool
         """
         super().__init__()
         self.policy_break_count = policy_break_count
         self.policies = policies
         self.policy_breaks = policy_breaks
+        self.is_diff = is_diff
 
     @property
     def has_policy_breaks(self) -> bool:

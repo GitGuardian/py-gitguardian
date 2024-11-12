@@ -137,6 +137,22 @@ class TestModel:
                     "matches": [{"match": "hello", "type": "hello"}],
                     "is_excluded": False,
                     "exclude_reason": None,
+                    "diff_kind": None,
+                },
+            ),
+            (
+                PolicyBreakSchema,
+                PolicyBreak,
+                {
+                    "type": "hello",
+                    "policy": "hello",
+                    "validity": "hey",
+                    "known_secret": True,
+                    "incident_url": "https://api.gitguardian.com/workspace/2/incidents/3",
+                    "matches": [{"match": "hello", "type": "hello"}],
+                    "is_excluded": False,
+                    "exclude_reason": None,
+                    "diff_kind": "addition",
                 },
             ),
             (
@@ -165,6 +181,16 @@ class TestModel:
                 ScanResultSchema,
                 ScanResult,
                 {"policy_break_count": 1, "policy_breaks": [], "policies": []},
+            ),
+            (
+                ScanResultSchema,
+                ScanResult,
+                {
+                    "policy_break_count": 1,
+                    "policy_breaks": [],
+                    "policies": [],
+                    "is_diff": True,
+                },
             ),
             (
                 DetailSchema,
