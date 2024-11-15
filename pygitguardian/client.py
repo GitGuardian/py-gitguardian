@@ -151,7 +151,6 @@ class GGClient:
     base_uri: str
     timeout: Optional[float]
     user_agent: str
-    extra_headers: Dict
     secret_scan_preferences: SecretScanPreferences
     remediation_messages: RemediationMessages
     callbacks: Optional[GGClientCallbacks]
