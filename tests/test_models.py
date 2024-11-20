@@ -3,6 +3,8 @@ from typing import OrderedDict
 import pytest
 
 from pygitguardian.models import (
+    ApiTokensResponse,
+    ApiTokensResponseSchema,
     Detail,
     DetailSchema,
     Document,
@@ -62,6 +64,24 @@ class TestModel:
                 HealthCheckResponseSchema,
                 OrderedDict,
                 {"detail": "hello", "status_code": 200},
+            ),
+            (
+                ApiTokensResponseSchema,
+                ApiTokensResponse,
+                {
+                    "id": "5ddaad0c-5a0c-4674-beb5-1cd198d13360",
+                    "name": "myTokenName",
+                    "workspace_id": 42,
+                    "type": "personal_access_token",
+                    "status": "revoked",
+                    "created_at": "2023-05-20T12:40:55.662949Z",
+                    "last_used_at": "2023-05-24T12:40:55.662949Z",
+                    "expire_at": None,
+                    "revoked_at": "2023-05-27T12:40:55.662949Z",
+                    "member_id": 22015,
+                    "creator_id": 22015,
+                    "scopes": ["incidents:read", "scan"],
+                },
             ),
             (MatchSchema, Match, {"match": "hello", "type": "hello"}),
             (

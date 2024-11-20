@@ -23,6 +23,7 @@ from pygitguardian.config import (
     MULTI_DOCUMENT_LIMIT,
 )
 from pygitguardian.models import (
+    ApiTokensResponse,
     Detail,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
@@ -865,6 +866,64 @@ def test_versions_from_headers(client: GGClient, method):
     other_client = GGClient(api_key="")
     assert other_client.app_version == app_version_value
     assert other_client.secrets_engine_version == secrets_engine_version_value
+
+
+@responses.activate
+@pytest.mark.parametrize("token", ["self", "token"])
+def test_api_tokens(client: GGClient, token):
+    """
+    GIVEN a ggclient
+    WHEN calling api_tokens with or without a token
+    THEN the method returns the token details
+    """
+    mock_response = responses.get(
+        url=client._url_from_endpoint(f"api_tokens/{token}", "v1"),
+        content_type="application/json",
+        status=201,
+        json={
+            "id": "5ddaad0c-5a0c-4674-beb5-1cd198d13360",
+            "name": "myTokenName",
+            "workspace_id": 42,
+            "type": "personal_access_token",
+            "status": "revoked",
+            "created_at": "2023-05-20T12:40:55.662949Z",
+            "last_used_at": "2023-05-24T12:40:55.662949Z",
+            "expire_at": None,
+            "revoked_at": "2023-05-27T12:40:55.662949Z",
+            "member_id": 22015,
+            "creator_id": 22015,
+            "scopes": ["incidents:read", "scan"],
+        },
+    )
+
+    result = client.api_tokens(token)
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, ApiTokensResponse)
+
+
+@responses.activate
+def test_api_tokens_error(
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling api_tokens with an invalid token
+    THEN the method returns a Detail object containing the error detail
+    """
+    mock_response = responses.get(
+        url=client._url_from_endpoint("api_tokens/invalid", "v1"),
+        content_type="application/json",
+        status=400,
+        json={
+            "detail": "Not authorized",
+        },
+    )
+
+    result = client.api_tokens(token="invalid")
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, Detail)
 
 
 @responses.activate
