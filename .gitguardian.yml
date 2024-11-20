@@ -1,8 +1,8 @@
 secret:
-  ignored-matches:
+  ignored_matches:
     - match: 5e9107aedc48b14af2749703ed3f83c2e1e6aca82ed86af980a2b925708c2da6
       name: ''
-  ignored-paths:
+  ignored_paths:
     - doc/**/*
     - README.md
     - CONTRIBUTING.md
