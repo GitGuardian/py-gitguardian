@@ -756,6 +756,91 @@ class HealthCheckResponse(Base):
         )
 
 
+class TokenType(str, Enum):
+    PERSONAL_ACCESS_TOKEN = "personal_access_token"
+    SERVICE_ACCOUNT = "service_account"
+
+
+class TokenStatus(str, Enum):
+    ACTIVE = "active"
+    EXPIRED = "expired"
+    REVOKED = "revoked"
+
+
+class TokenScopes(str, Enum):
+    SCAN = "scan"
+    INCIDENTS_READ = "incidents:read"
+    INCIDENTS_WRITE = "incidents:write"
+    INCIDENTS_SHARE = "incidents:share"
+    MEMBERS_READ = "members:read"
+    MEMBERS_WRITE = "members:write"
+    TEAMS_READ = "teams:read"
+    TEAMS_WRITE = "teams:write"
+    AUDIT_LOGS_READ = "audit_logs:read"
+    HONEYTOKENS_READ = "honeytokens:read"
+    HONEYTOKENS_WRITE = "honeytokens:write"
+    API_TOKENS_READ = "api_tokens:read"
+    API_TOKENS_WRITE = "api_tokens:write"
+    IP_ALLOWLIST_READ = "ip_allowlist:read"
+    IP_ALLOWLIST_WRITE = "ip_allowlist:write"
+    SOURCES_READ = "sources:read"
+    SOURCES_WRITE = "sources:write"
+    NHI_WRITE = "nhi:write"
+
+
+class ApiTokensResponseSchema(BaseSchema):
+    id = fields.UUID(required=True)
+    name = fields.String(required=True)
+    workspace_id = fields.Int(required=True)
+    type = fields.Enum(TokenType, by_value=True, required=True)
+    status = fields.Enum(TokenStatus, by_value=True, required=True)
+    created_at = fields.AwareDateTime(required=True)
+    last_used_at = fields.AwareDateTime(allow_none=True)
+    expire_at = fields.AwareDateTime(allow_none=True)
+    revoked_at = fields.AwareDateTime(allow_none=True)
+    member_id = fields.Int(allow_none=True)
+    creator_id = fields.Int(allow_none=True)
+    scopes = fields.List(fields.Enum(TokenScopes, by_value=True), required=False)
+
+    @post_load
+    def make_api_tokens_response(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> "ApiTokensResponse":
+        return ApiTokensResponse(**data)
+
+
+class ApiTokensResponse(Base, FromDictMixin):
+    SCHEMA = ApiTokensResponseSchema()
+
+    def __init__(
+        self,
+        id: UUID,
+        name: str,
+        workspace_id: int,
+        type: TokenType,
+        status: TokenStatus,
+        created_at: datetime,
+        last_used_at: Optional[datetime] = None,
+        expire_at: Optional[datetime] = None,
+        revoked_at: Optional[datetime] = None,
+        member_id: Optional[int] = None,
+        creator_id: Optional[int] = None,
+        scopes: Optional[List[TokenScopes]] = None,
+    ):
+        self.id = id
+        self.name = name
+        self.workspace_id = workspace_id
+        self.type = type
+        self.status = status
+        self.created_at = created_at
+        self.last_used_at = last_used_at
+        self.expire_at = expire_at
+        self.revoked_at = revoked_at
+        self.member_id = member_id
+        self.creator_id = creator_id
+        self.scopes = scopes or []
+
+
 @dataclass
 class SecretScanPreferences:
     maximum_document_size: int = DOCUMENT_SIZE_THRESHOLD_BYTES
