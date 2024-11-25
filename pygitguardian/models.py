@@ -767,7 +767,7 @@ class TokenStatus(str, Enum):
     REVOKED = "revoked"
 
 
-class TokenScopes(str, Enum):
+class TokenScope(str, Enum):
     SCAN = "scan"
     INCIDENTS_READ = "incidents:read"
     INCIDENTS_WRITE = "incidents:write"
@@ -788,7 +788,7 @@ class TokenScopes(str, Enum):
     NHI_WRITE = "nhi:write"
 
 
-class ApiTokensResponseSchema(BaseSchema):
+class APITokensResponseSchema(BaseSchema):
     id = fields.UUID(required=True)
     name = fields.String(required=True)
     workspace_id = fields.Int(required=True)
@@ -800,17 +800,17 @@ class ApiTokensResponseSchema(BaseSchema):
     revoked_at = fields.AwareDateTime(allow_none=True)
     member_id = fields.Int(allow_none=True)
     creator_id = fields.Int(allow_none=True)
-    scopes = fields.List(fields.Enum(TokenScopes, by_value=True), required=False)
+    scopes = fields.List(fields.Enum(TokenScope, by_value=True), required=False)
 
     @post_load
     def make_api_tokens_response(
         self, data: Dict[str, Any], **kwargs: Any
-    ) -> "ApiTokensResponse":
-        return ApiTokensResponse(**data)
+    ) -> "APITokensResponse":
+        return APITokensResponse(**data)
 
 
-class ApiTokensResponse(Base, FromDictMixin):
-    SCHEMA = ApiTokensResponseSchema()
+class APITokensResponse(Base, FromDictMixin):
+    SCHEMA = APITokensResponseSchema()
 
     def __init__(
         self,
@@ -825,7 +825,7 @@ class ApiTokensResponse(Base, FromDictMixin):
         revoked_at: Optional[datetime] = None,
         member_id: Optional[int] = None,
         creator_id: Optional[int] = None,
-        scopes: Optional[List[TokenScopes]] = None,
+        scopes: Optional[List[TokenScope]] = None,
     ):
         self.id = id
         self.name = name

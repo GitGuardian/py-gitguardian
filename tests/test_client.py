@@ -23,7 +23,7 @@ from pygitguardian.config import (
     MULTI_DOCUMENT_LIMIT,
 )
 from pygitguardian.models import (
-    ApiTokensResponse,
+    APITokensResponse,
     Detail,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
@@ -899,7 +899,7 @@ def test_api_tokens(client: GGClient, token):
     result = client.api_tokens(token)
 
     assert mock_response.call_count == 1
-    assert isinstance(result, ApiTokensResponse)
+    assert isinstance(result, APITokensResponse)
 
 
 @responses.activate
