@@ -25,7 +25,7 @@ from .iac_models import (
     IaCScanResult,
 )
 from .models import (
-    ApiTokensResponse,
+    APITokensResponse,
     Detail,
     Document,
     DocumentSchema,
@@ -355,7 +355,7 @@ class GGClient:
 
     def api_tokens(
         self, token: Optional[str] = None
-    ) -> Union[Detail, ApiTokensResponse]:
+    ) -> Union[Detail, APITokensResponse]:
         """
         api_tokens retrieves details of an API token
         If no token is passed, the endpoint retrieves details for the current API token.
@@ -363,7 +363,7 @@ class GGClient:
         use Detail.status_code to check the response status code of the API
 
         200 if server is online, return token details
-        :return: Detail or ApiTokensReponse and status code
+        :return: Detail or APITokensReponse and status code
         """
         try:
             if not token:
@@ -376,7 +376,7 @@ class GGClient:
             result.status_code = 504
         else:
             if resp.ok:
-                result = ApiTokensResponse.from_dict(resp.json())
+                result = APITokensResponse.from_dict(resp.json())
             else:
                 result = load_detail(resp)
             result.status_code = resp.status_code

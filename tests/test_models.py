@@ -3,8 +3,8 @@ from typing import OrderedDict
 import pytest
 
 from pygitguardian.models import (
-    ApiTokensResponse,
-    ApiTokensResponseSchema,
+    APITokensResponse,
+    APITokensResponseSchema,
     Detail,
     DetailSchema,
     Document,
@@ -66,8 +66,8 @@ class TestModel:
                 {"detail": "hello", "status_code": 200},
             ),
             (
-                ApiTokensResponseSchema,
-                ApiTokensResponse,
+                APITokensResponseSchema,
+                APITokensResponse,
                 {
                     "id": "5ddaad0c-5a0c-4674-beb5-1cd198d13360",
                     "name": "myTokenName",

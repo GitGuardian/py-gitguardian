@@ -788,7 +788,7 @@ class TokenScope(str, Enum):
     NHI_WRITE = "nhi:write"
 
 
-class ApiTokensResponseSchema(BaseSchema):
+class APITokensResponseSchema(BaseSchema):
     id = fields.UUID(required=True)
     name = fields.String(required=True)
     workspace_id = fields.Int(required=True)
@@ -805,12 +805,12 @@ class ApiTokensResponseSchema(BaseSchema):
     @post_load
     def make_api_tokens_response(
         self, data: Dict[str, Any], **kwargs: Any
-    ) -> "ApiTokensResponse":
-        return ApiTokensResponse(**data)
+    ) -> "APITokensResponse":
+        return APITokensResponse(**data)
 
 
-class ApiTokensResponse(Base, FromDictMixin):
-    SCHEMA = ApiTokensResponseSchema()
+class APITokensResponse(Base, FromDictMixin):
+    SCHEMA = APITokensResponseSchema()
 
     def __init__(
         self,
