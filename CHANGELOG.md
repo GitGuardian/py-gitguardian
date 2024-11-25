@@ -1,5 +1,25 @@
 # Changelog
 
+<a id='changelog-1.18.0'></a>
+
+## 1.18.0 — 2024-11-25
+
+### Added
+
+- Added the `is_diff` attribute to `ScanResult`.
+
+- Added the following attributes to `PolicyBreak`: `diff_kind`, `is_excluded` and `exclude_reason`.
+
+- `GGClient` now provides a `api_tokens()` method to retrieve API token details (see https://api.gitguardian.com/docs#tag/API-Tokens).
+
+### Changed
+
+- `GGClient.content_scan()` and `GGClient.multi_content_scan()` now accept an `all_secrets` parameter.
+
+### Fixed
+
+- Add missing value `info` to Severity model (#120).
+
 <a id='changelog-1.17.0'></a>
 
 ## 1.17.0 — 2024-09-23
