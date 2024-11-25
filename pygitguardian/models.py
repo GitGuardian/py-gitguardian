@@ -767,7 +767,7 @@ class TokenStatus(str, Enum):
     REVOKED = "revoked"
 
 
-class TokenScopes(str, Enum):
+class TokenScope(str, Enum):
     SCAN = "scan"
     INCIDENTS_READ = "incidents:read"
     INCIDENTS_WRITE = "incidents:write"
@@ -800,7 +800,7 @@ class ApiTokensResponseSchema(BaseSchema):
     revoked_at = fields.AwareDateTime(allow_none=True)
     member_id = fields.Int(allow_none=True)
     creator_id = fields.Int(allow_none=True)
-    scopes = fields.List(fields.Enum(TokenScopes, by_value=True), required=False)
+    scopes = fields.List(fields.Enum(TokenScope, by_value=True), required=False)
 
     @post_load
     def make_api_tokens_response(
@@ -825,7 +825,7 @@ class ApiTokensResponse(Base, FromDictMixin):
         revoked_at: Optional[datetime] = None,
         member_id: Optional[int] = None,
         creator_id: Optional[int] = None,
-        scopes: Optional[List[TokenScopes]] = None,
+        scopes: Optional[List[TokenScope]] = None,
     ):
         self.id = id
         self.name = name
