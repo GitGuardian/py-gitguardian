@@ -97,11 +97,12 @@ jobs:
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
   release:
