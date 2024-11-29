@@ -37,7 +37,7 @@ jobs:
           python -m pip install --upgrade pdm pre-commit
           pdm install -G dev --frozen-lockfile
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.cache/pre-commit
           key: pre-commit|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
@@ -97,17 +97,23 @@ jobs:
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
-      - uses: codecov/codecov-action@v3
+      - uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
           flags: unittests
           name: codecov-umbrella
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
 
   release:
     runs-on: ubuntu-latest
     needs: [lint, build]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
+
+    # This is required for `gh release create` to work
+    permissions:
+      contents: write
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -137,11 +143,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ steps.tags.outputs.tag }}
-          release_name: ${{ steps.tags.outputs.tag }}
-          draft: true
-          prerelease: false
+        run: |
+          gh release create --draft ${{ steps.tags.outputs.tag }}
