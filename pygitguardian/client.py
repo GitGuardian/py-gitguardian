@@ -26,6 +26,8 @@ from .iac_models import (
 )
 from .models import (
     APITokensResponse,
+    CursorPaginatedResponse,
+    DeleteMember,
     Detail,
     Document,
     DocumentSchema,
@@ -34,6 +36,8 @@ from .models import (
     HoneytokenWithContextResponse,
     JWTResponse,
     JWTService,
+    Member,
+    MembersParameters,
     MultiScanResult,
     QuotaResponse,
     RemediationMessages,
@@ -41,6 +45,7 @@ from .models import (
     SecretIncident,
     SecretScanPreferences,
     ServerMetadata,
+    UpdateMember,
 )
 from .sca_models import (
     ComputeSCAFilesResult,
@@ -328,6 +333,40 @@ class GGClient:
         # self.iac_diff_scan also bypass this method
         return self.request(
             "post",
+            endpoint=endpoint,
+            json=data,
+            version=version,
+            extra_headers=extra_headers,
+            **kwargs,
+        )
+
+    def patch(
+        self,
+        endpoint: str,
+        data: Union[Dict[str, Any], List[Dict[str, Any]], None] = None,
+        version: str = DEFAULT_API_VERSION,
+        extra_headers: Optional[Dict[str, str]] = None,
+        **kwargs: Any,
+    ) -> Response:
+        return self.request(
+            "patch",
+            endpoint=endpoint,
+            json=data,
+            version=version,
+            extra_headers=extra_headers,
+            **kwargs,
+        )
+
+    def delete(
+        self,
+        endpoint: str,
+        data: Union[Dict[str, Any], List[Dict[str, Any]], None] = None,
+        version: str = DEFAULT_API_VERSION,
+        extra_headers: Optional[Dict[str, str]] = None,
+        **kwargs: Any,
+    ) -> Response:
+        return self.request(
+            "delete",
             endpoint=endpoint,
             json=data,
             version=version,
@@ -859,3 +898,84 @@ class GGClient:
                 result = load_detail(response)
             result.status_code = response.status_code
         return result
+
+    def list_members(
+        self,
+        query_parameters: Optional[MembersParameters] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[Member]]:
+
+        response = self.get(
+            endpoint="members",
+            data=query_parameters.to_dict() if query_parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[Member]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[Member].from_response(response, Member)
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def get_member(
+        self,
+        member_id: int,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Member]:
+        response = self.get(
+            endpoint=f"members/{member_id}",
+            extra_headers=extra_headers,
+        )
+        obj: Union[Detail, Member]
+        if is_ok(response):
+            obj = Member.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def update_member(
+        self,
+        payload: UpdateMember,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Member]:
+
+        member_id = payload.id
+        data = UpdateMember.to_dict(payload)
+        del data["id"]
+
+        response = self.patch(
+            f"members/{member_id}", data=data, extra_headers=extra_headers
+        )
+        obj: Union[Detail, Member]
+        if is_ok(response):
+            obj = Member.from_dict(response.json())
+            print("Member : ", obj)
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def delete_member(
+        self,
+        member: DeleteMember,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, int]:
+        member_id = member.id
+        data = member.to_dict()
+        del data["id"]
+
+        response = self.delete(
+            f"members/{member_id}", params=data, extra_headers=extra_headers
+        )
+
+        # We bypass `is_ok` because the response content type is none
+        if response.status_code == 204:
+            return 204
+
+        return load_detail(response)

@@ -4,7 +4,19 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Literal, Optional, Type, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Dict,
+    Generic,
+    List,
+    Literal,
+    Optional,
+    Type,
+    TypeVar,
+    cast,
+)
 from uuid import UUID
 
 import marshmallow_dataclass
@@ -13,6 +25,7 @@ from marshmallow import (
     Schema,
     ValidationError,
     fields,
+    post_dump,
     post_load,
     pre_load,
     validate,
@@ -26,6 +39,10 @@ from .config import (
     DOCUMENT_SIZE_THRESHOLD_BYTES,
     MULTI_DOCUMENT_LIMIT,
 )
+
+
+if TYPE_CHECKING:
+    import requests
 
 
 class ToDictMixin:
@@ -54,8 +71,8 @@ class FromDictMixin:
     SCHEMA: ClassVar[Schema]
 
     @classmethod
-    def from_dict(cls, dct: Dict[str, Any]) -> Self:
-        return cast(Self, cls.SCHEMA.load(dct))
+    def from_dict(cls, dct: Dict[str, Any], many: Optional[bool] = None) -> Self:
+        return cast(Self, cls.SCHEMA.load(dct, many=many))
 
 
 class BaseSchema(Schema):
@@ -1077,3 +1094,146 @@ SecretIncidentSchema = cast(
     marshmallow_dataclass.class_schema(SecretIncident, base_schema=BaseSchema),
 )
 SecretIncident.SCHEMA = SecretIncidentSchema()
+
+
+class AccessLevel(str, Enum):
+    OWNER = "owner"
+    MANAGER = "manager"
+    MEMBER = "member"
+    RESTRICTED = "restricted"
+
+
+class PaginationParameter(Base, FromDictMixin):
+    """Pagination mixin used for endpoints that support pagination."""
+
+    cursor: str = ""
+    per_page: int = 20
+
+
+class SearchParameter(Base, FromDictMixin):
+    search: Optional[str] = None
+
+
+PaginatedData = TypeVar("PaginatedData", bound=FromDictMixin)
+
+
+@dataclass
+class CursorPaginatedResponse(Generic[PaginatedData]):
+    status_code: int
+    data: list[PaginatedData]
+    prev: Optional[str] = None
+    next: Optional[str] = None
+
+    @classmethod
+    def from_response(
+        cls, response: "requests.Response", data_type: Type[PaginatedData]
+    ) -> "CursorPaginatedResponse[PaginatedData]":
+        data = cast(
+            list[PaginatedData], data_type.from_dict(response.json(), many=True)
+        )
+        paginated_response = cls(status_code=response.status_code, data=data)
+
+        if previous_page := response.links.get("prev"):
+            paginated_response.prev = previous_page["url"]
+        if next_page := response.links.get("next"):
+            paginated_response.prev = next_page["url"]
+
+        return paginated_response
+
+
+@dataclass
+class MembersParameters(PaginationParameter, SearchParameter, Base, FromDictMixin):
+    """
+    Members query parameters
+    """
+
+    access_level: Optional[AccessLevel] = None
+    active: Optional[bool] = None
+    ordering: Optional[
+        Literal["id", "-id", "created_at", "-created_at", "last_login", "-last_login"]
+    ] = None
+
+
+MembersParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(MembersParameters, base_schema=BaseSchema),
+)
+MembersParameters.SCHEMA = MembersParametersSchema()
+
+
+@dataclass
+class Member(Base, FromDictMixin):
+    """
+    Member represents a user in a GitGuardian account.
+    """
+
+    id: int
+    access_level: AccessLevel
+    email: str
+    name: str
+    created_at: datetime
+    last_login: Optional[datetime]
+    active: bool
+
+
+class MemberSchema(BaseSchema):
+    id = fields.Int(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    email = fields.Str(required=True)
+    name = fields.Str(required=True)
+    created_at = fields.AwareDateTime(required=True)
+    last_login = fields.AwareDateTime(allow_none=True)
+    active = fields.Bool(required=True)
+
+    @post_load
+    def return_member(
+        self,
+        data: list[dict[str, Any]] | dict[str, Any],
+        **kwargs: dict[str, Any],
+    ):
+        data = cast(dict[str, Any], data)
+        return Member(**data)
+
+
+Member.SCHEMA = MemberSchema()
+
+
+class UpdateMemberSchema(BaseSchema):
+    id = fields.Int(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
+    active = fields.Bool(allow_none=True)
+
+    @post_dump
+    def access_level_value(
+        self, data: dict[str, Any], **kwargs: dict[str, Any]
+    ) -> dict[str, Any]:
+        if "access_level" in data:
+            data["access_level"] = AccessLevel(data["access_level"]).value
+        return data
+
+
+@dataclass
+class UpdateMember(Base, FromDictMixin):
+    """
+    UpdateMember represnets the payload to update a member
+    """
+
+    id: int
+    access_level: Optional[AccessLevel] = None
+    active: Optional[bool] = None
+
+
+UpdateMember.SCHEMA = UpdateMemberSchema()
+
+
+@dataclass
+class DeleteMember(Base, FromDictMixin):
+    id: int
+    send_email: Optional[bool] = None
+
+
+DeleteMemberSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(DeleteMember, base_schema=BaseSchema),
+)
+DeleteMember.SCHEMA = DeleteMemberSchema()

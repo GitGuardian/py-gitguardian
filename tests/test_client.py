@@ -23,15 +23,20 @@ from pygitguardian.config import (
     MULTI_DOCUMENT_LIMIT,
 )
 from pygitguardian.models import (
+    AccessLevel,
     APITokensResponse,
+    CursorPaginatedResponse,
+    DeleteMember,
     Detail,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
     JWTResponse,
     JWTService,
+    Member,
     MultiScanResult,
     QuotaResponse,
     ScanResult,
+    UpdateMember,
 )
 from pygitguardian.sca_models import (
     ComputeSCAFilesResult,
@@ -1391,3 +1396,71 @@ def test_read_metadata_remediation_message(client: GGClient):
     assert client.remediation_messages.pre_commit == messages["pre_commit"]
     assert client.remediation_messages.pre_push == messages["pre_push"]
     assert client.remediation_messages.pre_receive == messages["pre_receive"]
+
+
+LIST_MEMBERS_RESPONSE = [
+    {
+        "id": 3251,
+        "name": "Owl",
+        "email": "john.smith@example.org",
+        "role": "owner",
+        "access_level": "owner",
+        "active": True,
+        "created_at": "2022-04-20T11:07:24.000Z",
+        "last_login": "2022-04-20T11:07:24.000Z",
+    },
+    {
+        "id": 3252,
+        "name": "Owl",
+        "email": "john.smith@example.org",
+        "role": "owner",
+        "access_level": "owner",
+        "active": True,
+        "created_at": "2022-04-20T11:07:24.000Z",
+        "last_login": "2022-04-20T11:07:24.000Z",
+    },
+]
+
+
+@my_vcr.use_cassette("test_list_members.yaml", ignore_localhost=False)
+def test_list_members(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling /members endpoint
+    THEN it returns a paginated list of members
+    """
+
+    result = client.list_members()
+
+    assert isinstance(result, CursorPaginatedResponse), result.content
+
+
+@my_vcr.use_cassette("test_update_member.yaml", ignore_localhost=False)
+def test_update_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling PATCH /members/{id} endpoint with a payload
+    THEN it returns the updated member
+    """
+
+    result = client.update_member(
+        UpdateMember(id=10, access_level=AccessLevel.MEMBER, active=False)
+    )
+
+    assert isinstance(result, Member), result.content
+
+    assert not result.active
+    assert result.access_level == AccessLevel.MEMBER
+
+
+@my_vcr.use_cassette("test_delete_member.yaml", ignore_localhost=False)
+def test_delete_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /members/{id} endpoint
+    THEN the member is deleted
+    """
+
+    result = client.delete_member(DeleteMember(id=11))
+
+    assert result == 204, result.content
