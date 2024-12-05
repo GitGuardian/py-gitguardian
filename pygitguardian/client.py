@@ -26,6 +26,9 @@ from .iac_models import (
 )
 from .models import (
     APITokensResponse,
+    CreateTeam,
+    CreateTeamInvitation,
+    CreateTeamMember,
     CursorPaginatedResponse,
     DeleteMember,
     Detail,
@@ -45,7 +48,14 @@ from .models import (
     SecretIncident,
     SecretScanPreferences,
     ServerMetadata,
+    Team,
+    TeamInvitation,
+    TeamInvitationParameter,
+    TeamMember,
+    TeamMemberParameter,
+    TeamsParameter,
     UpdateMember,
+    UpdateTeam,
 )
 from .sca_models import (
     ComputeSCAFilesResult,
@@ -118,6 +128,14 @@ def is_create_ok(resp: Response) -> bool:
         resp.headers.get("content-type") == "application/json"
         and resp.status_code == codes.created
     )
+
+
+def is_delete_ok(resp: Response) -> bool:
+    """
+    is_delete_ok returns True if the API returns code 204
+    and the content type is JSON.
+    """
+    return resp.status_code == codes.no_content
 
 
 def _create_tar(root_path: Path, filenames: List[str]) -> bytes:
@@ -975,7 +993,223 @@ class GGClient:
         )
 
         # We bypass `is_ok` because the response content type is none
-        if response.status_code == 204:
-            return 204
+        if is_delete_ok(response):
+            return response.status_code
+
+        return load_detail(response)
+
+    def list_teams(
+        self,
+        parameters: Optional[TeamsParameter] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[Team]]:
+        response = self.get(
+            endpoint="teams",
+            data=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[Team]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[Team].from_response(response, Team)
+        else:
+            obj = load_detail(response)
+
+        obj.status_code
+        return obj
+
+    def get_team(
+        self,
+        team_id: int,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Team]:
+        response = self.get(
+            endpoint=f"teams/{team_id}",
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, Team]
+        if is_ok(response):
+            obj = Team.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def create_team(
+        self,
+        team: CreateTeam,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Team]:
+        response = self.post(
+            endpoint="teams", data=CreateTeam.to_dict(team), extra_headers=extra_headers
+        )
+
+        obj: Union[Detail, Team]
+        if is_create_ok(response):
+            obj = Team.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def update_team(
+        self,
+        team: UpdateTeam,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Team]:
+        team_id = team.id
+        data = UpdateTeam.to_dict(team)
+        del data["id"]
+
+        response = self.patch(
+            endpoint=f"teams/{team_id}",
+            data=data,
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, Team]
+        if is_ok(response):
+            obj = Team.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def delete_team(
+        self,
+        team_id: int,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, int]:
+        response = self.delete(
+            endpoint=f"teams/{team_id}",
+            extra_headers=extra_headers,
+        )
+
+        if is_delete_ok(response):
+            return response.status_code
+
+        return load_detail(response)
+
+    def list_team_invitations(
+        self,
+        team_id: int,
+        parameters: Optional[TeamInvitationParameter] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[TeamInvitation]]:
+        response = self.get(
+            endpoint=f"teams/{team_id}/team_invitations",
+            data=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[TeamInvitation]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[TeamInvitation].from_response(
+                response, TeamInvitation
+            )
+        else:
+            obj = load_detail(response)
+
+        obj.status_code
+        return obj
+
+    def create_team_invitation(
+        self,
+        team_id: int,
+        invitation: CreateTeamInvitation,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, TeamInvitation]:
+        response = self.post(
+            endpoint=f"teams/{team_id}/team_invitations",
+            data=CreateTeamInvitation.to_dict(invitation),
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, TeamInvitation]
+        if is_create_ok(response):
+            obj = TeamInvitation.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def delete_team_invitation(
+        self,
+        team_id: int,
+        invitation_id: int,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, int]:
+        response = self.delete(
+            endpoint=f"teams/{team_id}/team_invitations/{invitation_id}",
+            extra_headers=extra_headers,
+        )
+
+        if is_delete_ok(response):
+            return response.status_code
+
+        return load_detail(response)
+
+    def list_team_members(
+        self,
+        team_id: int,
+        parameters: Optional[TeamMemberParameter] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[TeamMember]]:
+        response = self.get(
+            endpoint=f"teams/{team_id}/team_memberships",
+            data=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[TeamMember]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[TeamMember].from_response(
+                response, TeamMember
+            )
+        else:
+            obj = load_detail(response)
+
+        obj.status_code
+        return obj
+
+    def create_team_member(
+        self,
+        team_id: int,
+        member: CreateTeamMember,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, TeamMember]:
+        response = self.post(
+            endpoint=f"teams/{team_id}/team_memberships",
+            data=CreateTeamMember.to_dict(member),
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, TeamMember]
+        if is_create_ok(response):
+            obj = TeamMember.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def delete_team_member(
+        self,
+        team_id: int,
+        team_member_id: int,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, int]:
+        response = self.delete(
+            endpoint=f"teams/{team_id}/team_memberships/{team_member_id}",
+            extra_headers=extra_headers,
+        )
+
+        if is_delete_ok(response):
+            return response.status_code
 
         return load_detail(response)

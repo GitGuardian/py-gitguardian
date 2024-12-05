@@ -1237,3 +1237,241 @@ DeleteMemberSchema = cast(
     marshmallow_dataclass.class_schema(DeleteMember, base_schema=BaseSchema),
 )
 DeleteMember.SCHEMA = DeleteMemberSchema()
+
+
+class TeamsParameter(PaginationParameter, SearchParameter, Base, FromDictMixin):
+    is_global: Optional[bool] = None
+
+
+TeamsParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(DeleteMember, base_schema=BaseSchema),
+)
+TeamsParameter.SCHEMA = TeamsParameterSchema()
+
+
+@dataclass
+class Team(Base, FromDictMixin):
+    id: int
+    name: str
+    is_global: bool
+    gitguardian_url: str
+    description: Optional[str] = None
+
+
+TeamsSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(Team, base_schema=BaseSchema),
+)
+Team.SCHEMA = TeamsSchema()
+
+
+@dataclass
+class CreateTeam(Base, FromDictMixin):
+    name: str
+    description: Optional[str] = ""
+
+
+class CreateTeamSchema(BaseSchema):
+    many = False
+
+    name = fields.Str(required=True)
+    description = fields.Str(allow_none=True)
+
+    class Meta:
+        exclude_none = True
+
+
+CreateTeam.SCHEMA = CreateTeamSchema()
+
+
+@dataclass
+class UpdateTeam(Base, FromDictMixin):
+    id: int
+    name: Optional[str]
+    description: Optional[str] = None
+
+
+UpdateTeamSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(UpdateTeam, base_schema=BaseSchema),
+)
+UpdateTeam.SCHEMA = UpdateTeamSchema()
+
+
+class TeamPermission(str, Enum):
+    MANAGER = "can_manage"
+    MEMBER = "cannot_manage"
+
+
+class IncidentPermission(str, Enum):
+    EDIT = "can_edit"
+    VIEW = "can_view"
+    FULL_ACCESS = "full_access"
+
+
+@dataclass
+class TeamInvitationParameter(PaginationParameter, Base, FromDictMixin):
+    invitation_id: Optional[int] = None
+    is_team_leader: Optional[bool] = None
+    incident_permission: Optional[IncidentPermission] = None
+
+
+@dataclass
+class TeamInvitationParameterSchema(BaseSchema):
+    invitation_id = fields.Int(allow_none=True)
+    is_team_leader = fields.Bool(allow_none=True)
+    incident_permission = fields.Enum(
+        IncidentPermission, by_value=True, allow_none=True
+    )
+
+    class Meta:
+        exclude_none = True
+
+
+TeamInvitationParameter.SCHEMA = TeamInvitationParameterSchema()
+
+
+@dataclass
+class TeamInvitation(Base, FromDictMixin):
+    id: int
+    invitation_id: int
+    team_id: int
+    team_permission: TeamPermission
+    incident_permission: IncidentPermission
+
+
+class TeamInvitationSchema(BaseSchema):
+    many = False
+
+    id = fields.Int(required=True)
+    invitation_id = fields.Int(required=True)
+    team_id = fields.Int(required=True)
+    team_permission = fields.Enum(TeamPermission, by_value=True, required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_member(
+        self,
+        data: dict[str, Any],
+        **kwargs: dict[str, Any],
+    ):
+        return TeamInvitation(**data)
+
+
+TeamInvitation.SCHEMA = TeamInvitationSchema()
+
+
+@dataclass
+class CreateTeamInvitation(Base, FromDictMixin):
+    invitation_id: int
+    is_team_leader: bool
+    incident_permission: IncidentPermission
+
+
+class CreateTeamInvitationSchema(BaseSchema):
+    many = False
+
+    invitation_id = fields.Int(required=True)
+    is_team_leader = fields.Bool(required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_team_invitation(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+        return CreateTeamInvitation(**data)
+
+    class Meta:
+        exclude_none = True
+
+
+CreateTeamInvitation.SCHEMA = CreateTeamInvitationSchema()
+
+
+class TeamMemberParameter(PaginationParameter, SearchParameter, Base, FromDictMixin):
+    is_team_leader: Optional[bool] = None
+    incident_permission: Optional[IncidentPermission] = None
+    member_id: Optional[int] = None
+
+
+class TeamMembershipParameterSchema(BaseSchema):
+    is_team_leader = fields.Bool(allow_none=True)
+    incident_permission = fields.Enum(
+        IncidentPermission, by_value=True, allow_none=True
+    )
+    member_id = fields.Int(allow_none=True)
+
+    @post_load
+    def return_team_membership_parameter(
+        self, data: dict[str, Any], **kwargs: dict[str, Any]
+    ):
+        return TeamMemberParameter(**data)
+
+    class Meta:
+        exclude_none = True
+
+
+TeamMemberParameter.SCHEMA = TeamMembershipParameterSchema()
+
+
+@dataclass
+class TeamMember(Base, FromDictMixin):
+    id: int
+    team_id: int
+    member_id: int
+    is_team_leader: bool
+    team_permission: TeamPermission
+    incident_permission: IncidentPermission
+
+
+class TeamMemberSchema(BaseSchema):
+    id = fields.Int(required=True)
+    team_id = fields.Int(required=True)
+    member_id = fields.Int(required=True)
+    is_team_leader = fields.Bool(required=True)
+    team_permission = fields.Enum(TeamPermission, by_value=True, required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_team_membership(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+        return TeamMember(**data)
+
+
+TeamMember.SCHEMA = TeamMemberSchema()
+
+
+@dataclass
+class CreateTeamMemberParameter(Base, FromDictMixin):
+    send_email: bool
+
+
+CreateTeamMemberParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(
+        CreateTeamMemberParameter, base_schema=BaseSchema
+    ),
+)
+CreateTeamMemberParameter.SCHEMA = CreateTeamMemberParameterSchema()
+
+
+@dataclass
+class CreateTeamMember(Base, FromDictMixin):
+    member_id: int
+    is_team_leader: bool
+    incident_permission: IncidentPermission
+
+
+class CreateTeamMemberSchema(BaseSchema):
+    many = False
+
+    member_id = fields.Int(required=True)
+    is_team_leader = fields.Bool(required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_create_team_membership(
+        self, data: dict[str, Any], **kwargs: dict[str, Any]
+    ):
+        return CreateTeamMember(**data)
+
+
+CreateTeamMember.SCHEMA = CreateTeamMemberSchema()
