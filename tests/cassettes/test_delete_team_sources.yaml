@@ -31,7 +31,7 @@ interactions:
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 12:45:18 GMT
+          - Fri, 06 Dec 2024 15:53:15 GMT
         Referrer-Policy:
           - same-origin
         Server:
@@ -45,7 +45,7 @@ interactions:
         X-Frame-Options:
           - DENY
         X-Request-ID:
-          - a22388028c540a672a7f0b9f9ee63406
+          - c40c97ffa8505619495c4656de9772e8
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:
@@ -54,7 +54,7 @@ interactions:
         code: 204
         message: No Content
   - request:
-      body: type=azure_devops
+      body: null
       headers:
         Accept:
           - '*/*'
@@ -62,14 +62,10 @@ interactions:
           - gzip, deflate
         Connection:
           - keep-alive
-        Content-Length:
-          - '17'
-        Content-Type:
-          - application/x-www-form-urlencoded
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams/9/sources
+      uri: https://api.gitguardian.com/v1/teams/9/sources?type=azure_devops
     response:
       body:
         string: '[{"id":124,"type":"azure_devops","full_name":"gg-integration-test /
@@ -92,7 +88,7 @@ interactions:
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 12:45:18 GMT
+          - Fri, 06 Dec 2024 15:53:15 GMT
         Link:
           - ''
         Referrer-Policy:
@@ -110,7 +106,7 @@ interactions:
         X-Per-Page:
           - '20'
         X-Request-ID:
-          - b1645bd71d969137f339bf4f8adcad6e
+          - fdcab3ffe17d5cc19ce6471a37f3ac25
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

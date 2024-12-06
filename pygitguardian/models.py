@@ -985,7 +985,7 @@ class Feedback(Base, FromDictMixin):
 @dataclass
 class SecretIncidentStats(Base, FromDictMixin):
     total: int
-    severity_breakdown: dict[Severity, int]
+    severity_breakdown: Dict[Severity, int]
 
 
 @dataclass
@@ -1165,7 +1165,7 @@ PaginatedData = TypeVar("PaginatedData", bound=FromDictMixin)
 @dataclass
 class CursorPaginatedResponse(Generic[PaginatedData]):
     status_code: int
-    data: list[PaginatedData]
+    data: List[PaginatedData]
     prev: Optional[str] = None
     next: Optional[str] = None
 
@@ -1174,7 +1174,7 @@ class CursorPaginatedResponse(Generic[PaginatedData]):
         cls, response: "requests.Response", data_type: Type[PaginatedData]
     ) -> "CursorPaginatedResponse[PaginatedData]":
         data = cast(
-            list[PaginatedData], data_type.from_dict(response.json(), many=True)
+            List[PaginatedData], data_type.from_dict(response.json(), many=True)
         )
         paginated_response = cls(status_code=response.status_code, data=data)
 
@@ -1205,7 +1205,7 @@ class MembersParametersSchema(BaseSchema):
     ordering = fields.Str(allow_none=True)
 
     @post_load
-    def return_members_parameters(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+    def return_members_parameters(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
         return MembersParameters(**data)
 
 
@@ -1239,10 +1239,9 @@ class MemberSchema(BaseSchema):
     @post_load
     def return_member(
         self,
-        data: list[dict[str, Any]] | dict[str, Any],
-        **kwargs: dict[str, Any],
+        data: Dict[str, Any],
+        **kwargs: Dict[str, Any],
     ):
-        data = cast(dict[str, Any], data)
         return Member(**data)
 
 
@@ -1256,8 +1255,8 @@ class UpdateMemberSchema(BaseSchema):
 
     @post_dump
     def access_level_value(
-        self, data: dict[str, Any], **kwargs: dict[str, Any]
-    ) -> dict[str, Any]:
+        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
+    ) -> Dict[str, Any]:
         if "access_level" in data:
             data["access_level"] = AccessLevel(data["access_level"]).value
         return data
@@ -1290,13 +1289,14 @@ DeleteMemberSchema = cast(
 DeleteMember.SCHEMA = DeleteMemberSchema()
 
 
-class TeamsParameter(PaginationParameter, SearchParameter, ToDictMixin):
+@dataclass
+class TeamsParameter(PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin):
     is_global: Optional[bool] = None
 
 
 TeamsParameterSchema = cast(
     Type[BaseSchema],
-    marshmallow_dataclass.class_schema(DeleteMember, base_schema=BaseSchema),
+    marshmallow_dataclass.class_schema(TeamsParameter, base_schema=BaseSchema),
 )
 TeamsParameter.SCHEMA = TeamsParameterSchema()
 
@@ -1368,7 +1368,6 @@ class TeamInvitationParameter(PaginationParameter, ToDictMixin):
     incident_permission: Optional[IncidentPermission] = None
 
 
-@dataclass
 class TeamInvitationParameterSchema(BaseSchema):
     invitation_id = fields.Int(allow_none=True)
     is_team_leader = fields.Bool(allow_none=True)
@@ -1404,8 +1403,8 @@ class TeamInvitationSchema(BaseSchema):
     @post_load
     def return_member(
         self,
-        data: dict[str, Any],
-        **kwargs: dict[str, Any],
+        data: Dict[str, Any],
+        **kwargs: Dict[str, Any],
     ):
         return TeamInvitation(**data)
 
@@ -1428,7 +1427,7 @@ class CreateTeamInvitationSchema(BaseSchema):
     incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
 
     @post_load
-    def return_team_invitation(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+    def return_team_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
         return CreateTeamInvitation(**data)
 
     class Meta:
@@ -1438,6 +1437,7 @@ class CreateTeamInvitationSchema(BaseSchema):
 CreateTeamInvitation.SCHEMA = CreateTeamInvitationSchema()
 
 
+@dataclass
 class TeamMemberParameter(PaginationParameter, SearchParameter, ToDictMixin):
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
@@ -1453,7 +1453,7 @@ class TeamMembershipParameterSchema(BaseSchema):
 
     @post_load
     def return_team_membership_parameter(
-        self, data: dict[str, Any], **kwargs: dict[str, Any]
+        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
     ):
         return TeamMemberParameter(**data)
 
@@ -1483,7 +1483,7 @@ class TeamMemberSchema(BaseSchema):
     incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
 
     @post_load
-    def return_team_membership(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+    def return_team_membership(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
         return TeamMember(**data)
 
 
@@ -1520,7 +1520,7 @@ class CreateTeamMemberSchema(BaseSchema):
 
     @post_load
     def return_create_team_membership(
-        self, data: dict[str, Any], **kwargs: dict[str, Any]
+        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
     ):
         return CreateTeamMember(**data)
 
@@ -1549,8 +1549,8 @@ TeamSourceParameters.SCHEMA = TeamSourceParametersSchema()
 @dataclass
 class UpdateTeamSource(Base, FromDictMixin):
     team_id: int
-    sources_to_add: list[int]
-    sources_to_remove: list[int]
+    sources_to_add: List[int]
+    sources_to_remove: List[int]
 
 
 UpdateTeamSourceSchema = cast(
@@ -1595,7 +1595,7 @@ class InvitationSchema(BaseSchema):
     date = fields.DateTime(required=True)
 
     @post_load
-    def return_invitation(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+    def return_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
         return Invitation(**data)
 
 
@@ -1627,7 +1627,7 @@ class CreateInvitationSchema(BaseSchema):
     access_level = fields.Enum(AccessLevel, by_value=True, required=True)
 
     @post_load
-    def return_invitation(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+    def return_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
         return CreateInvitation(**data)
 
 

@@ -31,6 +31,7 @@ from .models import (
     CreateTeam,
     CreateTeamInvitation,
     CreateTeamMember,
+    CreateTeamMemberParameter,
     CursorPaginatedResponse,
     DeleteMember,
     Detail,
@@ -1011,9 +1012,10 @@ class GGClient:
         parameters: Optional[TeamsParameter] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, CursorPaginatedResponse[Team]]:
+        params = parameters.to_dict() if parameters else {}
         response = self.get(
             endpoint="teams",
-            data=parameters.to_dict() if parameters else {},
+            params=params,
             extra_headers=extra_headers,
         )
 
@@ -1189,11 +1191,13 @@ class GGClient:
         self,
         team_id: int,
         member: CreateTeamMember,
+        parameters: Optional[CreateTeamMemberParameter] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, TeamMember]:
         response = self.post(
             endpoint=f"teams/{team_id}/team_memberships",
             data=CreateTeamMember.to_dict(member),
+            params=parameters.to_dict() if parameters else {},
             extra_headers=extra_headers,
         )
 

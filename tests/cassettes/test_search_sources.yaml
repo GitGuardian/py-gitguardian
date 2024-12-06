@@ -1,59 +1,5 @@
 interactions:
   - request:
-      body: '{"sources_to_add": [126], "sources_to_remove": []}'
-      headers:
-        Accept:
-          - '*/*'
-        Accept-Encoding:
-          - gzip, deflate
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '50'
-        Content-Type:
-          - application/json
-        User-Agent:
-          - pygitguardian/1.18.0 (Darwin;py3.11.8)
-      method: POST
-      uri: https://api.gitguardian.com/v1/teams/9/sources
-    response:
-      body:
-        string: ''
-      headers:
-        Access-Control-Expose-Headers:
-          - X-App-Version
-        Allow:
-          - GET, POST, HEAD, OPTIONS
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '0'
-        Cross-Origin-Opener-Policy:
-          - same-origin
-        Date:
-          - Fri, 06 Dec 2024 15:56:34 GMT
-        Referrer-Policy:
-          - same-origin
-        Server:
-          - nginx/1.24.0
-        Vary:
-          - Cookie
-        X-App-Version:
-          - dev
-        X-Content-Type-Options:
-          - nosniff
-        X-Frame-Options:
-          - DENY
-        X-Request-ID:
-          - 22643c94715fcf85df077d4b68ab6541
-        X-SCA-Engine-Version:
-          - 2.2.0
-        X-Secrets-Engine-Version:
-          - 2.127.0
-      status:
-        code: 204
-        message: No Content
-  - request:
       body: null
       headers:
         Accept:
@@ -65,7 +11,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams/9/sources?type=azure_devops
+      uri: https://api.gitguardian.com/v1/sources?type=azure_devops
     response:
       body:
         string: '[{"id":124,"type":"azure_devops","full_name":"gg-integration-test /
@@ -79,7 +25,7 @@ interactions:
         Access-Control-Expose-Headers:
           - X-App-Version
         Allow:
-          - GET, POST, HEAD, OPTIONS
+          - GET, HEAD, OPTIONS
         Connection:
           - keep-alive
         Content-Length:
@@ -89,7 +35,7 @@ interactions:
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 15:56:34 GMT
+          - Fri, 06 Dec 2024 14:41:54 GMT
         Link:
           - ''
         Referrer-Policy:
@@ -107,7 +53,7 @@ interactions:
         X-Per-Page:
           - '20'
         X-Request-ID:
-          - 69887de8037bf0eba9dadb62171e5889
+          - 61df3a3b0044668d310ce7357488d6d8
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:
