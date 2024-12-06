@@ -1199,10 +1199,16 @@ class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
     ] = None
 
 
-MembersParametersSchema = cast(
-    Type[BaseSchema],
-    marshmallow_dataclass.class_schema(MembersParameters, base_schema=BaseSchema),
-)
+class MembersParametersSchema(BaseSchema):
+    access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
+    active = fields.Bool(allow_none=True)
+    ordering = fields.Str(allow_none=True)
+
+    @post_load
+    def return_members_parameters(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+        return MembersParameters(**data)
+
+
 MembersParameters.SCHEMA = MembersParametersSchema()
 
 
@@ -1565,3 +1571,64 @@ SourceParametersSchema = cast(
     marshmallow_dataclass.class_schema(SourceParameters, base_schema=BaseSchema),
 )
 SourceParameters.SCHEMA = SourceParametersSchema()
+
+
+@dataclass
+class InvitationParameter(
+    PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin
+):
+    ordering: Literal["date", "-date"]
+
+
+@dataclass
+class Invitation(Base, FromDictMixin):
+    id: int
+    email: str
+    access_level: AccessLevel
+    date: datetime
+
+
+class InvitationSchema(BaseSchema):
+    id = fields.Int(required=True)
+    email = fields.Str(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    date = fields.DateTime(required=True)
+
+    @post_load
+    def return_invitation(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+        return Invitation(**data)
+
+
+Invitation.SCHEMA = InvitationSchema()
+
+
+@dataclass
+class CreateInvitationParameter(FromDictMixin, ToDictMixin):
+    send_email: Optional[bool] = None
+
+
+CreateInvitationParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(
+        CreateInvitationParameter, base_schema=BaseSchema
+    ),
+)
+CreateInvitationParameter.SCHEMA = CreateInvitationParameterSchema()
+
+
+@dataclass
+class CreateInvitation(FromDictMixin, ToDictMixin):
+    email: str
+    access_level: AccessLevel
+
+
+class CreateInvitationSchema(BaseSchema):
+    email = fields.Str(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+
+    @post_load
+    def return_invitation(self, data: dict[str, Any], **kwargs: dict[str, Any]):
+        return CreateInvitation(**data)
+
+
+CreateInvitation.SCHEMA = CreateInvitationSchema()

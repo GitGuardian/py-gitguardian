@@ -25,6 +25,8 @@ from pygitguardian.config import (
 from pygitguardian.models import (
     AccessLevel,
     APITokensResponse,
+    CreateInvitation,
+    CreateInvitationParameter,
     CreateTeam,
     CreateTeamInvitation,
     CreateTeamMember,
@@ -34,9 +36,11 @@ from pygitguardian.models import (
     HoneytokenResponse,
     HoneytokenWithContextResponse,
     IncidentPermission,
+    Invitation,
     JWTResponse,
     JWTService,
     Member,
+    MembersParameters,
     MultiScanResult,
     QuotaResponse,
     ScanResult,
@@ -1446,6 +1450,21 @@ def test_list_members(client: GGClient):
     assert isinstance(result, CursorPaginatedResponse), result.content
 
 
+@my_vcr.use_cassette("test_list_members_parameters.yaml", ignore_localhost=False)
+def test_search_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling /members endpoint
+    AND parameters are passed
+    THEN it returns a paginated list of members matching the parameters
+    """
+
+    result = client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
+
+    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert all(member.access_level == AccessLevel.MANAGER for member in result.data)
+
+
 @my_vcr.use_cassette("test_update_member.yaml", ignore_localhost=False)
 def test_update_member(client: GGClient):
     """
@@ -1704,3 +1723,48 @@ def test_add_team_sources(client: GGClient):
     )
     assert isinstance(team_sources, CursorPaginatedResponse), team_sources.content
     assert any(source.id == 126 for source in team_sources.data)
+
+
+@my_vcr.use_cassette("test_list_invitations.yaml", ignore_localhost=False)
+def test_list_invitations(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /invitations endpoint
+    THEN a paginated list of invitations is returned
+    """
+
+    result = client.list_invitations()
+    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result.data[0], Invitation)
+
+
+@my_vcr.use_cassette("test_send_invitation.yaml", ignore_localhost=False)
+def test_send_invitation(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /invitations endpoint
+    THEN an invitation is sent
+    """
+
+    result = client.send_invitation(
+        CreateInvitation(email="owl@example.com", access_level=AccessLevel.MEMBER),
+        CreateInvitationParameter(send_email=False),
+    )
+
+    assert isinstance(result, Invitation), result.content
+
+    assert result.email == "owl@example.com"
+    assert result.access_level == AccessLevel.MEMBER
+
+
+@my_vcr.use_cassette("test_delete_invitation.yaml", ignore_localhost=False)
+def test_delete_invitation(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /invitations/{id} endpoint
+    THEN an invitation is deleted
+    """
+
+    result = client.delete_invitation(2)
+
+    assert result == 204

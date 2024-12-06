@@ -26,6 +26,8 @@ from .iac_models import (
 )
 from .models import (
     APITokensResponse,
+    CreateInvitation,
+    CreateInvitationParameter,
     CreateTeam,
     CreateTeamInvitation,
     CreateTeamMember,
@@ -37,6 +39,8 @@ from .models import (
     HealthCheckResponse,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
+    Invitation,
+    InvitationParameter,
     JWTResponse,
     JWTService,
     Member,
@@ -929,7 +933,7 @@ class GGClient:
 
         response = self.get(
             endpoint="members",
-            data=query_parameters.to_dict() if query_parameters else {},
+            params=query_parameters.to_dict() if query_parameters else {},
             extra_headers=extra_headers,
         )
 
@@ -1106,7 +1110,7 @@ class GGClient:
     ) -> Union[Detail, CursorPaginatedResponse[TeamInvitation]]:
         response = self.get(
             endpoint=f"teams/{team_id}/team_invitations",
-            data=parameters.to_dict() if parameters else {},
+            params=parameters.to_dict() if parameters else {},
             extra_headers=extra_headers,
         )
 
@@ -1166,7 +1170,7 @@ class GGClient:
     ) -> Union[Detail, CursorPaginatedResponse[TeamMember]]:
         response = self.get(
             endpoint=f"teams/{team_id}/team_memberships",
-            data=parameters.to_dict() if parameters else {},
+            params=parameters.to_dict() if parameters else {},
             extra_headers=extra_headers,
         )
 
@@ -1225,7 +1229,7 @@ class GGClient:
     ) -> Union[Detail, CursorPaginatedResponse[Source]]:
         response = self.get(
             endpoint="sources",
-            data=parameters.to_dict() if parameters else {},
+            params=parameters.to_dict() if parameters else {},
             extra_headers=extra_headers,
         )
 
@@ -1246,7 +1250,7 @@ class GGClient:
     ) -> Union[Detail, CursorPaginatedResponse[Source]]:
         response = self.get(
             endpoint=f"teams/{team_id}/sources",
-            data=parameters.to_dict() if parameters else {},
+            params=parameters.to_dict() if parameters else {},
             extra_headers=extra_headers,
         )
 
@@ -1276,5 +1280,63 @@ class GGClient:
 
         if response.status_code == 204:
             return 204
+
+        return load_detail(response)
+
+    def list_invitations(
+        self,
+        parameters: Optional[InvitationParameter] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[Invitation]]:
+        response = self.get(
+            endpoint="invitations",
+            params=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[Invitation]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[Invitation].from_response(
+                response, Invitation
+            )
+        else:
+            obj = load_detail(response)
+
+        obj.status_code
+        return obj
+
+    def send_invitation(
+        self,
+        invitation: CreateInvitation,
+        parameters: Optional[CreateInvitationParameter] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, Invitation]:
+        response = self.post(
+            endpoint="invitations",
+            data=CreateInvitation.to_dict(invitation),
+            params=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, Invitation]
+        if is_create_ok(response):
+            obj = Invitation.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def delete_invitation(
+        self,
+        invitation_id: int,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, int]:
+        response = self.delete(
+            endpoint=f"invitations/{invitation_id}", extra_headers=extra_headers
+        )
+
+        if is_delete_ok(response):
+            return response.status_code
 
         return load_detail(response)

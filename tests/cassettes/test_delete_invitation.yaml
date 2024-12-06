@@ -1,0 +1,54 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '0'
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: DELETE
+      uri: https://api.gitguardian.com/v1/invitations/2
+    response:
+      body:
+        string: ''
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - DELETE, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '0'
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Fri, 06 Dec 2024 13:38:57 GMT
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Request-ID:
+          - fd715a797aabb2eddf49823db3e54209
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 204
+        message: No Content
+version: 1
