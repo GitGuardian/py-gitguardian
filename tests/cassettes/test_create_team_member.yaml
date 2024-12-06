@@ -1,0 +1,58 @@
+interactions:
+  - request:
+      body: '{"member_id": 12, "is_team_leader": false, "incident_permission": "can_view"}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '77'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: POST
+      uri: https://api.gitguardian.com/v1/teams/9/team_memberships
+    response:
+      body:
+        string: '{"id":10,"team_id":9,"member_id":12,"is_team_leader":false,"team_permission":"cannot_manage","incident_permission":"can_view"}'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '126'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 05 Dec 2024 18:12:24 GMT
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Request-ID:
+          - 166834a4962e207efa93e77c4ff4516d
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 201
+        message: Created
+version: 1

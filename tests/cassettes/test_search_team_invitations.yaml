@@ -1,0 +1,58 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/teams/9/team_invitations?incident_permission=can_view
+    response:
+      body:
+        string: '[]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '2'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Fri, 06 Dec 2024 14:33:04 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - c9f8aabf9f28131533330653571aef49
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+version: 1

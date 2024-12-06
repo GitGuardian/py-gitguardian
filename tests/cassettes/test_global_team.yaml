@@ -1,0 +1,58 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/teams?is_global=True
+    response:
+      body:
+        string: '[{"id":6,"is_global":true,"name":"All incidents","description":null,"gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/6"}]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '145'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Fri, 06 Dec 2024 14:26:03 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - 4f67e29113b6a59a311497ba05953fda
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+version: 1
