@@ -40,11 +40,14 @@ from pygitguardian.models import (
     MultiScanResult,
     QuotaResponse,
     ScanResult,
+    Source,
     Team,
     TeamInvitation,
     TeamMember,
+    TeamSourceParameters,
     UpdateMember,
     UpdateTeam,
+    UpdateTeamSource,
 )
 from pygitguardian.sca_models import (
     ComputeSCAFilesResult,
@@ -1635,3 +1638,69 @@ def test_delete_team_member(client: GGClient):
     result = client.delete_team_member(9, 10)
 
     assert result == 204
+
+
+@my_vcr.use_cassette("test_list_sources.yaml", ignore_localhost=False)
+def test_list_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /sources endpoint
+    THEN a paginated list of sources is returned
+    """
+
+    result = client.list_sources()
+    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result.data[0], Source)
+
+
+@my_vcr.use_cassette("test_list_teams_sources.yaml", ignore_localhost=False)
+def test_list_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /sources endpoint
+    THEN a paginated list of sources is returned
+    """
+
+    result = client.list_teams_sources(9)
+    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result.data[0], Source)
+
+
+@my_vcr.use_cassette("test_delete_team_sources.yaml", ignore_localhost=False)
+def test_delete_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/sources endpoint
+    THEN a source is deleted
+    """
+
+    result = client.update_team_source(UpdateTeamSource(9, [], [126]))
+
+    assert result == 204
+
+    team_sources = client.list_teams_sources(
+        9, TeamSourceParameters(type="azure_devops")
+    )
+    assert isinstance(team_sources, CursorPaginatedResponse), team_sources.content
+    assert not any(source.id == 126 for source in team_sources.data)
+
+
+@my_vcr.use_cassette("test_add_team_sources.yaml", ignore_localhost=False)
+def test_add_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/sources endpoint
+    THEN a source is added
+    """
+
+    result = client.update_team_source(
+        UpdateTeamSource(9, [126], []),
+    )
+
+    assert result == 204
+
+    team_sources = client.list_teams_sources(
+        9, TeamSourceParameters(type="azure_devops")
+    )
+    assert isinstance(team_sources, CursorPaginatedResponse), team_sources.content
+    assert any(source.id == 126 for source in team_sources.data)

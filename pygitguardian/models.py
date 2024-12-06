@@ -983,22 +983,67 @@ class Feedback(Base, FromDictMixin):
 
 
 @dataclass
+class SecretIncidentStats(Base, FromDictMixin):
+    total: int
+    severity_breakdown: dict[Severity, int]
+
+
+@dataclass
+class SecretIncidentsBreakdown(Base, FromDictMixin):
+    open_secret_incidents: SecretIncidentStats
+    closed_secret_incidents: SecretIncidentStats
+
+
+ScanStatus = Literal[
+    "pending",
+    "running",
+    "canceled",
+    "failed",
+    "too_large",
+    "timeout",
+    "pending_timeout",
+    "finished",
+]
+
+
+@dataclass
+class Scan(Base, FromDictMixin):
+    date: datetime
+    status: ScanStatus
+    failing_reason: str
+    commits_scanned: int
+    branches_scanned: int
+    duration: str
+
+
+SourceHealth = Literal["safe", "unknown", "at_risk"]
+SourceCriticality = Literal["critical", "high", "medium", "low", "unknown"]
+
+
+@dataclass
 class Source(Base, FromDictMixin):
     id: int
     url: str
     type: str
     full_name: str
-    health: Literal["safe", "unknown", "at_risk"]
+    health: SourceHealth
     default_branch: Optional[str]
     default_branch_head: Optional[str]
     open_incidents_count: int
     closed_incidents_count: int
-    secret_incidents_breakdown: Dict[str, Any]  # TODO: add SecretIncidentsBreakdown
+    secret_incidents_breakdown: SecretIncidentsBreakdown
     visibility: Visibility
     external_id: str
-    source_criticality: str
-    last_scan: Optional[Dict[str, Any]]  # TODO: add LastScan
+    source_criticality: SourceCriticality
+    last_scan: Scan
     monitored: bool
+
+
+SourceSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(Source, base_schema=BaseSchema),
+)
+Source.SCHEMA = SourceSchema()
 
 
 @dataclass
@@ -1103,14 +1148,14 @@ class AccessLevel(str, Enum):
     RESTRICTED = "restricted"
 
 
-class PaginationParameter(Base, FromDictMixin):
+class PaginationParameter(ToDictMixin):
     """Pagination mixin used for endpoints that support pagination."""
 
     cursor: str = ""
     per_page: int = 20
 
 
-class SearchParameter(Base, FromDictMixin):
+class SearchParameter(ToDictMixin):
     search: Optional[str] = None
 
 
@@ -1142,7 +1187,7 @@ class CursorPaginatedResponse(Generic[PaginatedData]):
 
 
 @dataclass
-class MembersParameters(PaginationParameter, SearchParameter, Base, FromDictMixin):
+class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
     """
     Members query parameters
     """
@@ -1239,7 +1284,7 @@ DeleteMemberSchema = cast(
 DeleteMember.SCHEMA = DeleteMemberSchema()
 
 
-class TeamsParameter(PaginationParameter, SearchParameter, Base, FromDictMixin):
+class TeamsParameter(PaginationParameter, SearchParameter, ToDictMixin):
     is_global: Optional[bool] = None
 
 
@@ -1311,7 +1356,7 @@ class IncidentPermission(str, Enum):
 
 
 @dataclass
-class TeamInvitationParameter(PaginationParameter, Base, FromDictMixin):
+class TeamInvitationParameter(PaginationParameter, ToDictMixin):
     invitation_id: Optional[int] = None
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
@@ -1387,7 +1432,7 @@ class CreateTeamInvitationSchema(BaseSchema):
 CreateTeamInvitation.SCHEMA = CreateTeamInvitationSchema()
 
 
-class TeamMemberParameter(PaginationParameter, SearchParameter, Base, FromDictMixin):
+class TeamMemberParameter(PaginationParameter, SearchParameter, ToDictMixin):
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
     member_id: Optional[int] = None
@@ -1440,7 +1485,7 @@ TeamMember.SCHEMA = TeamMemberSchema()
 
 
 @dataclass
-class CreateTeamMemberParameter(Base, FromDictMixin):
+class CreateTeamMemberParameter(ToDictMixin):
     send_email: bool
 
 
@@ -1475,3 +1520,48 @@ class CreateTeamMemberSchema(BaseSchema):
 
 
 CreateTeamMember.SCHEMA = CreateTeamMemberSchema()
+
+
+@dataclass
+class TeamSourceParameters(PaginationParameter, SearchParameter, ToDictMixin):
+    last_scan_status: Optional[ScanStatus] = None
+    type: Optional[str] = None
+    health: Optional[SourceHealth] = None
+    type: Optional[str] = None
+    ordering: Optional[Literal["last_scan_date", "-last_scan_date"]] = None
+    visibility: Optional[Visibility] = None
+    external_id: Optional[str] = None
+
+
+TeamSourceParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(TeamSourceParameters, base_schema=BaseSchema),
+)
+TeamSourceParameters.SCHEMA = TeamSourceParametersSchema()
+
+
+@dataclass
+class UpdateTeamSource(Base, FromDictMixin):
+    team_id: int
+    sources_to_add: list[int]
+    sources_to_remove: list[int]
+
+
+UpdateTeamSourceSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(UpdateTeamSource, base_schema=BaseSchema),
+)
+UpdateTeamSource.SCHEMA = UpdateTeamSourceSchema()
+
+
+@dataclass
+class SourceParameters(TeamSourceParameters):
+    source_criticality: Optional[SourceCriticality] = None
+    monitored: Optional[bool] = None
+
+
+SourceParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SourceParameters, base_schema=BaseSchema),
+)
+SourceParameters.SCHEMA = SourceParametersSchema()

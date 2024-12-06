@@ -1,4 +1,4 @@
-DEFAULT_BASE_URI = "http://localhost:3000/exposed"
+DEFAULT_BASE_URI = "https://api.gitguardian.com"
 DEFAULT_API_VERSION = "v1"
 DEFAULT_TIMEOUT = 20.0  # 20s default timeout
 

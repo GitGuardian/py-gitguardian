@@ -48,14 +48,18 @@ from .models import (
     SecretIncident,
     SecretScanPreferences,
     ServerMetadata,
+    Source,
+    SourceParameters,
     Team,
     TeamInvitation,
     TeamInvitationParameter,
     TeamMember,
     TeamMemberParameter,
+    TeamSourceParameters,
     TeamsParameter,
     UpdateMember,
     UpdateTeam,
+    UpdateTeamSource,
 )
 from .sca_models import (
     ComputeSCAFilesResult,
@@ -1211,5 +1215,66 @@ class GGClient:
 
         if is_delete_ok(response):
             return response.status_code
+
+        return load_detail(response)
+
+    def list_sources(
+        self,
+        parameters: Optional[SourceParameters] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[Source]]:
+        response = self.get(
+            endpoint="sources",
+            data=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[Source]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[Source].from_response(response, Source)
+        else:
+            obj = load_detail(response)
+
+        obj.status_code
+        return obj
+
+    def list_teams_sources(
+        self,
+        team_id: int,
+        parameters: Optional[TeamSourceParameters] = None,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, CursorPaginatedResponse[Source]]:
+        response = self.get(
+            endpoint=f"teams/{team_id}/sources",
+            data=parameters.to_dict() if parameters else {},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, CursorPaginatedResponse[Source]]
+        if is_ok(response):
+            obj = CursorPaginatedResponse[Source].from_response(response, Source)
+        else:
+            obj = load_detail(response)
+
+        obj.status_code
+        return obj
+
+    def update_team_source(
+        self,
+        team_sources: UpdateTeamSource,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, int]:
+        team_id = team_sources.team_id
+        data = team_sources.to_dict()
+        del data["team_id"]
+
+        response = self.post(
+            endpoint=f"teams/{team_id}/sources",
+            data=data,
+            extra_headers=extra_headers,
+        )
+
+        if response.status_code == 204:
+            return 204
 
         return load_detail(response)
