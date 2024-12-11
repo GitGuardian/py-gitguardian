@@ -71,8 +71,8 @@ class FromDictMixin:
     SCHEMA: ClassVar[Schema]
 
     @classmethod
-    def from_dict(cls, dct: Dict[str, Any], many: Optional[bool] = None) -> Self:
-        return cast(Self, cls.SCHEMA.load(dct, many=many))
+    def from_dict(cls, dct: Dict[str, Any]) -> Self:
+        return cast(Self, cls.SCHEMA.load(dct))
 
 
 class BaseSchema(Schema):
@@ -1174,7 +1174,7 @@ class CursorPaginatedResponse(Generic[PaginatedData]):
         cls, response: "requests.Response", data_type: Type[PaginatedData]
     ) -> "CursorPaginatedResponse[PaginatedData]":
         data = cast(
-            List[PaginatedData], data_type.from_dict(response.json(), many=True)
+            List[PaginatedData], [data_type.from_dict(obj) for obj in response.json()]
         )
         paginated_response = cls(status_code=response.status_code, data=data)
 
