@@ -142,7 +142,6 @@ def is_create_ok(resp: Response) -> bool:
 def is_delete_ok(resp: Response) -> bool:
     """
     is_delete_ok returns True if the API returns code 204
-    and the content type is JSON.
     """
     return resp.status_code == codes.no_content
 
@@ -992,7 +991,7 @@ class GGClient:
         self,
         member: DeleteMember,
         extra_headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Detail, int]:
+    ) -> Optional[Detail]:
         member_id = member.id
         data = member.to_dict()
         del data["id"]
@@ -1002,10 +1001,8 @@ class GGClient:
         )
 
         # We bypass `is_ok` because the response content type is none
-        if is_delete_ok(response):
-            return response.status_code
-
-        return load_detail(response)
+        if not is_delete_ok(response):
+            return load_detail(response)
 
     def list_teams(
         self,
@@ -1093,16 +1090,14 @@ class GGClient:
         self,
         team_id: int,
         extra_headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Detail, int]:
+    ) -> Optional[Detail]:
         response = self.delete(
             endpoint=f"teams/{team_id}",
             extra_headers=extra_headers,
         )
 
-        if is_delete_ok(response):
-            return response.status_code
-
-        return load_detail(response)
+        if not is_delete_ok(response):
+            return load_detail(response)
 
     def list_team_invitations(
         self,
@@ -1153,16 +1148,14 @@ class GGClient:
         team_id: int,
         invitation_id: int,
         extra_headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Detail, int]:
+    ) -> Optional[Detail]:
         response = self.delete(
             endpoint=f"teams/{team_id}/team_invitations/{invitation_id}",
             extra_headers=extra_headers,
         )
 
-        if is_delete_ok(response):
-            return response.status_code
-
-        return load_detail(response)
+        if not is_delete_ok(response):
+            return load_detail(response)
 
     def list_team_members(
         self,
@@ -1215,16 +1208,14 @@ class GGClient:
         team_id: int,
         team_member_id: int,
         extra_headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Detail, int]:
+    ) -> Optional[Detail]:
         response = self.delete(
             endpoint=f"teams/{team_id}/team_memberships/{team_member_id}",
             extra_headers=extra_headers,
         )
 
-        if is_delete_ok(response):
-            return response.status_code
-
-        return load_detail(response)
+        if not is_delete_ok(response):
+            return load_detail(response)
 
     def list_sources(
         self,
@@ -1335,12 +1326,10 @@ class GGClient:
         self,
         invitation_id: int,
         extra_headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Detail, int]:
+    ) -> Optional[Detail]:
         response = self.delete(
             endpoint=f"invitations/{invitation_id}", extra_headers=extra_headers
         )
 
-        if is_delete_ok(response):
-            return response.status_code
-
-        return load_detail(response)
+        if not is_delete_ok(response):
+            return load_detail(response)

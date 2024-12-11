@@ -1498,7 +1498,7 @@ def test_delete_member(client: GGClient):
 
     result = client.delete_member(DeleteMember(id=11))
 
-    assert result == 204, result.content
+    assert result is None, result.content
 
 
 @my_vcr.use_cassette("test_create_team.yaml", ignore_localhost=False)
@@ -1585,7 +1585,7 @@ def test_delete_team(client: GGClient):
 
     result = client.delete_team(8)
 
-    assert result == 204
+    assert result is None
 
 
 @my_vcr.use_cassette("test_create_team_invitation.yaml", ignore_localhost=False)
@@ -1652,7 +1652,7 @@ def test_delete_team_invitation(client: GGClient):
 
     result = client.delete_team_invitation(9, 1)
 
-    assert result == 204
+    assert result is None
 
 
 @my_vcr.use_cassette("test_list_team_members.yaml", ignore_localhost=False)
@@ -1731,7 +1731,7 @@ def test_delete_team_member(client: GGClient):
 
     result = client.delete_team_member(9, 10)
 
-    assert result == 204
+    assert result is None
 
 
 @my_vcr.use_cassette("test_list_sources.yaml", ignore_localhost=False)
@@ -1872,4 +1872,4 @@ def test_delete_invitation(client: GGClient):
 
     result = client.delete_invitation(2)
 
-    assert result == 204
+    assert result is None
