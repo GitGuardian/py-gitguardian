@@ -1,0 +1,58 @@
+interactions:
+  - request:
+      body: '{"name": "team1", "description": "New description"}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '51'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: PATCH
+      uri: https://api.gitguardian.com/v1/teams/8
+    response:
+      body:
+        string: '{"id":8,"is_global":false,"name":"team1","description":"New description","gitguardian_url":"https://dashboard.gitguardian.com/workspace/6/settings/user/teams/8"}'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, PUT, PATCH, DELETE, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '149'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 05 Dec 2024 16:50:36 GMT
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Request-ID:
+          - 6997dc22059d2e12bcad60a1ca76ad5f
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+version: 1

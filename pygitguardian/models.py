@@ -4,20 +4,18 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, ClassVar, Dict, List, Literal, Optional, Type, cast
+from typing import Any, Dict, List, Literal, Optional, Type, cast
 from uuid import UUID
 
 import marshmallow_dataclass
 from marshmallow import (
-    EXCLUDE,
-    Schema,
     ValidationError,
     fields,
+    post_dump,
     post_load,
     pre_load,
     validate,
 )
-from typing_extensions import Self
 
 from .config import (
     DEFAULT_PRE_COMMIT_MESSAGE,
@@ -26,60 +24,14 @@ from .config import (
     DOCUMENT_SIZE_THRESHOLD_BYTES,
     MULTI_DOCUMENT_LIMIT,
 )
-
-
-class ToDictMixin:
-    """
-    Provides a type-safe `to_dict()` method for classes using Marshmallow
-    """
-
-    SCHEMA: ClassVar[Schema]
-
-    def to_dict(self) -> Dict[str, Any]:
-        return cast(Dict[str, Any], self.SCHEMA.dump(self))
-
-
-class FromDictMixin:
-    """This class must be used as an additional base class for all classes whose schema
-    implements a `post_load` function turning the received dict into a class instance.
-
-    It makes it possible to deserialize an object using `MyClass.from_dict(dct)` instead
-    of `MyClass.SCHEMA.load(dct)`. The `from_dict()` method is shorter, but more
-    importantly, type-safe: its return type is an instance of `MyClass`, not
-    `list[Any] | Any`.
-
-    Reference: https://marshmallow.readthedocs.io/en/stable/quickstart.html#deserializing-to-objects  E501
-    """
-
-    SCHEMA: ClassVar[Schema]
-
-    @classmethod
-    def from_dict(cls, dct: Dict[str, Any]) -> Self:
-        return cast(Self, cls.SCHEMA.load(dct))
-
-
-class BaseSchema(Schema):
-    class Meta:
-        ordered = True
-        unknown = EXCLUDE
-
-
-class Base(ToDictMixin):
-    def __init__(self, status_code: Optional[int] = None) -> None:
-        self.status_code = status_code
-
-    def to_json(self) -> str:
-        """
-        to_json converts model to JSON string.
-        """
-        return cast(str, self.SCHEMA.dumps(self))
-
-    @property
-    def success(self) -> bool:
-        return self.__bool__()
-
-    def __bool__(self) -> bool:
-        return self.status_code == 200
+from .models_utils import (
+    Base,
+    BaseSchema,
+    FromDictMixin,
+    PaginationParameter,
+    SearchParameter,
+    ToDictMixin,
+)
 
 
 class DocumentSchema(BaseSchema):
@@ -966,22 +918,67 @@ class Feedback(Base, FromDictMixin):
 
 
 @dataclass
+class SecretIncidentStats(Base, FromDictMixin):
+    total: int
+    severity_breakdown: Dict[Severity, int]
+
+
+@dataclass
+class SecretIncidentsBreakdown(Base, FromDictMixin):
+    open_secret_incidents: SecretIncidentStats
+    closed_secret_incidents: SecretIncidentStats
+
+
+ScanStatus = Literal[
+    "pending",
+    "running",
+    "canceled",
+    "failed",
+    "too_large",
+    "timeout",
+    "pending_timeout",
+    "finished",
+]
+
+
+@dataclass
+class Scan(Base, FromDictMixin):
+    date: datetime
+    status: ScanStatus
+    failing_reason: str
+    commits_scanned: int
+    branches_scanned: int
+    duration: str
+
+
+SourceHealth = Literal["safe", "unknown", "at_risk"]
+SourceCriticality = Literal["critical", "high", "medium", "low", "unknown"]
+
+
+@dataclass
 class Source(Base, FromDictMixin):
     id: int
     url: str
     type: str
     full_name: str
-    health: Literal["safe", "unknown", "at_risk"]
+    health: SourceHealth
     default_branch: Optional[str]
     default_branch_head: Optional[str]
     open_incidents_count: int
     closed_incidents_count: int
-    secret_incidents_breakdown: Dict[str, Any]  # TODO: add SecretIncidentsBreakdown
+    secret_incidents_breakdown: SecretIncidentsBreakdown
     visibility: Visibility
     external_id: str
-    source_criticality: str
-    last_scan: Optional[Dict[str, Any]]  # TODO: add LastScan
+    source_criticality: SourceCriticality
+    last_scan: Optional[Scan]
     monitored: bool
+
+
+SourceSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(Source, base_schema=BaseSchema),
+)
+Source.SCHEMA = SourceSchema()
 
 
 @dataclass
@@ -1077,3 +1074,464 @@ SecretIncidentSchema = cast(
     marshmallow_dataclass.class_schema(SecretIncident, base_schema=BaseSchema),
 )
 SecretIncident.SCHEMA = SecretIncidentSchema()
+
+
+class AccessLevel(str, Enum):
+    OWNER = "owner"
+    MANAGER = "manager"
+    MEMBER = "member"
+    RESTRICTED = "restricted"
+
+
+@dataclass
+class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
+    """
+    Members query parameters
+    """
+
+    access_level: Optional[AccessLevel] = None
+    active: Optional[bool] = None
+    ordering: Optional[
+        Literal["id", "-id", "created_at", "-created_at", "last_login", "-last_login"]
+    ] = None
+
+
+class MembersParametersSchema(BaseSchema):
+    access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
+    active = fields.Bool(allow_none=True)
+    ordering = fields.Str(allow_none=True)
+
+    @post_load
+    def return_members_parameters(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+        return MembersParameters(**data)
+
+
+MembersParameters.SCHEMA = MembersParametersSchema()
+
+
+@dataclass
+class Member(Base, FromDictMixin):
+    """
+    Member represents a user in a GitGuardian account.
+    """
+
+    id: int
+    access_level: AccessLevel
+    email: str
+    name: str
+    created_at: datetime
+    last_login: Optional[datetime]
+    active: bool
+
+
+class MemberSchema(BaseSchema):
+    """
+    This schema cannot be done through marshmallow_dataclass as we want to use the
+    values of the AccessLevel enum to create the enum field
+    """
+
+    id = fields.Int(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    email = fields.Str(required=True)
+    name = fields.Str(required=True)
+    created_at = fields.AwareDateTime(required=True)
+    last_login = fields.AwareDateTime(allow_none=True)
+    active = fields.Bool(required=True)
+
+    @post_load
+    def return_member(
+        self,
+        data: Dict[str, Any],
+        **kwargs: Dict[str, Any],
+    ):
+        return Member(**data)
+
+
+Member.SCHEMA = MemberSchema()
+
+
+class UpdateMemberSchema(BaseSchema):
+    """
+    This schema cannot be done through marshmallow_dataclass as we want to use the
+    values of the AccessLevel enum to create the enum field
+    """
+
+    id = fields.Int(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
+    active = fields.Bool(allow_none=True)
+
+    @post_dump
+    def access_level_value(
+        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        if "access_level" in data:
+            data["access_level"] = AccessLevel(data["access_level"]).value
+        return data
+
+
+@dataclass
+class UpdateMember(Base, FromDictMixin):
+    """
+    UpdateMember represnets the payload to update a member
+    """
+
+    id: int
+    access_level: Optional[AccessLevel] = None
+    active: Optional[bool] = None
+
+
+UpdateMember.SCHEMA = UpdateMemberSchema()
+
+
+@dataclass
+class DeleteMember(Base, FromDictMixin):
+    id: int
+    send_email: Optional[bool] = None
+
+
+DeleteMemberSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(DeleteMember, base_schema=BaseSchema),
+)
+DeleteMember.SCHEMA = DeleteMemberSchema()
+
+
+@dataclass
+class TeamsParameter(PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin):
+    is_global: Optional[bool] = None
+
+
+TeamsParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(TeamsParameter, base_schema=BaseSchema),
+)
+TeamsParameter.SCHEMA = TeamsParameterSchema()
+
+
+@dataclass
+class Team(Base, FromDictMixin):
+    id: int
+    name: str
+    is_global: bool
+    gitguardian_url: str
+    description: Optional[str] = None
+
+
+TeamsSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(Team, base_schema=BaseSchema),
+)
+Team.SCHEMA = TeamsSchema()
+
+
+@dataclass
+class CreateTeam(Base, FromDictMixin):
+    name: str
+    description: Optional[str] = ""
+
+
+CreateTeamSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(CreateTeam, base_schema=BaseSchema),
+)
+
+
+CreateTeam.SCHEMA = CreateTeamSchema()
+
+
+@dataclass
+class UpdateTeam(Base, FromDictMixin):
+    id: int
+    name: Optional[str]
+    description: Optional[str] = None
+
+
+UpdateTeamSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(UpdateTeam, base_schema=BaseSchema),
+)
+UpdateTeam.SCHEMA = UpdateTeamSchema()
+
+
+class TeamPermission(str, Enum):
+    MANAGER = "can_manage"
+    MEMBER = "cannot_manage"
+
+
+class IncidentPermission(str, Enum):
+    EDIT = "can_edit"
+    VIEW = "can_view"
+    FULL_ACCESS = "full_access"
+
+
+@dataclass
+class TeamInvitationParameter(PaginationParameter, ToDictMixin):
+    invitation_id: Optional[int] = None
+    is_team_leader: Optional[bool] = None
+    incident_permission: Optional[IncidentPermission] = None
+
+
+class TeamInvitationParameterSchema(BaseSchema):
+    invitation_id = fields.Int(allow_none=True)
+    is_team_leader = fields.Bool(allow_none=True)
+    incident_permission = fields.Enum(
+        IncidentPermission, by_value=True, allow_none=True
+    )
+
+    class Meta:
+        exclude_none = True
+
+
+TeamInvitationParameter.SCHEMA = TeamInvitationParameterSchema()
+
+
+@dataclass
+class TeamInvitation(Base, FromDictMixin):
+    id: int
+    invitation_id: int
+    team_id: int
+    team_permission: TeamPermission
+    incident_permission: IncidentPermission
+
+
+class TeamInvitationSchema(BaseSchema):
+    many = False
+
+    id = fields.Int(required=True)
+    invitation_id = fields.Int(required=True)
+    team_id = fields.Int(required=True)
+    team_permission = fields.Enum(TeamPermission, by_value=True, required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_member(
+        self,
+        data: Dict[str, Any],
+        **kwargs: Dict[str, Any],
+    ):
+        return TeamInvitation(**data)
+
+
+TeamInvitation.SCHEMA = TeamInvitationSchema()
+
+
+@dataclass
+class CreateTeamInvitation(Base, FromDictMixin):
+    invitation_id: int
+    is_team_leader: bool
+    incident_permission: IncidentPermission
+
+
+class CreateTeamInvitationSchema(BaseSchema):
+    many = False
+
+    invitation_id = fields.Int(required=True)
+    is_team_leader = fields.Bool(required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_team_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+        return CreateTeamInvitation(**data)
+
+    class Meta:
+        exclude_none = True
+
+
+CreateTeamInvitation.SCHEMA = CreateTeamInvitationSchema()
+
+
+@dataclass
+class TeamMemberParameter(PaginationParameter, SearchParameter, ToDictMixin):
+    is_team_leader: Optional[bool] = None
+    incident_permission: Optional[IncidentPermission] = None
+    member_id: Optional[int] = None
+
+
+class TeamMembershipParameterSchema(BaseSchema):
+    is_team_leader = fields.Bool(allow_none=True)
+    incident_permission = fields.Enum(
+        IncidentPermission, by_value=True, allow_none=True
+    )
+    member_id = fields.Int(allow_none=True)
+
+    @post_load
+    def return_team_membership_parameter(
+        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
+    ):
+        return TeamMemberParameter(**data)
+
+    class Meta:
+        exclude_none = True
+
+
+TeamMemberParameter.SCHEMA = TeamMembershipParameterSchema()
+
+
+@dataclass
+class TeamMember(Base, FromDictMixin):
+    id: int
+    team_id: int
+    member_id: int
+    is_team_leader: bool
+    team_permission: TeamPermission
+    incident_permission: IncidentPermission
+
+
+class TeamMemberSchema(BaseSchema):
+    id = fields.Int(required=True)
+    team_id = fields.Int(required=True)
+    member_id = fields.Int(required=True)
+    is_team_leader = fields.Bool(required=True)
+    team_permission = fields.Enum(TeamPermission, by_value=True, required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_team_membership(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+        return TeamMember(**data)
+
+
+TeamMember.SCHEMA = TeamMemberSchema()
+
+
+@dataclass
+class CreateTeamMemberParameter(ToDictMixin):
+    send_email: bool
+
+
+CreateTeamMemberParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(
+        CreateTeamMemberParameter, base_schema=BaseSchema
+    ),
+)
+CreateTeamMemberParameter.SCHEMA = CreateTeamMemberParameterSchema()
+
+
+@dataclass
+class CreateTeamMember(Base, FromDictMixin):
+    member_id: int
+    is_team_leader: bool
+    incident_permission: IncidentPermission
+
+
+class CreateTeamMemberSchema(BaseSchema):
+    many = False
+
+    member_id = fields.Int(required=True)
+    is_team_leader = fields.Bool(required=True)
+    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+
+    @post_load
+    def return_create_team_membership(
+        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
+    ):
+        return CreateTeamMember(**data)
+
+
+CreateTeamMember.SCHEMA = CreateTeamMemberSchema()
+
+
+@dataclass
+class TeamSourceParameters(PaginationParameter, SearchParameter, ToDictMixin):
+    last_scan_status: Optional[ScanStatus] = None
+    type: Optional[str] = None
+    health: Optional[SourceHealth] = None
+    type: Optional[str] = None
+    ordering: Optional[Literal["last_scan_date", "-last_scan_date"]] = None
+    visibility: Optional[Visibility] = None
+    external_id: Optional[str] = None
+
+
+TeamSourceParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(TeamSourceParameters, base_schema=BaseSchema),
+)
+TeamSourceParameters.SCHEMA = TeamSourceParametersSchema()
+
+
+@dataclass
+class UpdateTeamSource(Base, FromDictMixin):
+    team_id: int
+    sources_to_add: List[int]
+    sources_to_remove: List[int]
+
+
+UpdateTeamSourceSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(UpdateTeamSource, base_schema=BaseSchema),
+)
+UpdateTeamSource.SCHEMA = UpdateTeamSourceSchema()
+
+
+@dataclass
+class SourceParameters(TeamSourceParameters):
+    source_criticality: Optional[SourceCriticality] = None
+    monitored: Optional[bool] = None
+
+
+SourceParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SourceParameters, base_schema=BaseSchema),
+)
+SourceParameters.SCHEMA = SourceParametersSchema()
+
+
+@dataclass
+class InvitationParameter(
+    PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin
+):
+    ordering: Literal["date", "-date"]
+
+
+@dataclass
+class Invitation(Base, FromDictMixin):
+    id: int
+    email: str
+    access_level: AccessLevel
+    date: datetime
+
+
+class InvitationSchema(BaseSchema):
+    id = fields.Int(required=True)
+    email = fields.Str(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    date = fields.DateTime(required=True)
+
+    @post_load
+    def return_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+        return Invitation(**data)
+
+
+Invitation.SCHEMA = InvitationSchema()
+
+
+@dataclass
+class CreateInvitationParameter(FromDictMixin, ToDictMixin):
+    send_email: Optional[bool] = None
+
+
+CreateInvitationParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(
+        CreateInvitationParameter, base_schema=BaseSchema
+    ),
+)
+CreateInvitationParameter.SCHEMA = CreateInvitationParameterSchema()
+
+
+@dataclass
+class CreateInvitation(FromDictMixin, ToDictMixin):
+    email: str
+    access_level: AccessLevel
+
+
+class CreateInvitationSchema(BaseSchema):
+    email = fields.Str(required=True)
+    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+
+    @post_load
+    def return_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+        return CreateInvitation(**data)
+
+
+CreateInvitation.SCHEMA = CreateInvitationSchema()
