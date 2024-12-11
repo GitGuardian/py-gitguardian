@@ -1035,7 +1035,7 @@ class Source(Base, FromDictMixin):
     visibility: Visibility
     external_id: str
     source_criticality: SourceCriticality
-    last_scan: Scan
+    last_scan: Optional[Scan]
     monitored: bool
 
 
