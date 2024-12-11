@@ -32,7 +32,6 @@ from .models import (
     CreateTeamInvitation,
     CreateTeamMember,
     CreateTeamMemberParameter,
-    CursorPaginatedResponse,
     DeleteMember,
     Detail,
     Document,
@@ -66,6 +65,7 @@ from .models import (
     UpdateTeam,
     UpdateTeamSource,
 )
+from .models_utils import CursorPaginatedResponse
 from .sca_models import (
     ComputeSCAFilesResult,
     SCAScanAllOutput,

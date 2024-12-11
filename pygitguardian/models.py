@@ -4,25 +4,11 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ClassVar,
-    Dict,
-    Generic,
-    List,
-    Literal,
-    Optional,
-    Type,
-    TypeVar,
-    cast,
-)
+from typing import Any, Dict, List, Literal, Optional, Type, cast
 from uuid import UUID
 
 import marshmallow_dataclass
 from marshmallow import (
-    EXCLUDE,
-    Schema,
     ValidationError,
     fields,
     post_dump,
@@ -30,7 +16,6 @@ from marshmallow import (
     pre_load,
     validate,
 )
-from typing_extensions import Self
 
 from .config import (
     DEFAULT_PRE_COMMIT_MESSAGE,
@@ -39,64 +24,14 @@ from .config import (
     DOCUMENT_SIZE_THRESHOLD_BYTES,
     MULTI_DOCUMENT_LIMIT,
 )
-
-
-if TYPE_CHECKING:
-    import requests
-
-
-class ToDictMixin:
-    """
-    Provides a type-safe `to_dict()` method for classes using Marshmallow
-    """
-
-    SCHEMA: ClassVar[Schema]
-
-    def to_dict(self) -> Dict[str, Any]:
-        return cast(Dict[str, Any], self.SCHEMA.dump(self))
-
-
-class FromDictMixin:
-    """This class must be used as an additional base class for all classes whose schema
-    implements a `post_load` function turning the received dict into a class instance.
-
-    It makes it possible to deserialize an object using `MyClass.from_dict(dct)` instead
-    of `MyClass.SCHEMA.load(dct)`. The `from_dict()` method is shorter, but more
-    importantly, type-safe: its return type is an instance of `MyClass`, not
-    `list[Any] | Any`.
-
-    Reference: https://marshmallow.readthedocs.io/en/stable/quickstart.html#deserializing-to-objects  E501
-    """
-
-    SCHEMA: ClassVar[Schema]
-
-    @classmethod
-    def from_dict(cls, dct: Dict[str, Any]) -> Self:
-        return cast(Self, cls.SCHEMA.load(dct))
-
-
-class BaseSchema(Schema):
-    class Meta:
-        ordered = True
-        unknown = EXCLUDE
-
-
-class Base(ToDictMixin):
-    def __init__(self, status_code: Optional[int] = None) -> None:
-        self.status_code = status_code
-
-    def to_json(self) -> str:
-        """
-        to_json converts model to JSON string.
-        """
-        return cast(str, self.SCHEMA.dumps(self))
-
-    @property
-    def success(self) -> bool:
-        return self.__bool__()
-
-    def __bool__(self) -> bool:
-        return self.status_code == 200
+from .models_utils import (
+    Base,
+    BaseSchema,
+    FromDictMixin,
+    PaginationParameter,
+    SearchParameter,
+    ToDictMixin,
+)
 
 
 class DocumentSchema(BaseSchema):
@@ -1148,44 +1083,6 @@ class AccessLevel(str, Enum):
     RESTRICTED = "restricted"
 
 
-class PaginationParameter(ToDictMixin):
-    """Pagination mixin used for endpoints that support pagination."""
-
-    cursor: str = ""
-    per_page: int = 20
-
-
-class SearchParameter(ToDictMixin):
-    search: Optional[str] = None
-
-
-PaginatedData = TypeVar("PaginatedData", bound=FromDictMixin)
-
-
-@dataclass
-class CursorPaginatedResponse(Generic[PaginatedData]):
-    status_code: int
-    data: List[PaginatedData]
-    prev: Optional[str] = None
-    next: Optional[str] = None
-
-    @classmethod
-    def from_response(
-        cls, response: "requests.Response", data_type: Type[PaginatedData]
-    ) -> "CursorPaginatedResponse[PaginatedData]":
-        data = cast(
-            List[PaginatedData], [data_type.from_dict(obj) for obj in response.json()]
-        )
-        paginated_response = cls(status_code=response.status_code, data=data)
-
-        if previous_page := response.links.get("prev"):
-            paginated_response.prev = previous_page["url"]
-        if next_page := response.links.get("next"):
-            paginated_response.prev = next_page["url"]
-
-        return paginated_response
-
-
 @dataclass
 class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
     """
@@ -1228,6 +1125,11 @@ class Member(Base, FromDictMixin):
 
 
 class MemberSchema(BaseSchema):
+    """
+    This schema cannot be done through marshmallow_dataclass as we want to use the
+    values of the AccessLevel enum to create the enum field
+    """
+
     id = fields.Int(required=True)
     access_level = fields.Enum(AccessLevel, by_value=True, required=True)
     email = fields.Str(required=True)
@@ -1249,6 +1151,11 @@ Member.SCHEMA = MemberSchema()
 
 
 class UpdateMemberSchema(BaseSchema):
+    """
+    This schema cannot be done through marshmallow_dataclass as we want to use the
+    values of the AccessLevel enum to create the enum field
+    """
+
     id = fields.Int(required=True)
     access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
     active = fields.Bool(allow_none=True)
@@ -1323,14 +1230,10 @@ class CreateTeam(Base, FromDictMixin):
     description: Optional[str] = ""
 
 
-class CreateTeamSchema(BaseSchema):
-    many = False
-
-    name = fields.Str(required=True)
-    description = fields.Str(allow_none=True)
-
-    class Meta:
-        exclude_none = True
+CreateTeamSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(CreateTeam, base_schema=BaseSchema),
+)
 
 
 CreateTeam.SCHEMA = CreateTeamSchema()

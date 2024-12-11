@@ -31,7 +31,6 @@ from pygitguardian.models import (
     CreateTeamInvitation,
     CreateTeamMember,
     CreateTeamMemberParameter,
-    CursorPaginatedResponse,
     DeleteMember,
     Detail,
     HoneytokenResponse,
@@ -58,6 +57,7 @@ from pygitguardian.models import (
     UpdateTeam,
     UpdateTeamSource,
 )
+from pygitguardian.models_utils import CursorPaginatedResponse
 from pygitguardian.sca_models import (
     ComputeSCAFilesResult,
     SCAScanAllOutput,
