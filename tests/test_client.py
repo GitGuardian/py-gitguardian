@@ -1452,7 +1452,7 @@ def test_list_members(client: GGClient):
 
     result = client.list_members()
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
 
 
 @my_vcr.use_cassette("test_list_members_parameters.yaml", ignore_localhost=False)
@@ -1466,7 +1466,7 @@ def test_search_member(client: GGClient):
 
     result = client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert all(member.access_level == AccessLevel.MANAGER for member in result.data)
 
 
@@ -1482,7 +1482,7 @@ def test_update_member(client: GGClient):
         UpdateMember(id=10, access_level=AccessLevel.MEMBER, active=False)
     )
 
-    assert isinstance(result, Member), result.content
+    assert isinstance(result, Member), result
 
     assert not result.active
     assert result.access_level == AccessLevel.MEMBER
@@ -1498,7 +1498,7 @@ def test_delete_member(client: GGClient):
 
     result = client.delete_member(DeleteMember(id=11))
 
-    assert result is None, result.content
+    assert result is None, result
 
 
 @my_vcr.use_cassette("test_create_team.yaml", ignore_localhost=False)
@@ -1511,7 +1511,7 @@ def test_create_team(client: GGClient):
 
     result = client.create_team(CreateTeam(name="team1"))
 
-    assert isinstance(result, Team), result.content
+    assert isinstance(result, Team), result
 
 
 @my_vcr.use_cassette("test_get_team.yaml", ignore_localhost=False)
@@ -1524,7 +1524,7 @@ def test_get_team(client: GGClient):
 
     result = client.get_team(8)
 
-    assert isinstance(result, Team), result.content
+    assert isinstance(result, Team), result
 
 
 @my_vcr.use_cassette("test_update_team.yaml", ignore_localhost=False)
@@ -1539,7 +1539,7 @@ def test_update_team(client: GGClient):
         UpdateTeam(id=8, name="team1", description="New description")
     )
 
-    assert isinstance(result, Team), result.content
+    assert isinstance(result, Team), result
 
     assert result.name == "team1"
     assert result.description == "New description"
@@ -1555,7 +1555,7 @@ def test_list_teams(client: GGClient):
 
     result = client.list_teams()
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert isinstance(result.data[0], Team)
 
 
@@ -1570,7 +1570,7 @@ def test_global_team(client: GGClient):
 
     result = client.list_teams(parameters=TeamsParameter(is_global=True))
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
 
     assert all(team.is_global for team in result.data)
 
@@ -1605,7 +1605,7 @@ def test_create_team_invitation(client: GGClient):
         ),
     )
 
-    assert isinstance(result, TeamInvitation), result.content
+    assert isinstance(result, TeamInvitation), result
 
 
 @my_vcr.use_cassette("test_list_team_invitations.yaml", ignore_localhost=False)
@@ -1618,7 +1618,7 @@ def test_list_team_invitations(client: GGClient):
 
     result = client.list_team_invitations(9)
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert isinstance(result.data[0], TeamInvitation)
 
 
@@ -1636,7 +1636,7 @@ def test_search_team_invitations(client: GGClient):
         parameters=TeamInvitationParameter(incident_permission=IncidentPermission.VIEW),
     )
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert all(
         invitation.incident_permission == "can_view" for invitation in result.data
     )
@@ -1665,7 +1665,7 @@ def test_list_team_members(client: GGClient):
 
     result = client.list_team_members(9)
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert isinstance(result.data[0], TeamMember)
 
 
@@ -1682,7 +1682,7 @@ def test_search_team_members(client: GGClient):
         9, parameters=TeamMemberParameter(is_team_leader=True)
     )
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert all(member.is_team_leader for member in result.data)
 
 
@@ -1698,7 +1698,7 @@ def test_create_team_member(client: GGClient):
         CreateTeamMember(12, False, IncidentPermission.VIEW),
     )
 
-    assert isinstance(result, TeamMember), result.content
+    assert isinstance(result, TeamMember), result
 
     assert result.incident_permission == IncidentPermission.VIEW
     assert not result.is_team_leader
@@ -1718,7 +1718,7 @@ def test_create_team_member_without_mail(client: GGClient):
         CreateTeamMemberParameter(send_email=False),
     )
 
-    assert isinstance(result, TeamMember), result.content
+    assert isinstance(result, TeamMember), result
 
 
 @my_vcr.use_cassette("test_delete_team_member.yaml", ignore_localhost=False)
@@ -1743,7 +1743,7 @@ def test_list_sources(client: GGClient):
     """
 
     result = client.list_sources()
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert isinstance(result.data[0], Source)
 
 
@@ -1758,7 +1758,7 @@ def test_search_sources(client: GGClient):
 
     result = client.list_sources(parameters=SourceParameters(type="azure_devops"))
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert all(source.type == "azure_devops" for source in result.data)
 
 
@@ -1771,7 +1771,7 @@ def test_list_team_sources(client: GGClient):
     """
 
     result = client.list_teams_sources(9)
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert isinstance(result.data[0], Source)
 
 
@@ -1786,7 +1786,7 @@ def test_search_team_sources(client: GGClient):
 
     result = client.list_teams_sources(9, TeamSourceParameters(type="azure_devops"))
 
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert all(source.type == "azure_devops" for source in result.data)
 
 
@@ -1839,7 +1839,7 @@ def test_list_invitations(client: GGClient):
     """
 
     result = client.list_invitations()
-    assert isinstance(result, CursorPaginatedResponse), result.content
+    assert isinstance(result, CursorPaginatedResponse), result
     assert isinstance(result.data[0], Invitation)
 
 
@@ -1856,7 +1856,7 @@ def test_send_invitation(client: GGClient):
         CreateInvitationParameter(send_email=False),
     )
 
-    assert isinstance(result, Invitation), result.content
+    assert isinstance(result, Invitation), result
 
     assert result.email == "owl@example.com"
     assert result.access_level == AccessLevel.MEMBER
