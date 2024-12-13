@@ -14,7 +14,7 @@ interactions:
       uri: https://api.gitguardian.com/v1/invitations
     response:
       body:
-        string: '[{"id":1,"date":"2024-12-05T17:35:12.273332Z","email":"toto+test@gg.com","role":"member","access_level":"member"}]'
+        string: '[{"id":13,"date":"2024-12-12T16:53:59.247129Z","email":"pygitguardian@example.com","role":"member","access_level":"member"},{"id":14,"date":"2024-12-12T16:54:44.192249Z","email":"example@test.com","role":"member","access_level":"member"}]'
       headers:
         Access-Control-Expose-Headers:
           - X-App-Version
@@ -23,13 +23,13 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '114'
+          - '238'
         Content-Type:
           - application/json
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 13:33:31 GMT
+          - Thu, 12 Dec 2024 16:59:34 GMT
         Link:
           - ''
         Referrer-Policy:
@@ -47,7 +47,7 @@ interactions:
         X-Per-Page:
           - '20'
         X-Request-ID:
-          - 182ad8123736b9315def7a957569ef89
+          - f762eb19d4027c92b2a3bce21967a08e
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

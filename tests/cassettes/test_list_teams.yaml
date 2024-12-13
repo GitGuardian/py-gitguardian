@@ -15,8 +15,11 @@ interactions:
     response:
       body:
         string:
-          '[{"id":6,"is_global":true,"name":"All incidents","description":null,"gitguardian_url":"https://dashboard.gitguardian.com/workspace/6/settings/user/teams/6"},{"id":8,"is_global":false,"name":"team1","description":"New
-          description","gitguardian_url":"https://dashboard.gitguardian.com/workspace/6/settings/user/teams/8"}]'
+          '[{"id":6,"is_global":true,"name":"All incidents","description":null,"gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/6"},{"id":18,"is_global":false,"name":"New
+          PyGitGuardian team","description":"New description","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/18"},{"id":19,"is_global":false,"name":"This
+          is a test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/19"},{"id":20,"is_global":false,"name":"Team
+          test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/20"},{"id":21,"is_global":false,"name":"PyGitGuardian
+          team","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/21"}]'
       headers:
         Access-Control-Expose-Headers:
           - X-App-Version
@@ -25,13 +28,13 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '295'
+          - '751'
         Content-Type:
           - application/json
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Thu, 05 Dec 2024 16:55:43 GMT
+          - Thu, 12 Dec 2024 16:59:32 GMT
         Link:
           - ''
         Referrer-Policy:
@@ -49,7 +52,7 @@ interactions:
         X-Per-Page:
           - '20'
         X-Request-ID:
-          - 27e8974fdddaaf9e841371cdac4995ee
+          - ae45a816ed4d7b8482480df12113661c
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

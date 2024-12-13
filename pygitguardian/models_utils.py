@@ -110,6 +110,6 @@ class CursorPaginatedResponse(Generic[PaginatedData]):
         if previous_page := response.links.get("prev"):
             paginated_response.prev = previous_page["url"]
         if next_page := response.links.get("next"):
-            paginated_response.prev = next_page["url"]
+            paginated_response.next = next_page["url"]
 
         return paginated_response

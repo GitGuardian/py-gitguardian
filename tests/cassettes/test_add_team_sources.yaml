@@ -1,6 +1,141 @@
 interactions:
   - request:
-      body: '{"sources_to_add": [126], "sources_to_remove": []}'
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/teams?is_global=False
+    response:
+      body:
+        string:
+          '[{"id":19,"is_global":false,"name":"This is a test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/19"},{"id":20,"is_global":false,"name":"Team
+          test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/20"},{"id":21,"is_global":false,"name":"PyGitGuardian
+          team","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/21"}]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '438'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:33 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - 58fa21985f6a41e52817d0eace32cfc5
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/sources
+    response:
+      body:
+        string: '[{"id":124,"type":"azure_devops","full_name":"gg-integration-test /
+          gg-test / default_branch","health":"at_risk","source_criticality":"unknown","default_branch":"test","default_branch_head":null,"open_incidents_count":19,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346395Z","status":"finished","failing_reason":"","commits_scanned":23,"duration":"0.437131","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"05b69081-f346-4022-8784-198f50aed182","secret_incidents_breakdown":{"open_secret_incidents":{"total":19,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":19}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/default_branch"},{"id":125,"type":"azure_devops","full_name":"gg-integration-test
+          / gg-test / gg-test","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":19,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346418Z","status":"finished","failing_reason":"","commits_scanned":43,"duration":"0.492489","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"7655868e-bb15-47ab-bd62-abd97212e5e8","secret_incidents_breakdown":{"open_secret_incidents":{"total":19,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":19}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/gg-test"},{"id":126,"type":"azure_devops","full_name":"gg-integration-test
+          / gg-test / huge_repo","health":"safe","source_criticality":"unknown","default_branch":"master","default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346442Z","status":"finished","failing_reason":"","commits_scanned":1007,"duration":"1.102781","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"455c4e0c-6dc3-48ce-a0e7-819d9a8d7523","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/huge_repo"},{"id":127,"type":"azure_devops","full_name":"gg-integration-test
+          / gg-test / new_repo","health":"safe","source_criticality":"unknown","default_branch":"master","default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346464Z","status":"finished","failing_reason":"","commits_scanned":1,"duration":"0.216094","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"f9b583fb-dcfd-46ec-8938-44b427d3e596","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/new_repo"},{"id":128,"type":"azure_devops","full_name":"gg-integration-test
+          / gg-test / t e s t i n g","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":115,"closed_incidents_count":1,"last_scan":{"date":"2024-12-06T12:27:52.346299Z","status":"finished","failing_reason":"","commits_scanned":113,"duration":"7.597231","branches_scanned":2,"progress":100},"monitored":true,"visibility":"private","external_id":"8a132329-0c77-4efc-a18a-882bda6ab28b","secret_incidents_breakdown":{"open_secret_incidents":{"total":115,"severity_breakdown":{"critical":0,"high":1,"medium":0,"low":0,"info":0,"unknown":114}},"closed_secret_incidents":{"total":1,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":1}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/t%20e%20s%20t%20i%20n%20g"},{"id":129,"type":"azure_devops","full_name":"gg-integration-test
+          / gg-test / test abc","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":28,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346367Z","status":"finished","failing_reason":"","commits_scanned":55,"duration":"0.623082","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"2aa16b64-2fb2-4639-afeb-70c0c4e8a267","secret_incidents_breakdown":{"open_secret_incidents":{"total":28,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":28}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/test%20abc"},{"id":130,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Mouse 804250","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10240","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/MOUS804250"},{"id":131,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Cheese 609495","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10241","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/CHEE609495"},{"id":132,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Fantastic Frozen Bacon 413763","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10242","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/FANT413763"},{"id":133,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Awesome Cotton Salad 575805","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10243","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/AWES575805"},{"id":134,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Incredible Steel Hat 449092","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10244","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/INCR449092"},{"id":135,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Shoes 435418","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10245","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/SHOE435418"},{"id":136,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Steel Ball 217001","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10246","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/STEE217001"},{"id":137,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Table 485589","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10247","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/TABL485589"},{"id":138,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Sleek Pizza 418589","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10248","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/SLEE418589"},{"id":139,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Pants 160878","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10249","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/PANT160878"},{"id":140,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Concrete Car 970994","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10250","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/CONC970994"},{"id":141,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Pants 965973","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10251","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/PANT965973"},{"id":142,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Wooden Ball 683600","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10252","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/WOOD683600"},{"id":143,"type":"jira_cloud","full_name":"yanne-gg-integration
+          / Incredible Steel Pizza 509982","health":"unknown","source_criticality":"unknown","default_branch":null,"default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":null,"monitored":true,"visibility":"private","external_id":"10253","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://yanne-gg-integration.atlassian.net/browse/INCR509982"}]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '14417'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:33 GMT
+        Link:
+          - <http://localhost/exposed/v1/sources?cursor=cD0xNDM%3D>; rel="next"
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - 25509b031d7733a791a772c11c7483b3
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: '{"sources_to_add": [124], "sources_to_remove": []}'
       headers:
         Accept:
           - '*/*'
@@ -15,7 +150,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: POST
-      uri: https://api.gitguardian.com/v1/teams/9/sources
+      uri: https://api.gitguardian.com/v1/teams/19/sources
     response:
       body:
         string: ''
@@ -31,7 +166,7 @@ interactions:
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 15:56:34 GMT
+          - Thu, 12 Dec 2024 16:59:33 GMT
         Referrer-Policy:
           - same-origin
         Server:
@@ -45,7 +180,7 @@ interactions:
         X-Frame-Options:
           - DENY
         X-Request-ID:
-          - 22643c94715fcf85df077d4b68ab6541
+          - 74153e49ee0a825ae6f02b0784058380
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:
@@ -65,7 +200,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams/9/sources?type=azure_devops
+      uri: https://api.gitguardian.com/v1/teams/19/sources?type=azure_devops
     response:
       body:
         string: '[{"id":124,"type":"azure_devops","full_name":"gg-integration-test /
@@ -73,7 +208,7 @@ interactions:
           / gg-test / gg-test","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":19,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346418Z","status":"finished","failing_reason":"","commits_scanned":43,"duration":"0.492489","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"7655868e-bb15-47ab-bd62-abd97212e5e8","secret_incidents_breakdown":{"open_secret_incidents":{"total":19,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":19}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/gg-test"},{"id":126,"type":"azure_devops","full_name":"gg-integration-test
           / gg-test / huge_repo","health":"safe","source_criticality":"unknown","default_branch":"master","default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346442Z","status":"finished","failing_reason":"","commits_scanned":1007,"duration":"1.102781","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"455c4e0c-6dc3-48ce-a0e7-819d9a8d7523","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/huge_repo"},{"id":127,"type":"azure_devops","full_name":"gg-integration-test
           / gg-test / new_repo","health":"safe","source_criticality":"unknown","default_branch":"master","default_branch_head":null,"open_incidents_count":0,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346464Z","status":"finished","failing_reason":"","commits_scanned":1,"duration":"0.216094","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"f9b583fb-dcfd-46ec-8938-44b427d3e596","secret_incidents_breakdown":{"open_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/new_repo"},{"id":128,"type":"azure_devops","full_name":"gg-integration-test
-          / gg-test / t e s t i n g","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":110,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346299Z","status":"finished","failing_reason":"","commits_scanned":113,"duration":"7.597231","branches_scanned":2,"progress":100},"monitored":true,"visibility":"private","external_id":"8a132329-0c77-4efc-a18a-882bda6ab28b","secret_incidents_breakdown":{"open_secret_incidents":{"total":110,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":110}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/t%20e%20s%20t%20i%20n%20g"},{"id":129,"type":"azure_devops","full_name":"gg-integration-test
+          / gg-test / t e s t i n g","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":115,"closed_incidents_count":1,"last_scan":{"date":"2024-12-06T12:27:52.346299Z","status":"finished","failing_reason":"","commits_scanned":113,"duration":"7.597231","branches_scanned":2,"progress":100},"monitored":true,"visibility":"private","external_id":"8a132329-0c77-4efc-a18a-882bda6ab28b","secret_incidents_breakdown":{"open_secret_incidents":{"total":115,"severity_breakdown":{"critical":0,"high":1,"medium":0,"low":0,"info":0,"unknown":114}},"closed_secret_incidents":{"total":1,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":1}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/t%20e%20s%20t%20i%20n%20g"},{"id":129,"type":"azure_devops","full_name":"gg-integration-test
           / gg-test / test abc","health":"at_risk","source_criticality":"unknown","default_branch":"main","default_branch_head":null,"open_incidents_count":28,"closed_incidents_count":0,"last_scan":{"date":"2024-12-06T12:27:52.346367Z","status":"finished","failing_reason":"","commits_scanned":55,"duration":"0.623082","branches_scanned":1,"progress":100},"monitored":true,"visibility":"private","external_id":"2aa16b64-2fb2-4639-afeb-70c0c4e8a267","secret_incidents_breakdown":{"open_secret_incidents":{"total":28,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":28}},"closed_secret_incidents":{"total":0,"severity_breakdown":{"critical":0,"high":0,"medium":0,"low":0,"info":0,"unknown":0}}},"url":"https://dev.azure.com/gg-integration-test/gg-test/_git/test%20abc"}]'
       headers:
         Access-Control-Expose-Headers:
@@ -89,7 +224,7 @@ interactions:
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 15:56:34 GMT
+          - Thu, 12 Dec 2024 16:59:34 GMT
         Link:
           - ''
         Referrer-Policy:
@@ -107,7 +242,7 @@ interactions:
         X-Per-Page:
           - '20'
         X-Request-ID:
-          - 69887de8037bf0eba9dadb62171e5889
+          - d87ddc466ebff365d07d2748c378b7ad
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

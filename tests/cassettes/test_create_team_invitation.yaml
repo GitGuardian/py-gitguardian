@@ -1,6 +1,6 @@
 interactions:
   - request:
-      body: '{"invitation_id": 1, "is_team_leader": true, "incident_permission": "can_view"}'
+      body: null
       headers:
         Accept:
           - '*/*'
@@ -8,17 +8,16 @@ interactions:
           - gzip, deflate
         Connection:
           - keep-alive
-        Content-Length:
-          - '79'
-        Content-Type:
-          - application/json
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
-      method: POST
-      uri: https://api.gitguardian.com/v1/teams/9/team_invitations
+      method: GET
+      uri: https://api.gitguardian.com/v1/teams?is_global=False
     response:
       body:
-        string: '{"id":1,"team_id":9,"invitation_id":1,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"can_view"}'
+        string:
+          '[{"id":19,"is_global":false,"name":"This is a test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/19"},{"id":20,"is_global":false,"name":"Team
+          test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/20"},{"id":21,"is_global":false,"name":"PyGitGuardian
+          team","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/21"}]'
       headers:
         Access-Control-Expose-Headers:
           - X-App-Version
@@ -27,13 +26,129 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '124'
+          - '438'
         Content-Type:
           - application/json
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Thu, 05 Dec 2024 17:37:44 GMT
+          - Thu, 12 Dec 2024 16:59:32 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - c2b0a05b57e590cfaf8f9fe2221eda91
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/invitations
+    response:
+      body:
+        string: '[{"id":13,"date":"2024-12-12T16:53:59.247129Z","email":"pygitguardian@example.com","role":"member","access_level":"member"},{"id":14,"date":"2024-12-12T16:54:44.192249Z","email":"example@test.com","role":"member","access_level":"member"}]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '238'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:32 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - df09bccf6aea67a2215c5dd905f6033e
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: '{"invitation_id": 13, "is_team_leader": true, "incident_permission": "can_view"}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '80'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: POST
+      uri: https://api.gitguardian.com/v1/teams/19/team_invitations
+    response:
+      body:
+        string: '{"id":7,"team_id":19,"invitation_id":13,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"can_view"}'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '126'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:32 GMT
         Referrer-Policy:
           - same-origin
         Server:
@@ -47,7 +162,7 @@ interactions:
         X-Frame-Options:
           - DENY
         X-Request-ID:
-          - 9f921c4d1568b2d510214689552e8902
+          - 9ce9f089220243eca87b41bc81b72b73
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

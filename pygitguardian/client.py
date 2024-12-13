@@ -32,7 +32,7 @@ from .models import (
     CreateTeamInvitation,
     CreateTeamMember,
     CreateTeamMemberParameter,
-    DeleteMember,
+    DeleteMemberParameters,
     Detail,
     Document,
     DocumentSchema,
@@ -980,7 +980,6 @@ class GGClient:
         obj: Union[Detail, Member]
         if is_ok(response):
             obj = Member.from_dict(response.json())
-            print("Member : ", obj)
         else:
             obj = load_detail(response)
 
@@ -989,7 +988,7 @@ class GGClient:
 
     def delete_member(
         self,
-        member: DeleteMember,
+        member: DeleteMemberParameters,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Optional[Detail]:
         member_id = member.id
@@ -1300,7 +1299,7 @@ class GGClient:
         obj.status_code
         return obj
 
-    def send_invitation(
+    def create_invitation(
         self,
         invitation: CreateInvitation,
         parameters: Optional[CreateInvitationParameter] = None,

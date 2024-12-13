@@ -8,12 +8,70 @@ interactions:
           - gzip, deflate
         Connection:
           - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/members?access_level=member
+    response:
+      body:
+        string:
+          '[{"id":16,"role":"member","access_level":"member","email":"henri.delateamsecretetducorealerting@gg.com","name":"Henri
+          De la team secret et du core alerting","created_at":"2024-12-12T16:54:17.568327Z","last_login":null,"active":true}]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '233'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:31 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - c56b4315637313b3d5eb7e70f9439a2c
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
         Content-Length:
           - '0'
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: DELETE
-      uri: https://api.gitguardian.com/v1/members/11
+      uri: https://api.gitguardian.com/v1/members/16
     response:
       body:
         string: ''
@@ -29,7 +87,7 @@ interactions:
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Thu, 05 Dec 2024 16:02:49 GMT
+          - Thu, 12 Dec 2024 16:59:31 GMT
         Referrer-Policy:
           - same-origin
         Server:
@@ -43,7 +101,7 @@ interactions:
         X-Frame-Options:
           - DENY
         X-Request-ID:
-          - 6471d63d5fe47af9711f900e0911ca4b
+          - 2b154a78777604a093040ddbcdc76217
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

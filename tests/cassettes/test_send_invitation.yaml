@@ -1,6 +1,6 @@
 interactions:
   - request:
-      body: '{"email": "owl@example.com", "access_level": "member"}'
+      body: '{"email": "pygitguardian@example.com", "access_level": "member"}'
       headers:
         Accept:
           - '*/*'
@@ -9,7 +9,7 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '54'
+          - '64'
         Content-Type:
           - application/json
         User-Agent:
@@ -18,7 +18,7 @@ interactions:
       uri: https://api.gitguardian.com/v1/invitations?send_email=False
     response:
       body:
-        string: '{"id":2,"date":"2024-12-06T13:35:36.737833Z","email":"owl@example.com","role":"member","access_level":"member"}'
+        string: '{"id":15,"date":"2024-12-12T17:00:27.844380Z","email":"pygitguardian@example.com","role":"member","access_level":"member"}'
       headers:
         Access-Control-Expose-Headers:
           - X-App-Version
@@ -27,13 +27,13 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '111'
+          - '122'
         Content-Type:
           - application/json
         Cross-Origin-Opener-Policy:
           - same-origin
         Date:
-          - Fri, 06 Dec 2024 13:35:36 GMT
+          - Thu, 12 Dec 2024 17:00:27 GMT
         Referrer-Policy:
           - same-origin
         Server:
@@ -47,7 +47,7 @@ interactions:
         X-Frame-Options:
           - DENY
         X-Request-ID:
-          - 2e6e4d6e2cb571015e6c9949fa6c431f
+          - ef94d7e9f303dfcd2caf016acde5004b
         X-SCA-Engine-Version:
           - 2.2.0
         X-Secrets-Engine-Version:

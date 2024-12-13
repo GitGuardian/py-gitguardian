@@ -1172,7 +1172,7 @@ class UpdateMemberSchema(BaseSchema):
 @dataclass
 class UpdateMember(Base, FromDictMixin):
     """
-    UpdateMember represnets the payload to update a member
+    UpdateMember represents the payload to update a member
     """
 
     id: int
@@ -1184,16 +1184,28 @@ UpdateMember.SCHEMA = UpdateMemberSchema()
 
 
 @dataclass
-class DeleteMember(Base, FromDictMixin):
+class UpdateMemberParameters(Base, FromDictMixin):
+    send_email: Optional[bool] = None
+
+
+UpdateMemberParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(UpdateMemberParameters, base_schema=BaseSchema),
+)
+UpdateMemberParameters.SCHEMA = UpdateMemberParametersSchema()
+
+
+@dataclass
+class DeleteMemberParameters(Base, FromDictMixin):
     id: int
     send_email: Optional[bool] = None
 
 
-DeleteMemberSchema = cast(
+DeleteMemberParametersSchema = cast(
     Type[BaseSchema],
-    marshmallow_dataclass.class_schema(DeleteMember, base_schema=BaseSchema),
+    marshmallow_dataclass.class_schema(DeleteMemberParameters, base_schema=BaseSchema),
 )
-DeleteMember.SCHEMA = DeleteMemberSchema()
+DeleteMemberParameters.SCHEMA = DeleteMemberParametersSchema()
 
 
 @dataclass
