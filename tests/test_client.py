@@ -1861,7 +1861,7 @@ def test_list_team_sources(client: GGClient, get_team: Callable[[], Team]):
     THEN a paginated list of sources is returned
     """
 
-    result = client.list_teams_sources(get_team().id)
+    result = client.list_team_sources(get_team().id)
     assert isinstance(result, CursorPaginatedResponse), result
 
     # This assumes at least one source has been installed and is on the perimeter of a team
@@ -1877,7 +1877,7 @@ def test_search_team_sources(client: GGClient, get_team: Callable[[], Team]):
     THEN a paginated list of sources is returned matching the parameters
     """
 
-    result = client.list_teams_sources(
+    result = client.list_team_sources(
         get_team().id, TeamSourceParameters(type="azure_devops")
     )
 
@@ -1894,7 +1894,7 @@ def test_delete_team_sources(client: GGClient, get_team: Callable[[], Team]):
     """
 
     team = get_team()
-    team_sources = client.list_teams_sources(team.id)
+    team_sources = client.list_team_sources(team.id)
     assert isinstance(
         team_sources, CursorPaginatedResponse
     ), "Could not fetch team sources"
@@ -1905,7 +1905,7 @@ def test_delete_team_sources(client: GGClient, get_team: Callable[[], Team]):
 
     assert result == 204
 
-    team_sources = client.list_teams_sources(team.id)
+    team_sources = client.list_team_sources(team.id)
     assert isinstance(team_sources, CursorPaginatedResponse), team_sources
     assert not any(source.id == source_to_delete.id for source in team_sources.data)
 
@@ -1929,7 +1929,7 @@ def test_add_team_sources(
 
     assert result == 204
 
-    team_sources = client.list_teams_sources(
+    team_sources = client.list_team_sources(
         team.id, TeamSourceParameters(type="azure_devops")
     )
     assert isinstance(team_sources, CursorPaginatedResponse), team_sources

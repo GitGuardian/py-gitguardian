@@ -1236,7 +1236,7 @@ class GGClient:
         obj.status_code
         return obj
 
-    def list_teams_sources(
+    def list_team_sources(
         self,
         team_id: int,
         parameters: Optional[TeamSourceParameters] = None,
