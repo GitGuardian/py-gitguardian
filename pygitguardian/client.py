@@ -1021,7 +1021,6 @@ class GGClient:
         else:
             obj = load_detail(response)
 
-        obj.status_code
         return obj
 
     def get_team(
@@ -1063,11 +1062,11 @@ class GGClient:
 
     def update_team(
         self,
-        team: UpdateTeam,
+        payload: UpdateTeam,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, Team]:
-        team_id = team.id
-        data = UpdateTeam.to_dict(team)
+        team_id = payload.id
+        data = UpdateTeam.to_dict(payload)
         del data["id"]
 
         response = self.patch(
@@ -1118,7 +1117,6 @@ class GGClient:
         else:
             obj = load_detail(response)
 
-        obj.status_code
         return obj
 
     def create_team_invitation(
@@ -1176,7 +1174,6 @@ class GGClient:
         else:
             obj = load_detail(response)
 
-        obj.status_code
         return obj
 
     def create_team_member(
@@ -1233,7 +1230,6 @@ class GGClient:
         else:
             obj = load_detail(response)
 
-        obj.status_code
         return obj
 
     def list_team_sources(
@@ -1254,16 +1250,15 @@ class GGClient:
         else:
             obj = load_detail(response)
 
-        obj.status_code
         return obj
 
     def update_team_source(
         self,
-        team_sources: UpdateTeamSource,
+        payload: UpdateTeamSource,
         extra_headers: Optional[Dict[str, str]] = None,
-    ) -> Union[Detail, int]:
-        team_id = team_sources.team_id
-        data = team_sources.to_dict()
+    ) -> Optional[Detail]:
+        team_id = payload.team_id
+        data = payload.to_dict()
         del data["team_id"]
 
         response = self.post(
@@ -1272,10 +1267,8 @@ class GGClient:
             extra_headers=extra_headers,
         )
 
-        if response.status_code == 204:
-            return 204
-
-        return load_detail(response)
+        if not response.status_code == 204:
+            return load_detail(response)
 
     def list_invitations(
         self,
@@ -1296,7 +1289,6 @@ class GGClient:
         else:
             obj = load_detail(response)
 
-        obj.status_code
         return obj
 
     def create_invitation(

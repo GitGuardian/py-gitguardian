@@ -72,25 +72,6 @@ def get_source(client: GGClient):
 
 
 @pytest.fixture
-def get_member(client: GGClient):
-    """
-    Return a function that fetches the first member available
-    in the account, every account should have at least
-    one member (the owner)
-    """
-
-    def inner():
-        paginated_teams = client.list_members()
-        assert isinstance(
-            paginated_teams, CursorPaginatedResponse
-        ), "Could not fetch members from GitGuardian"
-
-        return paginated_teams.data[0]
-
-    return inner
-
-
-@pytest.fixture
 def get_invitation(client: GGClient):
     """
     Return a function that fetches the first invitation available

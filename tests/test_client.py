@@ -1903,7 +1903,7 @@ def test_delete_team_sources(client: GGClient, get_team: Callable[[], Team]):
         UpdateTeamSource(team.id, [], [source_to_delete.id])
     )
 
-    assert result == 204
+    assert result is None
 
     team_sources = client.list_team_sources(team.id)
     assert isinstance(team_sources, CursorPaginatedResponse), team_sources
@@ -1927,7 +1927,7 @@ def test_add_team_sources(
         UpdateTeamSource(team.id, [source.id], []),
     )
 
-    assert result == 204
+    assert result is None
 
     team_sources = client.list_team_sources(
         team.id, TeamSourceParameters(type="azure_devops")
