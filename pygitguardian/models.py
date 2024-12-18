@@ -1102,7 +1102,7 @@ class MembersParametersSchema(BaseSchema):
     ordering = fields.Str(allow_none=True)
 
     @post_load
-    def return_members_parameters(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+    def make_members_parameters(self, data: Dict[str, Any], **kwargs: Any):
         return MembersParameters(**data)
 
 
@@ -1142,7 +1142,7 @@ class MemberSchema(BaseSchema):
     def return_member(
         self,
         data: Dict[str, Any],
-        **kwargs: Dict[str, Any],
+        **kwargs: Any,
     ):
         return Member(**data)
 
@@ -1161,9 +1161,7 @@ class UpdateMemberSchema(BaseSchema):
     active = fields.Bool(allow_none=True)
 
     @post_dump
-    def access_level_value(
-        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
-    ) -> Dict[str, Any]:
+    def access_level_value(self, data: Dict[str, Any], **kwargs: Any) -> Dict[str, Any]:
         if "access_level" in data:
             data["access_level"] = AccessLevel(data["access_level"]).value
         return data
@@ -1316,10 +1314,10 @@ class TeamInvitationSchema(BaseSchema):
     incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
 
     @post_load
-    def return_member(
+    def make_team_invitation(
         self,
         data: Dict[str, Any],
-        **kwargs: Dict[str, Any],
+        **kwargs: Any,
     ):
         return TeamInvitation(**data)
 
@@ -1342,7 +1340,7 @@ class CreateTeamInvitationSchema(BaseSchema):
     incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
 
     @post_load
-    def return_team_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+    def make_team_invitation(self, data: Dict[str, Any], **kwargs: Any):
         return CreateTeamInvitation(**data)
 
     class Meta:
@@ -1367,9 +1365,7 @@ class TeamMembershipParameterSchema(BaseSchema):
     member_id = fields.Int(allow_none=True)
 
     @post_load
-    def return_team_membership_parameter(
-        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
-    ):
+    def make_team_member_parameter(self, data: Dict[str, Any], **kwargs: Any):
         return TeamMemberParameter(**data)
 
     class Meta:
@@ -1398,7 +1394,7 @@ class TeamMemberSchema(BaseSchema):
     incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
 
     @post_load
-    def return_team_membership(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+    def make_team_member(self, data: Dict[str, Any], **kwargs: Any):
         return TeamMember(**data)
 
 
@@ -1434,9 +1430,7 @@ class CreateTeamMemberSchema(BaseSchema):
     incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
 
     @post_load
-    def return_create_team_membership(
-        self, data: Dict[str, Any], **kwargs: Dict[str, Any]
-    ):
+    def make_create_team_member(self, data: Dict[str, Any], **kwargs: Any):
         return CreateTeamMember(**data)
 
 
@@ -1510,7 +1504,7 @@ class InvitationSchema(BaseSchema):
     date = fields.DateTime(required=True)
 
     @post_load
-    def return_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+    def make_invitation(self, data: Dict[str, Any], **kwargs: Any):
         return Invitation(**data)
 
 
@@ -1542,7 +1536,7 @@ class CreateInvitationSchema(BaseSchema):
     access_level = fields.Enum(AccessLevel, by_value=True, required=True)
 
     @post_load
-    def return_invitation(self, data: Dict[str, Any], **kwargs: Dict[str, Any]):
+    def make_create_invitation(self, data: Dict[str, Any], **kwargs: Any):
         return CreateInvitation(**data)
 
 
