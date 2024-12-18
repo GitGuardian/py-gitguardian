@@ -4,7 +4,7 @@ import tarfile
 from collections import OrderedDict
 from datetime import date
 from io import BytesIO
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+from typing import Any, Dict, List, Optional, Tuple, Type
 from unittest.mock import Mock, patch
 
 import pytest
@@ -67,6 +67,7 @@ from pygitguardian.sca_models import (
 )
 
 from .conftest import create_client, my_vcr
+from .utils import get_invitation, get_source, get_team
 
 
 FILENAME = ".env"
@@ -1525,7 +1526,7 @@ def test_create_team(client: GGClient):
 
 
 @my_vcr.use_cassette("test_get_team.yaml", ignore_localhost=False)
-def test_get_team(client: GGClient, get_team: Callable[[], Team]):
+def test_get_team(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /teams/{id} endpoint
@@ -1541,7 +1542,7 @@ def test_get_team(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_update_team.yaml", ignore_localhost=False)
-def test_update_team(client: GGClient, get_team: Callable[[], Team]):
+def test_update_team(client: GGClient):
     """
     GIVEN a client
     WHEN calling PATCH /teams endpoint
@@ -1592,7 +1593,7 @@ def test_global_team(client: GGClient):
 
 
 @my_vcr.use_cassette("test_delete_team.yaml", ignore_localhost=False)
-def test_delete_team(client: GGClient, get_team: Callable[[], Team]):
+def test_delete_team(client: GGClient):
     """
     GIVEN a client
     WHEN calling DELETE /teams/{id} endpoint
@@ -1606,11 +1607,7 @@ def test_delete_team(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_create_team_invitation.yaml", ignore_localhost=False)
-def test_create_team_invitation(
-    client: GGClient,
-    get_team: Callable[[], Team],
-    get_invitation: Callable[[], Invitation],
-):
+def test_create_team_invitation(client: GGClient):
     """
     GIVEN a client
     WHEN calling POST /teams/{id}/invitations endpoint
@@ -1633,7 +1630,7 @@ def test_create_team_invitation(
 
 
 @my_vcr.use_cassette("test_list_team_invitations.yaml", ignore_localhost=False)
-def test_list_team_invitations(client: GGClient, get_team: Callable[[], Team]):
+def test_list_team_invitations(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /teams/{id}/invitations endpoint
@@ -1649,7 +1646,7 @@ def test_list_team_invitations(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_search_team_invitations.yaml", ignore_localhost=False)
-def test_search_team_invitations(client: GGClient, get_team: Callable[[], Team]):
+def test_search_team_invitations(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /teams/{id}/invitations endpoint
@@ -1670,7 +1667,7 @@ def test_search_team_invitations(client: GGClient, get_team: Callable[[], Team])
 
 
 @my_vcr.use_cassette("test_delete_team_invitation.yaml", ignore_localhost=False)
-def test_delete_team_invitation(client: GGClient, get_team: Callable[[], Team]):
+def test_delete_team_invitation(client: GGClient):
     """
     GIVEN a client
     WHEN calling DELETE /teams/{id}/invitations/{id} endpoint
@@ -1689,7 +1686,7 @@ def test_delete_team_invitation(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_list_team_members.yaml", ignore_localhost=False)
-def test_list_team_members(client: GGClient, get_team: Callable[[], Team]):
+def test_list_team_members(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /teams/{id}/members endpoint
@@ -1704,7 +1701,7 @@ def test_list_team_members(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_search_team_members.yaml", ignore_localhost=False)
-def test_search_team_members(client: GGClient, get_team: Callable[[], Team]):
+def test_search_team_members(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /teams/{id}/members endpoint
@@ -1725,7 +1722,7 @@ def test_search_team_members(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_create_team_member.yaml", ignore_localhost=False)
-def test_create_team_member(client: GGClient, get_team: Callable[[], Team]):
+def test_create_team_member(client: GGClient):
     """
     GIVEN a client
     WHEN calling POST /teams/{id}/members endpoint
@@ -1762,9 +1759,7 @@ def test_create_team_member(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_create_team_member_parameters.yaml", ignore_localhost=False)
-def test_create_team_member_without_mail(
-    client: GGClient, get_team: Callable[[], Team]
-):
+def test_create_team_member_without_mail(client: GGClient):
     """
     GIVEN a client
     WHEN calling POST /teams/{id}/members endpoint
@@ -1799,7 +1794,7 @@ def test_create_team_member_without_mail(
 
 
 @my_vcr.use_cassette("test_delete_team_member.yaml", ignore_localhost=False)
-def test_delete_team_member(client: GGClient, get_team: Callable[[], Team]):
+def test_delete_team_member(client: GGClient):
     """
     GIVEN a client
     WHEN calling DELETE /teams/{id}/members/{id} endpoint
@@ -1854,7 +1849,7 @@ def test_search_sources(client: GGClient):
 
 
 @my_vcr.use_cassette("test_list_teams_sources.yaml", ignore_localhost=False)
-def test_list_team_sources(client: GGClient, get_team: Callable[[], Team]):
+def test_list_team_sources(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /sources endpoint
@@ -1869,7 +1864,7 @@ def test_list_team_sources(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_search_teams_sources.yaml", ignore_localhost=False)
-def test_search_team_sources(client: GGClient, get_team: Callable[[], Team]):
+def test_search_team_sources(client: GGClient):
     """
     GIVEN a client
     WHEN calling GET /sources endpoint
@@ -1886,7 +1881,7 @@ def test_search_team_sources(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_delete_team_sources.yaml", ignore_localhost=False)
-def test_delete_team_sources(client: GGClient, get_team: Callable[[], Team]):
+def test_delete_team_sources(client: GGClient):
     """
     GIVEN a client
     WHEN calling POST /teams/{id}/sources endpoint
@@ -1911,9 +1906,7 @@ def test_delete_team_sources(client: GGClient, get_team: Callable[[], Team]):
 
 
 @my_vcr.use_cassette("test_add_team_sources.yaml", ignore_localhost=False)
-def test_add_team_sources(
-    client: GGClient, get_team: Callable[[], Team], get_source: Callable[[], Source]
-):
+def test_add_team_sources(client: GGClient):
     """
     GIVEN a client
     WHEN calling POST /teams/{id}/sources endpoint
