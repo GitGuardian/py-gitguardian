@@ -1,0 +1,110 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: GET
+      uri: https://api.gitguardian.com/v1/invitations
+    response:
+      body:
+        string: '[{"id":13,"date":"2024-12-12T16:53:59.247129Z","email":"pygitguardian@example.com","role":"member","access_level":"member"},{"id":14,"date":"2024-12-12T16:54:44.192249Z","email":"example@test.com","role":"member","access_level":"member"}]'
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - GET, POST, HEAD, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '238'
+        Content-Type:
+          - application/json
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:34 GMT
+        Link:
+          - ''
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Per-Page:
+          - '20'
+        X-Request-ID:
+          - 308ee83bf3b6d61edde508ea06430075
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '0'
+        User-Agent:
+          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+      method: DELETE
+      uri: https://api.gitguardian.com/v1/invitations/13
+    response:
+      body:
+        string: ''
+      headers:
+        Access-Control-Expose-Headers:
+          - X-App-Version
+        Allow:
+          - DELETE, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '0'
+        Cross-Origin-Opener-Policy:
+          - same-origin
+        Date:
+          - Thu, 12 Dec 2024 16:59:34 GMT
+        Referrer-Policy:
+          - same-origin
+        Server:
+          - nginx/1.24.0
+        Vary:
+          - Cookie
+        X-App-Version:
+          - dev
+        X-Content-Type-Options:
+          - nosniff
+        X-Frame-Options:
+          - DENY
+        X-Request-ID:
+          - f5eb9d8b1d00b83701a8d41c427be20e
+        X-SCA-Engine-Version:
+          - 2.2.0
+        X-Secrets-Engine-Version:
+          - 2.127.0
+      status:
+        code: 204
+        message: No Content
+version: 1

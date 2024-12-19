@@ -23,16 +23,41 @@ from pygitguardian.config import (
     MULTI_DOCUMENT_LIMIT,
 )
 from pygitguardian.models import (
+    AccessLevel,
     APITokensResponse,
+    CreateInvitation,
+    CreateInvitationParameters,
+    CreateTeam,
+    CreateTeamInvitation,
+    CreateTeamMember,
+    CreateTeamMemberParameters,
+    DeleteMemberParameters,
     Detail,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
+    IncidentPermission,
+    Invitation,
     JWTResponse,
     JWTService,
+    Member,
+    MembersParameters,
     MultiScanResult,
     QuotaResponse,
     ScanResult,
+    Source,
+    SourceParameters,
+    Team,
+    TeamInvitation,
+    TeamInvitationParameters,
+    TeamMember,
+    TeamMemberParameters,
+    TeamSourceParameters,
+    TeamsParameters,
+    UpdateMember,
+    UpdateTeam,
+    UpdateTeamSource,
 )
+from pygitguardian.models_utils import CursorPaginatedResponse
 from pygitguardian.sca_models import (
     ComputeSCAFilesResult,
     SCAScanAllOutput,
@@ -42,6 +67,7 @@ from pygitguardian.sca_models import (
 )
 
 from .conftest import create_client, my_vcr
+from .utils import get_invitation, get_source, get_team
 
 
 FILENAME = ".env"
@@ -1391,3 +1417,568 @@ def test_read_metadata_remediation_message(client: GGClient):
     assert client.remediation_messages.pre_commit == messages["pre_commit"]
     assert client.remediation_messages.pre_push == messages["pre_push"]
     assert client.remediation_messages.pre_receive == messages["pre_receive"]
+
+
+LIST_MEMBERS_RESPONSE = [
+    {
+        "id": 3251,
+        "name": "Owl",
+        "email": "john.smith@example.org",
+        "role": "owner",
+        "access_level": "owner",
+        "active": True,
+        "created_at": "2022-04-20T11:07:24.000Z",
+        "last_login": "2022-04-20T11:07:24.000Z",
+    },
+    {
+        "id": 3252,
+        "name": "Owl",
+        "email": "john.smith@example.org",
+        "role": "owner",
+        "access_level": "owner",
+        "active": True,
+        "created_at": "2022-04-20T11:07:24.000Z",
+        "last_login": "2022-04-20T11:07:24.000Z",
+    },
+]
+
+
+@my_vcr.use_cassette("test_list_members.yaml", ignore_localhost=False)
+def test_list_members(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling /members endpoint
+    THEN it returns a paginated list of members
+    """
+
+    result = client.list_members()
+
+    assert isinstance(result, CursorPaginatedResponse), result
+
+
+@my_vcr.use_cassette("test_list_members_parameters.yaml", ignore_localhost=False)
+def test_search_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling /members endpoint
+    AND parameters are passed
+    THEN it returns a paginated list of members matching the parameters
+    """
+
+    result = client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert all(member.access_level == AccessLevel.MANAGER for member in result.data)
+
+
+@my_vcr.use_cassette("test_update_member.yaml", ignore_localhost=False)
+def test_update_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling PATCH /members/{id} endpoint with a payload
+    THEN it returns the updated member
+    """
+
+    # This assumes there is at least one manager in the first page of members
+    members = client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
+    assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
+
+    result = client.update_member(
+        UpdateMember(
+            id=members.data[0].id, access_level=AccessLevel.MEMBER, active=False
+        )
+    )
+
+    assert isinstance(result, Member), result
+
+    assert not result.active
+    assert result.access_level == AccessLevel.MEMBER
+
+
+@my_vcr.use_cassette("test_delete_member.yaml", ignore_localhost=False)
+def test_delete_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /members/{id} endpoint
+    THEN the member is deleted
+    """
+
+    members = client.list_members(MembersParameters(access_level=AccessLevel.MEMBER))
+    assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
+
+    member = members.data[0]
+    result = client.delete_member(DeleteMemberParameters(id=member.id))
+
+    assert result is None, result
+
+
+@my_vcr.use_cassette("test_create_team.yaml", ignore_localhost=False)
+def test_create_team(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams endpoint
+    THEN a team is created
+    """
+
+    result = client.create_team(CreateTeam(name="PyGitGuardian team"))
+
+    assert isinstance(result, Team), result
+
+
+@my_vcr.use_cassette("test_get_team.yaml", ignore_localhost=False)
+def test_get_team(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams/{id} endpoint
+    THEN the corresponding team is returned
+    """
+
+    # This test would require a team to be created first and its id
+    # stored in a config file for this test to simulate a real use case
+    team = get_team()
+    result = client.get_team(team.id)
+
+    assert isinstance(result, Team), result
+
+
+@my_vcr.use_cassette("test_update_team.yaml", ignore_localhost=False)
+def test_update_team(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling PATCH /teams endpoint
+    THEN the corresponding team is updated
+    """
+
+    team = get_team()
+    result = client.update_team(
+        UpdateTeam(
+            id=team.id, name="New PyGitGuardian team", description="New description"
+        )
+    )
+
+    assert isinstance(result, Team), result
+
+    assert result.name == "New PyGitGuardian team"
+    assert result.description == "New description"
+
+
+@my_vcr.use_cassette("test_list_teams.yaml", ignore_localhost=False)
+def test_list_teams(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams endpoint
+    THEN a paginated list of teams is returned
+    """
+
+    result = client.list_teams()
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert isinstance(result.data[0], Team)
+
+
+@my_vcr.use_cassette("test_global_team.yaml", ignore_localhost=False)
+def test_global_team(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams endpoint
+    AND passing is_global parameter
+    THEN the global team is returned
+    """
+
+    result = client.list_teams(parameters=TeamsParameters(is_global=True))
+
+    assert isinstance(result, CursorPaginatedResponse), result
+
+    assert all(team.is_global for team in result.data)
+
+
+@my_vcr.use_cassette("test_delete_team.yaml", ignore_localhost=False)
+def test_delete_team(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /teams/{id} endpoint
+    THEN the team is deleted
+    """
+
+    team = get_team()
+    result = client.delete_team(team.id)
+
+    assert result is None
+
+
+@my_vcr.use_cassette("test_create_team_invitation.yaml", ignore_localhost=False)
+def test_create_team_invitation(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/invitations endpoint
+    THEN an invitation is created
+    """
+
+    team = get_team()
+    invitation = get_invitation()
+
+    result = client.create_team_invitation(
+        team.id,
+        CreateTeamInvitation(
+            invitation_id=invitation.id,
+            is_team_leader=True,
+            incident_permission=IncidentPermission.VIEW,
+        ),
+    )
+
+    assert isinstance(result, TeamInvitation), result
+
+
+@my_vcr.use_cassette("test_list_team_invitations.yaml", ignore_localhost=False)
+def test_list_team_invitations(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams/{id}/invitations endpoint
+    THEN a paginated list of invitations is returned
+    """
+
+    team = get_team()
+    result = client.list_team_invitations(team.id)
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    # This assumes there is at least one team invitation
+    assert isinstance(result.data[0], TeamInvitation)
+
+
+@my_vcr.use_cassette("test_search_team_invitations.yaml", ignore_localhost=False)
+def test_search_team_invitations(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams/{id}/invitations endpoint
+    AND parameters are passed
+    THEN a paginated list of invitations is returned matching the parameters
+    """
+
+    team = get_team()
+    result = client.list_team_invitations(
+        team.id,
+        parameters=TeamInvitationParameters(
+            incident_permission=IncidentPermission.VIEW
+        ),
+    )
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert all(
+        invitation.incident_permission == "can_view" for invitation in result.data
+    )
+
+
+@my_vcr.use_cassette("test_delete_team_invitation.yaml", ignore_localhost=False)
+def test_delete_team_invitation(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /teams/{id}/invitations/{id} endpoint
+    THEN an invitation is deleted
+    """
+
+    team = get_team()
+    team_invitations = client.list_team_invitations(team.id)
+    assert isinstance(
+        team_invitations, CursorPaginatedResponse
+    ), "Could not fetch team invitations"
+
+    result = client.delete_team_invitation(team.id, team_invitations.data[0].id)
+
+    assert result is None
+
+
+@my_vcr.use_cassette("test_list_team_members.yaml", ignore_localhost=False)
+def test_list_team_members(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams/{id}/members endpoint
+    THEN a paginated list of members is returned
+    """
+
+    team = get_team()
+    result = client.list_team_members(team.id)
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert isinstance(result.data[0], TeamMember)
+
+
+@my_vcr.use_cassette("test_search_team_members.yaml", ignore_localhost=False)
+def test_search_team_members(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /teams/{id}/members endpoint
+    AND parameters are passed
+    THEN a paginated list of members is returned matching the parameters
+    """
+
+    team = get_team()
+
+    # Every team should have at least one team leader, but an account without a team
+    # will nullify the purpose of this test even though it will pass
+    result = client.list_team_members(
+        team.id, parameters=TeamMemberParameters(is_team_leader=True)
+    )
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert all(member.is_team_leader for member in result.data)
+
+
+@my_vcr.use_cassette("test_create_team_member.yaml", ignore_localhost=False)
+def test_create_team_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/members endpoint
+    THEN a member is created
+    """
+
+    all_members = client.list_members()
+    assert isinstance(
+        all_members, CursorPaginatedResponse
+    ), "Could not fetch members from GitGuardian"
+
+    team = get_team()
+    team_members = client.list_team_members(team.id)
+    assert isinstance(
+        team_members, CursorPaginatedResponse
+    ), "Could not fetch team members from GitGuardian"
+    team_members_ids = {team_member.member_id for team_member in team_members.data}
+
+    # This assumes there is at least one member in the first page of team members that
+    # does not belong to the retrieved team
+    member_to_add = next(
+        member for member in all_members.data if member.id not in team_members_ids
+    )
+
+    result = client.create_team_member(
+        team.id,
+        CreateTeamMember(member_to_add.id, False, IncidentPermission.VIEW),
+    )
+
+    assert isinstance(result, TeamMember), result
+
+    assert result.incident_permission == IncidentPermission.VIEW
+    assert not result.is_team_leader
+
+
+@my_vcr.use_cassette("test_create_team_member_parameters.yaml", ignore_localhost=False)
+def test_create_team_member_without_mail(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/members endpoint
+    THEN a member is created
+    """
+
+    all_members = client.list_members()
+    assert isinstance(
+        all_members, CursorPaginatedResponse
+    ), "Could not fetch members from GitGuardian"
+
+    team = get_team()
+    team_members = client.list_team_members(team.id)
+    assert isinstance(
+        team_members, CursorPaginatedResponse
+    ), "Could not fetch team members from GitGuardian"
+    team_members_ids = {team_member.member_id for team_member in team_members.data}
+
+    # This assumes there is at least one member in the first page of team members that
+    # does not belong to the retrieved team
+    member_to_add = next(
+        member for member in all_members.data if member.id not in team_members_ids
+    )
+
+    result = client.create_team_member(
+        team.id,
+        CreateTeamMember(member_to_add.id, False, IncidentPermission.VIEW),
+        CreateTeamMemberParameters(send_email=False),
+    )
+
+    assert isinstance(result, TeamMember), result
+
+
+@my_vcr.use_cassette("test_delete_team_member.yaml", ignore_localhost=False)
+def test_delete_team_member(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /teams/{id}/members/{id} endpoint
+    THEN a member is deleted
+    """
+
+    all_members = client.list_members()
+    assert isinstance(
+        all_members, CursorPaginatedResponse
+    ), "Could not fetch members from GitGuardian"
+
+    team = get_team()
+    team_members = client.list_team_members(
+        team.id, TeamMemberParameters(is_team_leader=False)
+    )
+    assert isinstance(
+        team_members, CursorPaginatedResponse
+    ), "Could not fetch team members from GitGuardian"
+
+    team_member = team_members.data[0]
+    result = client.delete_team_member(team.id, team_member.id)
+
+    assert result is None
+
+
+@my_vcr.use_cassette("test_list_sources.yaml", ignore_localhost=False)
+def test_list_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /sources endpoint
+    THEN a paginated list of sources is returned
+    """
+
+    result = client.list_sources()
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert isinstance(result.data[0], Source)
+
+
+@my_vcr.use_cassette("test_search_sources.yaml", ignore_localhost=False)
+def test_search_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /sources endpoint
+    AND parameters are passed
+    THEN a paginated list of sources is returned matching the parameters
+    """
+
+    result = client.list_sources(parameters=SourceParameters(type="azure_devops"))
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert all(source.type == "azure_devops" for source in result.data)
+
+
+@my_vcr.use_cassette("test_list_teams_sources.yaml", ignore_localhost=False)
+def test_list_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /sources endpoint
+    THEN a paginated list of sources is returned
+    """
+
+    result = client.list_team_sources(get_team().id)
+    assert isinstance(result, CursorPaginatedResponse), result
+
+    # This assumes at least one source has been installed and is on the perimeter of a team
+    assert isinstance(result.data[0], Source)
+
+
+@my_vcr.use_cassette("test_search_teams_sources.yaml", ignore_localhost=False)
+def test_search_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /sources endpoint
+    AND parameters are passed
+    THEN a paginated list of sources is returned matching the parameters
+    """
+
+    result = client.list_team_sources(
+        get_team().id, TeamSourceParameters(type="azure_devops")
+    )
+
+    assert isinstance(result, CursorPaginatedResponse), result
+    assert all(source.type == "azure_devops" for source in result.data)
+
+
+@my_vcr.use_cassette("test_delete_team_sources.yaml", ignore_localhost=False)
+def test_delete_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/sources endpoint
+    THEN a source is deleted
+    """
+
+    team = get_team()
+    team_sources = client.list_team_sources(team.id)
+    assert isinstance(
+        team_sources, CursorPaginatedResponse
+    ), "Could not fetch team sources"
+    source_to_delete = team_sources.data[0]
+    result = client.update_team_source(
+        UpdateTeamSource(team.id, [], [source_to_delete.id])
+    )
+
+    assert result is None
+
+    team_sources = client.list_team_sources(team.id)
+    assert isinstance(team_sources, CursorPaginatedResponse), team_sources
+    assert not any(source.id == source_to_delete.id for source in team_sources.data)
+
+
+@my_vcr.use_cassette("test_add_team_sources.yaml", ignore_localhost=False)
+def test_add_team_sources(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /teams/{id}/sources endpoint
+    THEN a source is added
+    """
+
+    team = get_team()
+    source = get_source()
+
+    result = client.update_team_source(
+        UpdateTeamSource(team.id, [source.id], []),
+    )
+
+    assert result is None
+
+    team_sources = client.list_team_sources(
+        team.id, TeamSourceParameters(type="azure_devops")
+    )
+    assert isinstance(team_sources, CursorPaginatedResponse), team_sources
+    assert any(received_source.id == source.id for received_source in team_sources.data)
+
+
+@my_vcr.use_cassette("test_list_invitations.yaml", ignore_localhost=False)
+def test_list_invitations(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling GET /invitations endpoint
+    THEN a paginated list of invitations is returned
+    """
+
+    result = client.list_invitations()
+    assert isinstance(result, CursorPaginatedResponse), result
+    # This assumes there is at least one invitation sent in the account
+    assert isinstance(result.data[0], Invitation)
+
+
+@my_vcr.use_cassette("test_send_invitation.yaml", ignore_localhost=False)
+def test_send_invitation(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /invitations endpoint
+    THEN an invitation is sent
+    """
+
+    result = client.create_invitation(
+        CreateInvitation(
+            email="pygitguardian@example.com", access_level=AccessLevel.MEMBER
+        ),
+        CreateInvitationParameters(send_email=False),
+    )
+
+    assert isinstance(result, Invitation), result
+
+    assert result.email == "pygitguardian@example.com"
+    assert result.access_level == AccessLevel.MEMBER
+
+
+@my_vcr.use_cassette("test_delete_invitation.yaml", ignore_localhost=False)
+def test_delete_invitation(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling DELETE /invitations/{id} endpoint
+    THEN the invitation is deleted
+    """
+
+    invitations = client.list_invitations()
+    assert isinstance(
+        invitations, CursorPaginatedResponse
+    ), "Could not fetch invitations"
+
+    result = client.delete_invitation(invitations.data[0].id)
+
+    assert result is None
