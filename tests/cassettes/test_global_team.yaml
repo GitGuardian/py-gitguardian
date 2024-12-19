@@ -11,7 +11,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams?is_global=True
+      uri: https://api.gitguardian.com/v1/teams?cursor=&per_page=20&is_global=True
     response:
       body:
         string: '[{"id":6,"is_global":true,"name":"All incidents","description":null,"gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/6"}]'

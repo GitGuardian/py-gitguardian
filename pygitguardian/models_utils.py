@@ -77,6 +77,7 @@ class Base(ToDictMixin):
         return self.status_code == 200
 
 
+@dataclass
 class PaginationParameter(ToDictMixin):
     """Pagination mixin used for endpoints that support pagination."""
 
@@ -84,6 +85,7 @@ class PaginationParameter(ToDictMixin):
     per_page: int = 20
 
 
+@dataclass
 class SearchParameter(ToDictMixin):
     search: Optional[str] = None
 

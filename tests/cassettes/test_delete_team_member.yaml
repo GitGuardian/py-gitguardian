@@ -70,7 +70,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams?is_global=False
+      uri: https://api.gitguardian.com/v1/teams?cursor=&per_page=20&is_global=False
     response:
       body:
         string:

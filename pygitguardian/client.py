@@ -27,11 +27,11 @@ from .iac_models import (
 from .models import (
     APITokensResponse,
     CreateInvitation,
-    CreateInvitationParameter,
+    CreateInvitationParameters,
     CreateTeam,
     CreateTeamInvitation,
     CreateTeamMember,
-    CreateTeamMemberParameter,
+    CreateTeamMemberParameters,
     DeleteMemberParameters,
     Detail,
     Document,
@@ -40,7 +40,7 @@ from .models import (
     HoneytokenResponse,
     HoneytokenWithContextResponse,
     Invitation,
-    InvitationParameter,
+    InvitationParameters,
     JWTResponse,
     JWTService,
     Member,
@@ -56,11 +56,11 @@ from .models import (
     SourceParameters,
     Team,
     TeamInvitation,
-    TeamInvitationParameter,
+    TeamInvitationParameters,
     TeamMember,
-    TeamMemberParameter,
+    TeamMemberParameters,
     TeamSourceParameters,
-    TeamsParameter,
+    TeamsParameters,
     UpdateMember,
     UpdateTeam,
     UpdateTeamSource,
@@ -1005,7 +1005,7 @@ class GGClient:
 
     def list_teams(
         self,
-        parameters: Optional[TeamsParameter] = None,
+        parameters: Optional[TeamsParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, CursorPaginatedResponse[Team]]:
         params = parameters.to_dict() if parameters else {}
@@ -1021,6 +1021,7 @@ class GGClient:
         else:
             obj = load_detail(response)
 
+        obj.status_code = response.status_code
         return obj
 
     def get_team(
@@ -1100,7 +1101,7 @@ class GGClient:
     def list_team_invitations(
         self,
         team_id: int,
-        parameters: Optional[TeamInvitationParameter] = None,
+        parameters: Optional[TeamInvitationParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, CursorPaginatedResponse[TeamInvitation]]:
         response = self.get(
@@ -1117,6 +1118,7 @@ class GGClient:
         else:
             obj = load_detail(response)
 
+        obj.status_code = response.status_code
         return obj
 
     def create_team_invitation(
@@ -1157,7 +1159,7 @@ class GGClient:
     def list_team_members(
         self,
         team_id: int,
-        parameters: Optional[TeamMemberParameter] = None,
+        parameters: Optional[TeamMemberParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, CursorPaginatedResponse[TeamMember]]:
         response = self.get(
@@ -1174,13 +1176,14 @@ class GGClient:
         else:
             obj = load_detail(response)
 
+        obj.status_code = response.status_code
         return obj
 
     def create_team_member(
         self,
         team_id: int,
         member: CreateTeamMember,
-        parameters: Optional[CreateTeamMemberParameter] = None,
+        parameters: Optional[CreateTeamMemberParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, TeamMember]:
         response = self.post(
@@ -1230,6 +1233,7 @@ class GGClient:
         else:
             obj = load_detail(response)
 
+        obj.status_code = response.status_code
         return obj
 
     def list_team_sources(
@@ -1250,6 +1254,7 @@ class GGClient:
         else:
             obj = load_detail(response)
 
+        obj.status_code = response.status_code
         return obj
 
     def update_team_source(
@@ -1272,7 +1277,7 @@ class GGClient:
 
     def list_invitations(
         self,
-        parameters: Optional[InvitationParameter] = None,
+        parameters: Optional[InvitationParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, CursorPaginatedResponse[Invitation]]:
         response = self.get(
@@ -1289,12 +1294,13 @@ class GGClient:
         else:
             obj = load_detail(response)
 
+        obj.status_code = response.status_code
         return obj
 
     def create_invitation(
         self,
         invitation: CreateInvitation,
-        parameters: Optional[CreateInvitationParameter] = None,
+        parameters: Optional[CreateInvitationParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, Invitation]:
         response = self.post(

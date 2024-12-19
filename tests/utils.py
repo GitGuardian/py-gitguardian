@@ -1,4 +1,4 @@
-from pygitguardian.models import Invitation, Source, Team, TeamsParameter
+from pygitguardian.models import Invitation, Source, Team, TeamsParameters
 from pygitguardian.models_utils import CursorPaginatedResponse
 
 from .conftest import create_client
@@ -44,7 +44,7 @@ def get_team() -> Team:
 
     client = create_client()
 
-    paginated_teams = client.list_teams(TeamsParameter(is_global=False))
+    paginated_teams = client.list_teams(TeamsParameters(is_global=False))
     assert isinstance(
         paginated_teams, CursorPaginatedResponse
     ), "Could not fetch teams from GitGuardian"

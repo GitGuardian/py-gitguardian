@@ -1207,15 +1207,15 @@ DeleteMemberParameters.SCHEMA = DeleteMemberParametersSchema()
 
 
 @dataclass
-class TeamsParameter(PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin):
+class TeamsParameters(PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin):
     is_global: Optional[bool] = None
 
 
 TeamsParameterSchema = cast(
     Type[BaseSchema],
-    marshmallow_dataclass.class_schema(TeamsParameter, base_schema=BaseSchema),
+    marshmallow_dataclass.class_schema(TeamsParameters, base_schema=BaseSchema),
 )
-TeamsParameter.SCHEMA = TeamsParameterSchema()
+TeamsParameters.SCHEMA = TeamsParameterSchema()
 
 
 @dataclass
@@ -1275,7 +1275,7 @@ class IncidentPermission(str, Enum):
 
 
 @dataclass
-class TeamInvitationParameter(PaginationParameter, ToDictMixin):
+class TeamInvitationParameters(PaginationParameter, ToDictMixin):
     invitation_id: Optional[int] = None
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
@@ -1292,7 +1292,7 @@ class TeamInvitationParameterSchema(BaseSchema):
         exclude_none = True
 
 
-TeamInvitationParameter.SCHEMA = TeamInvitationParameterSchema()
+TeamInvitationParameters.SCHEMA = TeamInvitationParameterSchema()
 
 
 @dataclass
@@ -1351,7 +1351,7 @@ CreateTeamInvitation.SCHEMA = CreateTeamInvitationSchema()
 
 
 @dataclass
-class TeamMemberParameter(PaginationParameter, SearchParameter, ToDictMixin):
+class TeamMemberParameters(PaginationParameter, SearchParameter, ToDictMixin):
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
     member_id: Optional[int] = None
@@ -1366,13 +1366,13 @@ class TeamMembershipParameterSchema(BaseSchema):
 
     @post_load
     def make_team_member_parameter(self, data: Dict[str, Any], **kwargs: Any):
-        return TeamMemberParameter(**data)
+        return TeamMemberParameters(**data)
 
     class Meta:
         exclude_none = True
 
 
-TeamMemberParameter.SCHEMA = TeamMembershipParameterSchema()
+TeamMemberParameters.SCHEMA = TeamMembershipParameterSchema()
 
 
 @dataclass
@@ -1402,17 +1402,17 @@ TeamMember.SCHEMA = TeamMemberSchema()
 
 
 @dataclass
-class CreateTeamMemberParameter(ToDictMixin):
-    send_email: bool
+class CreateTeamMemberParameters(ToDictMixin):
+    send_email: Optional[bool] = None
 
 
 CreateTeamMemberParameterSchema = cast(
     Type[BaseSchema],
     marshmallow_dataclass.class_schema(
-        CreateTeamMemberParameter, base_schema=BaseSchema
+        CreateTeamMemberParameters, base_schema=BaseSchema
     ),
 )
-CreateTeamMemberParameter.SCHEMA = CreateTeamMemberParameterSchema()
+CreateTeamMemberParameters.SCHEMA = CreateTeamMemberParameterSchema()
 
 
 @dataclass
@@ -1483,10 +1483,10 @@ SourceParameters.SCHEMA = SourceParametersSchema()
 
 
 @dataclass
-class InvitationParameter(
+class InvitationParameters(
     PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin
 ):
-    ordering: Literal["date", "-date"]
+    ordering: Optional[Literal["date", "-date"]] = None
 
 
 @dataclass
@@ -1512,17 +1512,17 @@ Invitation.SCHEMA = InvitationSchema()
 
 
 @dataclass
-class CreateInvitationParameter(FromDictMixin, ToDictMixin):
+class CreateInvitationParameters(FromDictMixin, ToDictMixin):
     send_email: Optional[bool] = None
 
 
 CreateInvitationParameterSchema = cast(
     Type[BaseSchema],
     marshmallow_dataclass.class_schema(
-        CreateInvitationParameter, base_schema=BaseSchema
+        CreateInvitationParameters, base_schema=BaseSchema
     ),
 )
-CreateInvitationParameter.SCHEMA = CreateInvitationParameterSchema()
+CreateInvitationParameters.SCHEMA = CreateInvitationParameterSchema()
 
 
 @dataclass

@@ -26,11 +26,11 @@ from pygitguardian.models import (
     AccessLevel,
     APITokensResponse,
     CreateInvitation,
-    CreateInvitationParameter,
+    CreateInvitationParameters,
     CreateTeam,
     CreateTeamInvitation,
     CreateTeamMember,
-    CreateTeamMemberParameter,
+    CreateTeamMemberParameters,
     DeleteMemberParameters,
     Detail,
     HoneytokenResponse,
@@ -48,11 +48,11 @@ from pygitguardian.models import (
     SourceParameters,
     Team,
     TeamInvitation,
-    TeamInvitationParameter,
+    TeamInvitationParameters,
     TeamMember,
-    TeamMemberParameter,
+    TeamMemberParameters,
     TeamSourceParameters,
-    TeamsParameter,
+    TeamsParameters,
     UpdateMember,
     UpdateTeam,
     UpdateTeamSource,
@@ -1585,7 +1585,7 @@ def test_global_team(client: GGClient):
     THEN the global team is returned
     """
 
-    result = client.list_teams(parameters=TeamsParameter(is_global=True))
+    result = client.list_teams(parameters=TeamsParameters(is_global=True))
 
     assert isinstance(result, CursorPaginatedResponse), result
 
@@ -1657,7 +1657,9 @@ def test_search_team_invitations(client: GGClient):
     team = get_team()
     result = client.list_team_invitations(
         team.id,
-        parameters=TeamInvitationParameter(incident_permission=IncidentPermission.VIEW),
+        parameters=TeamInvitationParameters(
+            incident_permission=IncidentPermission.VIEW
+        ),
     )
 
     assert isinstance(result, CursorPaginatedResponse), result
@@ -1714,7 +1716,7 @@ def test_search_team_members(client: GGClient):
     # Every team should have at least one team leader, but an account without a team
     # will nullify the purpose of this test even though it will pass
     result = client.list_team_members(
-        team.id, parameters=TeamMemberParameter(is_team_leader=True)
+        team.id, parameters=TeamMemberParameters(is_team_leader=True)
     )
 
     assert isinstance(result, CursorPaginatedResponse), result
@@ -1787,7 +1789,7 @@ def test_create_team_member_without_mail(client: GGClient):
     result = client.create_team_member(
         team.id,
         CreateTeamMember(member_to_add.id, False, IncidentPermission.VIEW),
-        CreateTeamMemberParameter(send_email=False),
+        CreateTeamMemberParameters(send_email=False),
     )
 
     assert isinstance(result, TeamMember), result
@@ -1808,7 +1810,7 @@ def test_delete_team_member(client: GGClient):
 
     team = get_team()
     team_members = client.list_team_members(
-        team.id, TeamMemberParameter(is_team_leader=False)
+        team.id, TeamMemberParameters(is_team_leader=False)
     )
     assert isinstance(
         team_members, CursorPaginatedResponse
@@ -1955,7 +1957,7 @@ def test_send_invitation(client: GGClient):
         CreateInvitation(
             email="pygitguardian@example.com", access_level=AccessLevel.MEMBER
         ),
-        CreateInvitationParameter(send_email=False),
+        CreateInvitationParameters(send_email=False),
     )
 
     assert isinstance(result, Invitation), result

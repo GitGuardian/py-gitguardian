@@ -11,7 +11,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/sources?type=azure_devops
+      uri: https://api.gitguardian.com/v1/sources?cursor=&per_page=20&type=azure_devops
     response:
       body:
         string: '[{"id":124,"type":"azure_devops","full_name":"gg-integration-test /
