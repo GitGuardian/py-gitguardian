@@ -28,6 +28,7 @@ from .models_utils import (
     Base,
     BaseSchema,
     FromDictMixin,
+    FromDictWithBase,
     PaginationParameter,
     SearchParameter,
     ToDictMixin,
@@ -113,7 +114,7 @@ class DetailSchema(BaseSchema):
         return Detail(**data)
 
 
-class Detail(Base, FromDictMixin):
+class Detail(FromDictWithBase):
     """Detail is a response object mostly returned on error or when the
     api output is a simple string.
 
@@ -146,7 +147,7 @@ class MatchSchema(BaseSchema):
         return Match(**data)
 
 
-class Match(Base, FromDictMixin):
+class Match(FromDictWithBase):
     """
     Match describes an issue found by GitGuardian.
 
@@ -231,7 +232,7 @@ class PolicyBreakSchema(BaseSchema):
         return PolicyBreak(**data)
 
 
-class PolicyBreak(Base, FromDictMixin):
+class PolicyBreak(FromDictWithBase):
     """
     PolicyBreak describes a GitGuardian policy break found
     in a scan.
@@ -288,7 +289,7 @@ class ScanResultSchema(BaseSchema):
         return ScanResult(**data)
 
 
-class ScanResult(Base, FromDictMixin):
+class ScanResult(FromDictWithBase):
     """ScanResult is a response object returned on a Content Scan
 
     Attributes:
@@ -378,7 +379,7 @@ class MultiScanResultSchema(BaseSchema):
         return MultiScanResult(**data)
 
 
-class MultiScanResult(Base, FromDictMixin):
+class MultiScanResult(FromDictWithBase):
     """ScanResult is a response object returned on a Content Scan
 
     Attributes:
@@ -956,7 +957,7 @@ SourceCriticality = Literal["critical", "high", "medium", "low", "unknown"]
 
 
 @dataclass
-class Source(Base, FromDictMixin):
+class Source(FromDictWithBase):
     id: int
     url: str
     type: str
@@ -1110,7 +1111,7 @@ MembersParameters.SCHEMA = MembersParametersSchema()
 
 
 @dataclass
-class Member(Base, FromDictMixin):
+class Member(FromDictWithBase):
     """
     Member represents a user in a GitGuardian account.
     """
@@ -1168,7 +1169,7 @@ class UpdateMemberSchema(BaseSchema):
 
 
 @dataclass
-class UpdateMember(Base, FromDictMixin):
+class UpdateMember(FromDictWithBase):
     """
     UpdateMember represents the payload to update a member
     """
@@ -1182,7 +1183,7 @@ UpdateMember.SCHEMA = UpdateMemberSchema()
 
 
 @dataclass
-class UpdateMemberParameters(Base, FromDictMixin):
+class UpdateMemberParameters(FromDictWithBase):
     send_email: Optional[bool] = None
 
 
@@ -1194,7 +1195,7 @@ UpdateMemberParameters.SCHEMA = UpdateMemberParametersSchema()
 
 
 @dataclass
-class DeleteMemberParameters(Base, FromDictMixin):
+class DeleteMemberParameters(FromDictWithBase):
     id: int
     send_email: Optional[bool] = None
 
@@ -1219,7 +1220,7 @@ TeamsParameters.SCHEMA = TeamsParameterSchema()
 
 
 @dataclass
-class Team(Base, FromDictMixin):
+class Team(FromDictWithBase):
     id: int
     name: str
     is_global: bool
@@ -1235,7 +1236,7 @@ Team.SCHEMA = TeamsSchema()
 
 
 @dataclass
-class CreateTeam(Base, FromDictMixin):
+class CreateTeam(FromDictWithBase):
     name: str
     description: Optional[str] = ""
 
@@ -1250,7 +1251,7 @@ CreateTeam.SCHEMA = CreateTeamSchema()
 
 
 @dataclass
-class UpdateTeam(Base, FromDictMixin):
+class UpdateTeam(FromDictWithBase):
     id: int
     name: Optional[str]
     description: Optional[str] = None
@@ -1296,7 +1297,7 @@ TeamInvitationParameters.SCHEMA = TeamInvitationParameterSchema()
 
 
 @dataclass
-class TeamInvitation(Base, FromDictMixin):
+class TeamInvitation(FromDictWithBase):
     id: int
     invitation_id: int
     team_id: int
@@ -1326,7 +1327,7 @@ TeamInvitation.SCHEMA = TeamInvitationSchema()
 
 
 @dataclass
-class CreateTeamInvitation(Base, FromDictMixin):
+class CreateTeamInvitation(FromDictWithBase):
     invitation_id: int
     is_team_leader: bool
     incident_permission: IncidentPermission
@@ -1376,7 +1377,7 @@ TeamMemberParameters.SCHEMA = TeamMembershipParameterSchema()
 
 
 @dataclass
-class TeamMember(Base, FromDictMixin):
+class TeamMember(FromDictWithBase):
     id: int
     team_id: int
     member_id: int
@@ -1416,7 +1417,7 @@ CreateTeamMemberParameters.SCHEMA = CreateTeamMemberParameterSchema()
 
 
 @dataclass
-class CreateTeamMember(Base, FromDictMixin):
+class CreateTeamMember(FromDictWithBase):
     member_id: int
     is_team_leader: bool
     incident_permission: IncidentPermission
@@ -1456,7 +1457,7 @@ TeamSourceParameters.SCHEMA = TeamSourceParametersSchema()
 
 
 @dataclass
-class UpdateTeamSource(Base, FromDictMixin):
+class UpdateTeamSource(FromDictWithBase):
     team_id: int
     sources_to_add: List[int]
     sources_to_remove: List[int]
@@ -1490,7 +1491,7 @@ class InvitationParameters(
 
 
 @dataclass
-class Invitation(Base, FromDictMixin):
+class Invitation(FromDictWithBase):
     id: int
     email: str
     access_level: AccessLevel

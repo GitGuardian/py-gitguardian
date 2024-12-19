@@ -90,7 +90,11 @@ class SearchParameter(ToDictMixin):
     search: Optional[str] = None
 
 
-PaginatedData = TypeVar("PaginatedData", bound=FromDictMixin)
+class FromDictWithBase(FromDictMixin, Base):
+    pass
+
+
+PaginatedData = TypeVar("PaginatedData", bound=FromDictWithBase)
 
 
 @dataclass
@@ -107,6 +111,9 @@ class CursorPaginatedResponse(Generic[PaginatedData]):
         data = cast(
             List[PaginatedData], [data_type.from_dict(obj) for obj in response.json()]
         )
+        for element in data:
+            element.status_code = response.status_code
+
         paginated_response = cls(status_code=response.status_code, data=data)
 
         if previous_page := response.links.get("prev"):
