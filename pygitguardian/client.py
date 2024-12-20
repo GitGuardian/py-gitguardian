@@ -927,13 +927,13 @@ class GGClient:
 
     def list_members(
         self,
-        query_parameters: Optional[MembersParameters] = None,
+        parameters: Optional[MembersParameters] = None,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, CursorPaginatedResponse[Member]]:
 
         response = self.get(
             endpoint="members",
-            params=query_parameters.to_dict() if query_parameters else {},
+            params=parameters.to_dict() if parameters else {},
             extra_headers=extra_headers,
         )
 

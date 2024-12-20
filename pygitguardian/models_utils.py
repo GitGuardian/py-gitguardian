@@ -15,6 +15,7 @@ from typing import (
     cast,
 )
 
+import marshmallow_dataclass
 from marshmallow import EXCLUDE, Schema
 from typing_extensions import Self
 
@@ -85,9 +86,23 @@ class PaginationParameter(ToDictMixin):
     per_page: int = 20
 
 
+PaginationParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(PaginationParameter, base_schema=BaseSchema),
+)
+PaginationParameter.SCHEMA = PaginationParameterSchema()
+
+
 @dataclass
 class SearchParameter(ToDictMixin):
     search: Optional[str] = None
+
+
+SearchParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(SearchParameter, base_schema=BaseSchema),
+)
+SearchParameter.SCHEMA = SearchParameterSchema()
 
 
 class FromDictWithBase(FromDictMixin, Base):
