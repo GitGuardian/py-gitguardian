@@ -1,5 +1,15 @@
 # Changelog
 
+<a id='changelog-1.19.0'></a>
+
+## 1.19.0 — 2025-01-07
+
+### Added
+
+- Added support for members and teams endpoints.
+- Added support for invitations endpoints.
+- Added support for sources endpoints.
+
 <a id='changelog-1.18.0'></a>
 
 ## 1.18.0 — 2024-11-25
