@@ -19,6 +19,7 @@ ROOT_DIR = Path(__file__).parent.parent
 CHANGELOG_PATH = ROOT_DIR / "CHANGELOG.md"
 INIT_PATH = ROOT_DIR / "pygitguardian" / "__init__.py"
 CASSETTES_DIR = ROOT_DIR / "tests" / "cassettes"
+SETUP_WORKSPACE_SCRIPT = ROOT_DIR / "scripts" / "setup_test_workspace.py"
 
 # The branch this script must be run from, except in dev mode.
 RELEASE_BRANCH = "master"
@@ -97,6 +98,16 @@ def main(dev_mode: bool) -> int:
     return 0
 
 
+def setup_test_workspace():
+    log_progress("Setting up workspace")
+    try:
+        check_run(
+            ["pdm", "run", SETUP_WORKSPACE_SCRIPT], cwd=ROOT_DIR, stderr=subprocess.PIPE
+        )
+    except subprocess.CalledProcessError as exc:
+        fail(f"There was an error setting up the test workspace :\n{exc.stderr}")
+
+
 @main.command()
 def run_tests() -> None:
     """Run all tests.
@@ -109,6 +120,8 @@ def run_tests() -> None:
     log_progress("Removing cassettes")
     shutil.rmtree(CASSETTES_DIR)
     CASSETTES_DIR.mkdir()
+
+    setup_test_workspace()
 
     log_progress("Running tests")
     check_run(["pytest", "tests"], cwd=ROOT_DIR)
