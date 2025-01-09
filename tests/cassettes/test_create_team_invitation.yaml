@@ -9,57 +9,64 @@ interactions:
         Connection:
           - keep-alive
         User-Agent:
-          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+          - pygitguardian/1.19.0 (Darwin;py3.11.8)
       method: GET
       uri: https://api.gitguardian.com/v1/teams?cursor=&per_page=20&is_global=False
     response:
       body:
         string:
-          '[{"id":19,"is_global":false,"name":"This is a test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/19"},{"id":20,"is_global":false,"name":"Team
-          test","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/20"},{"id":21,"is_global":false,"name":"PyGitGuardian
-          team","description":"","gitguardian_url":"http://localhost:3000/workspace/6/settings/user/teams/21"}]'
+          '[{"id":799237,"is_global":false,"name":"PyGitGuardian Team 1","description":"","gitguardian_url":"https://dashboard.gitguardian.com/workspace/628984/settings/user/teams/799237"},{"id":799238,"is_global":false,"name":"PyGitGuardian
+          team","description":"","gitguardian_url":"https://dashboard.gitguardian.com/workspace/628984/settings/user/teams/799238"}]'
       headers:
-        Access-Control-Expose-Headers:
+        access-control-expose-headers:
           - X-App-Version
-        Allow:
+        allow:
           - GET, POST, HEAD, OPTIONS
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '438'
-        Content-Type:
+        content-length:
+          - '353'
+        content-type:
           - application/json
-        Cross-Origin-Opener-Policy:
+        cross-origin-opener-policy:
           - same-origin
-        Date:
-          - Thu, 12 Dec 2024 16:59:32 GMT
-        Link:
+        date:
+          - Thu, 09 Jan 2025 12:32:16 GMT
+        link:
           - ''
-        Referrer-Policy:
-          - same-origin
-        Server:
-          - nginx/1.24.0
-        Vary:
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        server:
+          - istio-envoy
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
           - Cookie
-        X-App-Version:
-          - dev
-        X-Content-Type-Options:
+        x-app-version:
+          - v2.133.1
+        x-content-type-options:
           - nosniff
-        X-Frame-Options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '30'
+        x-frame-options:
           - DENY
-        X-Per-Page:
+          - SAMEORIGIN
+        x-per-page:
           - '20'
-        X-Request-ID:
-          - c2b0a05b57e590cfaf8f9fe2221eda91
-        X-SCA-Engine-Version:
-          - 2.2.0
-        X-Secrets-Engine-Version:
-          - 2.127.0
+        x-sca-engine-version:
+          - 2.3.0
+        x-sca-last-vuln-fetch:
+          - '2025-01-09T11:07:18.494922+00:00'
+        x-secrets-engine-version:
+          - 2.129.1
+        x-xss-protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
   - request:
-      body: null
+      body:
+        '{"email": "pygitguardian+create_team_invitation@example.com", "access_level":
+        "member"}'
       headers:
         Accept:
           - '*/*'
@@ -67,55 +74,62 @@ interactions:
           - gzip, deflate
         Connection:
           - keep-alive
+        Content-Length:
+          - '87'
+        Content-Type:
+          - application/json
         User-Agent:
-          - pygitguardian/1.18.0 (Darwin;py3.11.8)
-      method: GET
+          - pygitguardian/1.19.0 (Darwin;py3.11.8)
+      method: POST
       uri: https://api.gitguardian.com/v1/invitations
     response:
       body:
-        string: '[{"id":13,"date":"2024-12-12T16:53:59.247129Z","email":"pygitguardian@example.com","role":"member","access_level":"member"},{"id":14,"date":"2024-12-12T16:54:44.192249Z","email":"example@test.com","role":"member","access_level":"member"}]'
+        string: '{"id":25184,"date":"2025-01-09T12:32:17.009583Z","email":"pygitguardian+create_team_invitation@example.com","role":"member","access_level":"member"}'
       headers:
-        Access-Control-Expose-Headers:
+        access-control-expose-headers:
           - X-App-Version
-        Allow:
+        allow:
           - GET, POST, HEAD, OPTIONS
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '238'
-        Content-Type:
+        content-length:
+          - '148'
+        content-type:
           - application/json
-        Cross-Origin-Opener-Policy:
+        cross-origin-opener-policy:
           - same-origin
-        Date:
-          - Thu, 12 Dec 2024 16:59:32 GMT
-        Link:
-          - ''
-        Referrer-Policy:
-          - same-origin
-        Server:
-          - nginx/1.24.0
-        Vary:
+        date:
+          - Thu, 09 Jan 2025 12:32:17 GMT
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        server:
+          - istio-envoy
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
           - Cookie
-        X-App-Version:
-          - dev
-        X-Content-Type-Options:
+        x-app-version:
+          - v2.133.1
+        x-content-type-options:
           - nosniff
-        X-Frame-Options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '63'
+        x-frame-options:
           - DENY
-        X-Per-Page:
-          - '20'
-        X-Request-ID:
-          - df09bccf6aea67a2215c5dd905f6033e
-        X-SCA-Engine-Version:
-          - 2.2.0
-        X-Secrets-Engine-Version:
-          - 2.127.0
+          - SAMEORIGIN
+        x-sca-engine-version:
+          - 2.3.0
+        x-sca-last-vuln-fetch:
+          - '2025-01-09T11:07:18.494922+00:00'
+        x-secrets-engine-version:
+          - 2.129.1
+        x-xss-protection:
+          - 1; mode=block
       status:
-        code: 200
-        message: OK
+        code: 201
+        message: Created
   - request:
-      body: '{"invitation_id": 13, "is_team_leader": true, "incident_permission": "can_view"}'
+      body: '{"invitation_id": 25184, "is_team_leader": true, "incident_permission":
+        "can_view"}'
       headers:
         Accept:
           - '*/*'
@@ -124,49 +138,55 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '80'
+          - '83'
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.18.0 (Darwin;py3.11.8)
+          - pygitguardian/1.19.0 (Darwin;py3.11.8)
       method: POST
-      uri: https://api.gitguardian.com/v1/teams/19/team_invitations
+      uri: https://api.gitguardian.com/v1/teams/799237/team_invitations
     response:
       body:
-        string: '{"id":7,"team_id":19,"invitation_id":13,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"can_view"}'
+        string: '{"id":52456,"team_id":799237,"invitation_id":25184,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"can_view"}'
       headers:
-        Access-Control-Expose-Headers:
+        access-control-expose-headers:
           - X-App-Version
-        Allow:
+        allow:
           - GET, POST, HEAD, OPTIONS
-        Connection:
-          - keep-alive
-        Content-Length:
-          - '126'
-        Content-Type:
+        content-length:
+          - '137'
+        content-type:
           - application/json
-        Cross-Origin-Opener-Policy:
+        cross-origin-opener-policy:
           - same-origin
-        Date:
-          - Thu, 12 Dec 2024 16:59:32 GMT
-        Referrer-Policy:
-          - same-origin
-        Server:
-          - nginx/1.24.0
-        Vary:
+        date:
+          - Thu, 09 Jan 2025 12:32:17 GMT
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        server:
+          - istio-envoy
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
           - Cookie
-        X-App-Version:
-          - dev
-        X-Content-Type-Options:
+        x-app-version:
+          - v2.133.1
+        x-content-type-options:
           - nosniff
-        X-Frame-Options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '45'
+        x-frame-options:
           - DENY
-        X-Request-ID:
-          - 9ce9f089220243eca87b41bc81b72b73
-        X-SCA-Engine-Version:
-          - 2.2.0
-        X-Secrets-Engine-Version:
-          - 2.127.0
+          - SAMEORIGIN
+        x-sca-engine-version:
+          - 2.3.0
+        x-sca-last-vuln-fetch:
+          - '2025-01-09T11:07:18.494922+00:00'
+        x-secrets-engine-version:
+          - 2.129.1
+        x-xss-protection:
+          - 1; mode=block
       status:
         code: 201
         message: Created

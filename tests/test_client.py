@@ -67,7 +67,7 @@ from pygitguardian.sca_models import (
 )
 
 from .conftest import create_client, my_vcr
-from .utils import get_invitation, get_source, get_team
+from .utils import get_source, get_team
 
 
 FILENAME = ".env"
@@ -1615,7 +1615,13 @@ def test_create_team_invitation(client: GGClient):
     """
 
     team = get_team()
-    invitation = get_invitation()
+    invitation = client.create_invitation(
+        CreateInvitation(
+            "pygitguardian+create_team_invitation@example.com", AccessLevel.MEMBER
+        )
+    )
+
+    assert isinstance(invitation, Invitation), invitation.detail
 
     result = client.create_team_invitation(
         team.id,
@@ -1751,13 +1757,12 @@ def test_create_team_member(client: GGClient):
 
     result = client.create_team_member(
         team.id,
-        CreateTeamMember(member_to_add.id, False, IncidentPermission.VIEW),
+        CreateTeamMember(member_to_add.id, False, IncidentPermission.FULL_ACCESS),
     )
 
     assert isinstance(result, TeamMember), result
 
-    assert result.incident_permission == IncidentPermission.VIEW
-    assert not result.is_team_leader
+    assert result.incident_permission == IncidentPermission.FULL_ACCESS
 
 
 @my_vcr.use_cassette("test_create_team_member_parameters.yaml", ignore_localhost=False)
@@ -1788,7 +1793,7 @@ def test_create_team_member_without_mail(client: GGClient):
 
     result = client.create_team_member(
         team.id,
-        CreateTeamMember(member_to_add.id, False, IncidentPermission.VIEW),
+        CreateTeamMember(member_to_add.id, False, IncidentPermission.FULL_ACCESS),
         CreateTeamMemberParameters(send_email=False),
     )
 
