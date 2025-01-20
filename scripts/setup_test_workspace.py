@@ -4,9 +4,10 @@ This will allow the user to run tests without relying on cassettes, note that
 there are a few limitations due to actions that cannot be performed through
 the API, notably :
 - Create the workspace
-- Create members
-- Add deleted members back to the workspace
-- Integrate a source
+- We cannot create members, so there must exist a minimum amount of members in the workspace
+    - This also means deleted members cannot be brought back from the script
+- We cannot integrate a source entirely from the public API
+    - There must exist a source in the workspace
 """
 
 import os
@@ -50,7 +51,7 @@ MIN_NB_TEAM_MEMBER = 2
 PYGITGUARDIAN_TEST_TEAM = "PyGitGuardian team"
 
 
-def ensure_not_detail(var: T | Detail) -> T:
+def ensure_success(var: T | Detail) -> T:
     if not isinstance(var, Detail):
         return var
     else:
@@ -60,12 +61,21 @@ def ensure_not_detail(var: T | Detail) -> T:
 def unwrap_paginated_response(
     var: CursorPaginatedResponse[PaginatedDataType] | Detail,
 ) -> List[PaginatedDataType]:
-    data = ensure_not_detail(var)
+    data = ensure_success(var)
 
     return data.data
 
 
 def ensure_member_coherence():
+    """
+    This function ensures that the workspace :
+    - Has no deactivated members
+        - If there are, they will be activated
+    - Has at most 1 admin / manager (excluding owner)
+        - It may demote some manager to member
+    - There is at least `MIN_NB_MEMBER`
+    """
+
     deactivated_members = unwrap_paginated_response(
         client.list_members(MembersParameters(active=False))
     )
@@ -78,7 +88,7 @@ def ensure_member_coherence():
 
     if len(admin_members) > 1:
         for member in admin_members[1:]:
-            ensure_not_detail(
+            ensure_success(
                 client.update_member(UpdateMember(member.id, AccessLevel.MEMBER))
             )
     else:
@@ -89,20 +99,22 @@ def ensure_member_coherence():
             len(members) > 0
         ), "There must be at least one member with access level member in the workspace"
 
-        ensure_not_detail(
+        ensure_success(
             client.update_member(UpdateMember(members[0].id, AccessLevel.MANAGER))
         )
 
-    members = ensure_not_detail(client.list_members(MembersParameters(per_page=5)))
+    members = ensure_success(client.list_members(MembersParameters(per_page=5)))
 
-    assert len(members.data) > 3, "There must be at least 3 members in the workspace"
+    assert (
+        len(members.data) > MIN_NB_MEMBER
+    ), "There must be at least 3 members in the workspace"
 
 
 def add_source_to_team(team: Team, available_sources: Iterable[Source] | None = None):
     if available_sources is None:
-        available_sources = ensure_not_detail(client.list_sources()).data
+        available_sources = ensure_success(client.list_sources()).data
 
-    ensure_not_detail(
+    ensure_success(
         client.update_team_source(
             UpdateTeamSource(team.id, [source.id for source in available_sources], [])
         )
@@ -133,7 +145,7 @@ def add_team_members(
         )
         assert admin_member is not None, "There should be at least one admin member"
 
-        ensure_not_detail(
+        ensure_success(
             client.create_team_member(
                 team.id,
                 CreateTeamMember(
@@ -163,7 +175,7 @@ def add_team_members(
         if to_add_member.access_level == AccessLevel.MANAGER:
             is_team_leader = True
 
-        ensure_not_detail(
+        ensure_success(
             client.create_team_member(
                 team.id,
                 CreateTeamMember(
@@ -176,6 +188,17 @@ def add_team_members(
 
 
 def ensure_team_coherence():
+    """
+    This function ensures that the workspace :
+    - Has no team with name prefixed by `PYGITGUARDIAN_TEST_TEAM`
+    - At least `MIN_NB_TEAM` exist
+        - If not they will be created
+    - Every team has at least one source
+        - If possible, it will try to add at least one source
+    - Every team has at least 2 members, an admin and a member
+        - If possible, it will try to add those members
+    """
+
     pygitguardian_teams = []
     try:
         pygitguardian_teams = unwrap_paginated_response(
@@ -186,7 +209,7 @@ def ensure_team_coherence():
             raise
     finally:
         for team in pygitguardian_teams:
-            ensure_not_detail(client.delete_team(team.id))
+            ensure_success(client.delete_team(team.id))
 
     teams = unwrap_paginated_response(
         # exclude global team since we can't add sources / members to it
@@ -196,7 +219,7 @@ def ensure_team_coherence():
     nb_teams = len(teams)
     if nb_teams < MIN_NB_TEAM:
         for i in range(MIN_NB_TEAM - nb_teams):
-            new_team = ensure_not_detail(
+            new_team = ensure_success(
                 client.create_team(CreateTeam(name=f"PyGitGuardian Team {i}"))
             )
             teams.append(new_team)
@@ -217,16 +240,25 @@ def ensure_team_coherence():
 
 
 def ensure_invitation_coherence():
+    """
+    This function ensures that the workspace :
+    - Has no invitation for emails starting with `pygitguardian`
+    - There is at least one pending invitation
+        - If not, an invitation will be sent to `pygitguardian@example.com`
+    - All team have attached team invitations
+        - If not, they will be created
+    """
+
     test_invitation = unwrap_paginated_response(
         client.list_invitations(InvitationParameters(search="pygitguardian"))
     )
 
     for invitation in test_invitation:
-        ensure_not_detail(client.delete_invitation(invitation.id))
+        ensure_success(client.delete_invitation(invitation.id))
     invitations = unwrap_paginated_response(client.list_invitations())
 
     if len(invitations) < 1:
-        invitation = ensure_not_detail(
+        invitation = ensure_success(
             client.create_invitation(
                 CreateInvitation(
                     email="pygitguardian@invitation.com",
@@ -243,7 +275,7 @@ def ensure_invitation_coherence():
             client.list_team_invitations(team.id)
         )
         if not team_invitations:
-            ensure_not_detail(
+            ensure_success(
                 client.create_team_invitation(
                     team.id,
                     CreateTeamInvitation(
