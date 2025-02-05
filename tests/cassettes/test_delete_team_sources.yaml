@@ -51,8 +51,6 @@ interactions:
           - '20'
         X-Request-ID:
           - ea889edda539c08bb70d35eb8a240e7b
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
@@ -113,8 +111,6 @@ interactions:
           - '20'
         X-Request-ID:
           - cb0318be8ec3c9abb3c2decd4a2fe968
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
@@ -167,8 +163,6 @@ interactions:
           - DENY
         X-Request-ID:
           - 33fae4e257cf966d4a84e57269819a3e
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
@@ -228,8 +222,6 @@ interactions:
           - '20'
         X-Request-ID:
           - baa5cf1b0ac0cfac6d146990dbd457a3
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:

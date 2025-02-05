@@ -48,8 +48,6 @@ interactions:
           - DENY
         X-Request-ID:
           - ef94d7e9f303dfcd2caf016acde5004b
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:

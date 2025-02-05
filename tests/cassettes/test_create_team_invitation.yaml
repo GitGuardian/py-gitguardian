@@ -52,10 +52,6 @@ interactions:
           - SAMEORIGIN
         x-per-page:
           - '20'
-        x-sca-engine-version:
-          - 2.3.0
-        x-sca-last-vuln-fetch:
-          - '2025-01-09T11:07:18.494922+00:00'
         x-secrets-engine-version:
           - 2.129.1
         x-xss-protection:
@@ -116,10 +112,6 @@ interactions:
         x-frame-options:
           - DENY
           - SAMEORIGIN
-        x-sca-engine-version:
-          - 2.3.0
-        x-sca-last-vuln-fetch:
-          - '2025-01-09T11:07:18.494922+00:00'
         x-secrets-engine-version:
           - 2.129.1
         x-xss-protection:
@@ -179,10 +171,6 @@ interactions:
         x-frame-options:
           - DENY
           - SAMEORIGIN
-        x-sca-engine-version:
-          - 2.3.0
-        x-sca-last-vuln-fetch:
-          - '2025-01-09T11:07:18.494922+00:00'
         x-secrets-engine-version:
           - 2.129.1
         x-xss-protection:

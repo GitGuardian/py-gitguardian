@@ -68,8 +68,6 @@ interactions:
           - '20'
         X-Request-ID:
           - bad417e5cb8390018bf5c37c5d5c317f
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
