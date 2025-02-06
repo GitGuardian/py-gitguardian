@@ -51,8 +51,6 @@ interactions:
           - '20'
         X-Request-ID:
           - 69f3e07f70508d42fcda772509e25c8d
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
@@ -107,8 +105,6 @@ interactions:
           - '20'
         X-Request-ID:
           - ab97c68068c701932313f58691187827
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
@@ -159,8 +155,6 @@ interactions:
           - DENY
         X-Request-ID:
           - 6328f39a8af957cbdfe428bf3becc33c
-        X-SCA-Engine-Version:
-          - 2.2.0
         X-Secrets-Engine-Version:
           - 2.127.0
       status:
