@@ -72,56 +72,6 @@ DOCUMENT = """
 """
 EXAMPLE_RESPONSE = """
 [{
-  "policy_break_count": 2,
-  "policies": [
-    "Filenames",
-    "File extensions",
-    "Secrets detection"
-  ],
-  "policy_breaks": [
-    {
-      "type": ".env",
-      "policy": "Filenames",
-      "matches": [
-        {
-          "type": "filename",
-          "match": ".env"
-        }
-      ]
-    },
-    {
-      "type": "Basic Auth String",
-      "policy": "Secrets detection",
-      "matches": [
-        {
-          "type": "username",
-          "match": "jen_barber",
-          "index_start": 36,
-          "index_end": 45,
-          "line_start": 2,
-          "line_end": 2
-        },
-        {
-          "type": "password",
-          "match": "correcthorsebatterystaple",
-          "index_start": 47,
-          "index_end": 71,
-          "line_start": 2,
-          "line_end": 2
-        },
-        {
-          "type": "host",
-          "match": "cake.gitguardian.com",
-          "index_start": 73,
-          "index_end": 92,
-          "line_start": 2,
-          "line_end": 2
-        }
-      ]
-    }
-  ]
-},
-{
   "policy_break_count": 1,
   "policies": [
     "Filenames",
@@ -322,7 +272,6 @@ def test_health_check(client: GGClient):
         pytest.param(
             "with_breaks",
             [
-                {"filename": FILENAME, "document": DOCUMENT},
                 {"document": DOCUMENT},
                 {"filename": "normal", "document": "normal"},
             ],
@@ -432,15 +381,12 @@ def test_content_not_ok():
     "name, to_scan, policy_break_count, has_secrets, has_policy_breaks",
     [
         pytest.param(
-            "filename_secret",
-            {"filename": FILENAME, "document": DOCUMENT},
-            2,
+            "secret",
+            {"document": DOCUMENT},
+            1,
             True,
             True,
-            id="filename_secret",
-        ),
-        pytest.param(
-            "secret", {"document": DOCUMENT}, 1, True, True, id="secret (deprecated)"
+            id="secret (deprecated)",
         ),
         pytest.param(
             "secret_validity",
@@ -457,14 +403,6 @@ def test_content_not_ok():
             False,
             False,
             id="Document containing a 0 byte",
-        ),
-        pytest.param(
-            "filename",
-            {"filename": FILENAME, "document": "normal"},
-            1,
-            False,
-            True,
-            id="filename",
         ),
         pytest.param(
             "no_breaks",
