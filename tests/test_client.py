@@ -341,7 +341,6 @@ def test_health_check(client: GGClient):
         ),
     ],
 )
-@my_vcr.use_cassette
 def test_multi_content_scan(
     client: GGClient,
     name: str,
@@ -353,28 +352,23 @@ def test_multi_content_scan(
     with my_vcr.use_cassette(name + ".yaml"):
         multiscan = client.multi_content_scan(to_scan)
 
-        assert multiscan.status_code == 200
-        if not isinstance(multiscan, MultiScanResult):
-            pytest.fail("multiscan is not a MultiScanResult")
-            return
+    assert multiscan.status_code == 200
+    assert isinstance(multiscan, MultiScanResult)
 
-        assert type(multiscan.to_dict()) == OrderedDict
-        assert type(multiscan.to_json()) == str
-        assert type(repr(multiscan)) == str
-        assert type(str(multiscan)) == str
-        assert multiscan.has_secrets == has_secrets
-        assert multiscan.has_policy_breaks == has_policy_breaks
+    assert type(multiscan.to_dict()) == OrderedDict
+    assert type(multiscan.to_json()) == str
+    assert type(repr(multiscan)) == str
+    assert type(str(multiscan)) == str
+    assert multiscan.has_secrets == has_secrets
+    assert multiscan.has_policy_breaks == has_policy_breaks
 
-        for i, scan_result in enumerate(multiscan.scan_results):
-            if expected:
-                example_dict = json.loads(expected)
-                assert all(
-                    elem in example_dict[i]["policies"] for elem in scan_result.policies
-                )
-                assert (
-                    scan_result.policy_break_count
-                    == example_dict[i]["policy_break_count"]
-                )
+    if not expected:
+        return
+
+    example_dict = json.loads(expected)
+    for i, scan_result in enumerate(multiscan.scan_results):
+        assert all(elem in example_dict[i]["policies"] for elem in scan_result.policies)
+        assert scan_result.policy_break_count == example_dict[i]["policy_break_count"]
 
 
 @patch("pygitguardian.config.DOCUMENT_SIZE_THRESHOLD_BYTES", 20)
