@@ -1,9 +1,7 @@
 interactions:
   - request:
-      body: '[{"filename": ".env", "document": "\n    import urllib.request\n    url
-        = ''http://jen_barber:correcthorsebatterystaple@cake.gitguardian.com/isreal.json''\n    response
-        = urllib.request.urlopen(url)\n    consume(response.read())\"\n"}, {"document":
-        "\n    import urllib.request\n    url = ''http://jen_barber:correcthorsebatterystaple@cake.gitguardian.com/isreal.json''\n    response
+      body:
+        '[{"document": "\n    import urllib.request\n    url = ''http://jen_barber:correcthorsebatterystaple@cake.gitguardian.com/isreal.json''\n    response
         = urllib.request.urlopen(url)\n    consume(response.read())\"\n"}, {"filename":
         "normal", "document": "normal"}]'
       headers:
@@ -14,63 +12,54 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '492'
+          - '259'
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.3.4 (Linux;py3.8.10)
+          - pygitguardian/1.19.0 (Linux;py3.10.12)
       method: POST
       uri: https://api.gitguardian.com/v1/multiscan
     response:
       body:
         string:
-          '[{"policy_break_count":2,"policies":["File extensions","Filenames","Secrets
-          detection"],"policy_breaks":[{"type":".env","policy":"Filenames","matches":[{"type":"filename","match":".env"}]},{"type":"Basic
-          Auth String","policy":"Secrets detection","matches":[{"type":"username","match":"jen_barber","index_start":40,"index_end":49,"line_start":2,"line_end":2},{"type":"password","match":"correcthorsebatterystaple","index_start":51,"index_end":75,"line_start":2,"line_end":2},{"type":"host","match":"cake.gitguardian.com","index_start":77,"index_end":96,"line_start":2,"line_end":2}],"validity":"no_checker"}]},{"policy_break_count":1,"policies":["File
-          extensions","Filenames","Secrets detection"],"policy_breaks":[{"type":"Basic
-          Auth String","policy":"Secrets detection","matches":[{"type":"username","match":"jen_barber","index_start":40,"index_end":49,"line_start":2,"line_end":2},{"type":"password","match":"correcthorsebatterystaple","index_start":51,"index_end":75,"line_start":2,"line_end":2},{"type":"host","match":"cake.gitguardian.com","index_start":77,"index_end":96,"line_start":2,"line_end":2}],"validity":"no_checker"}]},{"policy_break_count":0,"policies":["File
-          extensions","Filenames","Secrets detection"],"policy_breaks":[]}]'
+          '[{"policy_break_count":1,"policies":["Secrets detection"],"policy_breaks":[{"type":"Basic
+          Auth String","policy":"Secrets detection","matches":[{"type":"username","match":"jen_barber","index_start":45,"index_end":54,"line_start":3,"line_end":3},{"type":"password","match":"correcthorsebatterystaple","index_start":56,"index_end":80,"line_start":3,"line_end":3},{"type":"host","match":"cake.gitguardian.com","index_start":82,"index_end":101,"line_start":3,"line_end":3}],"is_excluded":false,"exclude_reason":null,"incident_url":"https://dashboard.gitguardian.com/workspace/8/incidents/10114685","known_secret":true,"validity":"no_checker","diff_kind":null}],"is_diff":false},{"policy_break_count":0,"policies":["Secrets
+          detection"],"policy_breaks":[],"is_diff":false}]'
       headers:
-        Access-Control-Expose-Headers:
+        access-control-expose-headers:
           - X-App-Version
-        Allow:
+        allow:
           - POST, OPTIONS
-        Connection:
-          - keep-alive
-        Content-Type:
+        content-length:
+          - '766'
+        content-type:
           - application/json
-        Date:
-          - Thu, 30 Jun 2022 10:29:32 GMT
-        Referrer-Policy:
+        cross-origin-opener-policy:
+          - same-origin
+        date:
+          - Mon, 24 Feb 2025 12:49:30 GMT
+        referrer-policy:
           - strict-origin-when-cross-origin
-        Server:
-          - nginx
-        Set-Cookie:
-          - AWSALB=0NfNYw3UeyBFpnge2V9Eg/1mGjFw092I9Sz6A9XTSEcEwwY9QOaglYydWG0j9lP08vyA+Lbr2GKW5wEsC4ps3gWBR4xR/t2cWAZs9ce2iFiqaodevlC5KyXGb6kC;
-            Expires=Thu, 07 Jul 2022 10:29:32 GMT; Path=/
-          - AWSALBCORS=0NfNYw3UeyBFpnge2V9Eg/1mGjFw092I9Sz6A9XTSEcEwwY9QOaglYydWG0j9lP08vyA+Lbr2GKW5wEsC4ps3gWBR4xR/t2cWAZs9ce2iFiqaodevlC5KyXGb6kC;
-            Expires=Thu, 07 Jul 2022 10:29:32 GMT; Path=/; SameSite=None; Secure
-        Strict-Transport-Security:
+        server:
+          - istio-envoy
+        strict-transport-security:
           - max-age=31536000; includeSubDomains
-        Transfer-Encoding:
-          - chunked
-        Vary:
-          - Accept-Encoding
+        vary:
           - Cookie
-        X-App-Version:
-          - v2.8.1
-        X-Content-Type-Options:
+        x-app-version:
+          - v2.155.0
+        x-content-type-options:
           - nosniff
           - nosniff
-        X-Frame-Options:
+        x-envoy-upstream-service-time:
+          - '490'
+        x-frame-options:
           - DENY
           - SAMEORIGIN
-        X-Secrets-Engine-Version:
-          - 2.70.0
-        X-XSS-Protection:
+        x-secrets-engine-version:
+          - 2.132.2
+        x-xss-protection:
           - 1; mode=block
-        content-length:
-          - '1240'
       status:
         code: 200
         message: OK
