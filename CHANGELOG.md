@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.20.0'></a>
+
+## 1.20.0 — 2025-02-25
+
+### Removed
+
+- Removed support for the deprecated SCA and IaC endpoints.
+
 <a id='changelog-1.19.0'></a>
 
 ## 1.19.0 — 2025-01-07
