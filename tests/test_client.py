@@ -33,6 +33,7 @@ from pygitguardian.models import (
     CreateTeamMemberParameters,
     DeleteMemberParameters,
     Detail,
+    DetectorDetails,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
     IncidentPermission,
@@ -752,6 +753,22 @@ def test_bogus_rate_limit():
     assert rate_limit_response.call_count == 1
     assert isinstance(result, Detail)
     callbacks.on_rate_limited.assert_not_called()
+
+
+def test_detector_overview(client: GGClient):
+    with my_vcr.use_cassette("detector_details.yaml"):
+        detector_response = client.detector_details("1password_service_account_token")
+        assert detector_response.status_code == 200
+        if isinstance(detector_response, DetectorDetails):
+            assert detector_response.name == "1password_service_account_token"
+            assert detector_response.display_name == "1Password Service Account Token"
+            assert detector_response.type == "specific"
+            assert detector_response.category == "other"
+            assert detector_response.is_active
+        else:
+            pytest.fail("returned should be a DetectorDetails")
+
+        assert type(detector_response.to_dict()) == OrderedDict
 
 
 def test_quota_overview(client: GGClient):

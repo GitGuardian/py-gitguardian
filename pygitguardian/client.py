@@ -28,6 +28,7 @@ from .models import (
     CreateTeamMemberParameters,
     DeleteMemberParameters,
     Detail,
+    DetectorDetailsResponse,
     Document,
     DocumentSchema,
     HealthCheckResponse,
@@ -568,6 +569,35 @@ class GGClient:
             obj = load_detail(resp)
 
         obj.status_code = resp.status_code
+        return obj
+
+    def detector_details(
+        self,
+        detector_name: str,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, DetectorDetailsResponse]:
+        """
+        detector_details handles the /detectors/{detector_name} endpoint of the API
+
+        :param detector_name: detector name
+        :param extra_headers: additional headers to add to the request
+        :return: Detail or Detector response and status code
+        """
+
+        resp = self.get(
+            endpoint=f"secret_detectors/{detector_name}",
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, DetectorDetailsResponse]
+        if is_ok(resp):
+            print(resp.json())
+            obj = DetectorDetailsResponse.from_dict(resp.json())
+        else:
+            obj = load_detail(resp)
+
+        obj.status_code = resp.status_code
+
         return obj
 
     def quota_overview(
