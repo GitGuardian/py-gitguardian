@@ -709,6 +709,147 @@ class HealthCheckResponse(Base):
         )
 
 
+class DetectorType(str, Enum):
+    SPECIFIC = "specific"
+    GENERIC = "generic"
+    CUSTOM = "custom"
+
+
+class DetectorDetailsSchema(BaseSchema):
+    name = fields.String(required=True)
+    display_name = fields.String(required=True)
+    type = fields.Enum(DetectorType, by_value=True, required=True)
+    category = fields.String(required=True)
+    is_active = fields.Boolean(required=True)
+    scans_code_only = fields.Boolean(required=True)
+    checkable = fields.Boolean(required=True)
+    use_with_validity_check_disabled = fields.Boolean(required=True)
+    frequency = fields.Float(required=True)
+    removed_at = fields.String(required=False, load_default=None, dump_default=None)
+    open_incidents_count = fields.Int(required=True)
+    ignored_incidents_count = fields.Int(required=True)
+    resolved_incidents_count = fields.Int(required=True)
+
+    @post_load
+    def make_detector(self, data: Dict[str, Any], **kwargs: Any) -> "DetectorDetails":
+        return DetectorDetails(**data)
+
+
+class DetectorDetails(Base, FromDictMixin):
+    """ "
+    Response from /v1/detectors, to retrieve a detetor details
+    from the API
+    {
+        "name": "aws_iam",
+        "display_name": "AWS Keys",
+        "type": "specific",
+        "category": "Cloud Provider",
+        "is_active": true,
+        "scans_code_only": false,
+        "checkable": true,
+        "use_with_validity_check_disabled": true,
+        "frequency": "1O3.74",
+        "removed_at": null,
+        "open_incidents_count": 17,
+        "ignored_incidents_count": 9,
+        "resolved_incidents_count": 42
+    }
+    """
+
+    SCHEMA = DetectorDetailsSchema()
+
+    def __init__(
+        self,
+        name: str,
+        display_name: str,
+        type: DetectorType,
+        category: str,
+        is_active: bool,
+        scans_code_only: bool,
+        checkable: bool,
+        use_with_validity_check_disabled: bool,
+        frequency: float,
+        removed_at: str | None,
+        open_incidents_count: int,
+        ignored_incidents_count: int,
+        resolved_incidents_count: int,
+        **kwargs: Any,
+    ):
+        super().__init__()
+        self.name = name
+        self.display_name = display_name
+        self.type = type
+        self.category = category
+        self.is_active = is_active
+        self.scans_code_only = scans_code_only
+        self.checkable = checkable
+        self.use_with_validity_check_disabled = use_with_validity_check_disabled
+        self.frequency = frequency
+        self.removed_at = removed_at
+        self.open_incidents_count = open_incidents_count
+        self.ignored_incidents_count = ignored_incidents_count
+        self.resolved_incidents_count = resolved_incidents_count
+
+
+class DetectorDetailsResponseSchema(BaseSchema):
+    name = fields.String(required=True)
+    display_name = fields.String(required=True)
+    type = fields.Enum(DetectorType, by_value=True, required=True)
+    category = fields.String(required=True)
+    is_active = fields.Boolean(required=True)
+    scans_code_only = fields.Boolean(required=True)
+    checkable = fields.Boolean(required=True)
+    use_with_validity_check_disabled = fields.Boolean(required=True)
+    frequency = fields.Float(required=True)
+    removed_at = fields.String(required=False, load_default=None, dump_default=None)
+    open_incidents_count = fields.Int(required=True)
+    ignored_incidents_count = fields.Int(required=True)
+    resolved_incidents_count = fields.Int(required=True)
+
+    @post_load
+    def make_detector(self, data: Dict[str, Any], **kwargs: Any) -> "DetectorDetails":
+        return DetectorDetails(**data)
+
+
+class DetectorDetailsResponse(Base, FromDictMixin):
+    SCHEMA = DetectorDetailsResponseSchema()
+
+    def __init__(self, detector: DetectorDetails, **kwargs: Any):
+        super().__init__()
+        self.name = detector.name
+        self.display_name = detector.display_name
+        self.type = detector.type
+        self.category = detector.category
+        self.is_active = detector.is_active
+        self.scans_code_only = detector.scans_code_only
+        self.checkable = detector.checkable
+        self.use_with_validity_check_disabled = (
+            detector.use_with_validity_check_disabled
+        )
+        self.frequency = detector.frequency
+        self.removed_at = detector.removed_at
+        self.open_incidents_count = detector.open_incidents_count
+        self.ignored_incidents_count = detector.ignored_incidents_count
+        self.resolved_incidents_count = detector.resolved_incidents_count
+
+    def __repr__(self) -> str:
+        return (
+            f"name:{self.name}, "
+            f"display_name:{self.display_name}, "
+            f"type:{self.type}, "
+            f"category:{self.category}, "
+            f"is_active:{self.is_active}, "
+            f"scans_code_only:{self.scans_code_only}, "
+            f"checkable:{self.checkable}, "
+            f"use_with_validity_check_disabled:{self.use_with_validity_check_disabled}, "
+            f"frequency:{self.frequency}, "
+            f"removed_at:{self.removed_at}, "
+            f"open_incidents_count:{self.open_incidents_count}, "
+            f"ignored_incidents_count:{self.ignored_incidents_count}, "
+            f"resolved_incidents_count:{self.resolved_incidents_count}"
+        )
+
+
 class TokenType(str, Enum):
     PERSONAL_ACCESS_TOKEN = "personal_access_token"
     SERVICE_ACCOUNT = "service_account"

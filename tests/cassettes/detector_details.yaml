@@ -1,0 +1,57 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.20.0 (Linux;py3.10.13)
+      method: GET
+      uri: https://api.gitguardian.com/v1/secret_detectors/1password_service_account_token
+    response:
+      body:
+        string: '{"name":"1password_service_account_token","display_name":"1Password
+          Service Account Token","is_active":true,"type":"specific","category":"other","checkable":false,"frequency":0.02,"use_with_validity_check_disabled":true,"scans_code_only":false,"removed_at":null,"open_incidents_count":0,"ignored_incidents_count":0,"resolved_incidents_count":0}'
+      headers:
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - GET, HEAD, OPTIONS
+        content-length:
+          - '344'
+        content-type:
+          - application/json
+        cross-origin-opener-policy:
+          - same-origin
+        date:
+          - Tue, 08 Apr 2025 12:51:08 GMT
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        server:
+          - istio-envoy
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.185.0
+        x-content-type-options:
+          - nosniff
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '38'
+        x-frame-options:
+          - DENY
+          - SAMEORIGIN
+        x-secrets-engine-version:
+          - 2.135.3
+        x-xss-protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+version: 1
