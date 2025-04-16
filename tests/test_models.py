@@ -95,6 +95,9 @@ class TestModel:
                             "policy_breaks": [
                                 {
                                     "type": "break",
+                                    "detector_name": "hello",
+                                    "detector_group_name": "hello",
+                                    "documentation_url": None,
                                     "policy": "mypol",
                                     "matches": [
                                         {
@@ -114,6 +117,9 @@ class TestModel:
                 PolicyBreak,
                 {
                     "type": "hello",
+                    "detector_name": "hello",
+                    "detector_group_name": "hello",
+                    "documentation_url": None,
                     "policy": "hello",
                     "validity": "hey",
                     "matches": [{"match": "hello", "type": "hello"}],
@@ -124,6 +130,9 @@ class TestModel:
                 PolicyBreak,
                 {
                     "type": "hello",
+                    "detector_name": "hello",
+                    "detector_group_name": "hello",
+                    "documentation_url": None,
                     "policy": "hello",
                     "validity": "hey",
                     "known_secret": True,
@@ -136,6 +145,9 @@ class TestModel:
                 PolicyBreak,
                 {
                     "type": "hello",
+                    "detector_name": "hello",
+                    "detector_group_name": "hello",
+                    "documentation_url": None,
                     "policy": "hello",
                     "validity": "hey",
                     "known_secret": True,
@@ -150,6 +162,9 @@ class TestModel:
                 PolicyBreak,
                 {
                     "type": "hello",
+                    "detector_name": "hello",
+                    "detector_group_name": "hello",
+                    "documentation_url": None,
                     "policy": "hello",
                     "validity": "hey",
                     "known_secret": True,
@@ -165,6 +180,9 @@ class TestModel:
                 PolicyBreak,
                 {
                     "type": "hello",
+                    "detector_name": "hello",
+                    "detector_group_name": "hello",
+                    "documentation_url": None,
                     "policy": "hello",
                     "validity": "hey",
                     "known_secret": True,
@@ -482,6 +500,9 @@ class TestModel:
         """
         data = {
             "type": "hello",
+            "detector_name": "hello",
+            "detector_group_name": "hello",
+            "documentation_url": None,
             "policy": "hello",
             "validity": "hey",
             "matches": [{"match": "hello", "type": "hello"}],

@@ -581,6 +581,9 @@ def test_multiscan_parameters(client: GGClient, ignore_known_secrets, all_secret
                 "policy_breaks": [
                     {
                         "type": "break",
+                        "detector_name": "break",
+                        "detector_group_name": "break",
+                        "documentation_url": None,
                         "policy": "mypol",
                         "matches": [
                             {
