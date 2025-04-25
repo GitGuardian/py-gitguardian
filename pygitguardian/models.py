@@ -749,7 +749,11 @@ class TokenScope(str, Enum):
     IP_ALLOWLIST_WRITE = "ip_allowlist:write"
     SOURCES_READ = "sources:read"
     SOURCES_WRITE = "sources:write"
-    NHI_WRITE = "nhi:write"
+    NHI_WRITE_VAULT = "nhi:write-vault"
+    NHI_SEND_INVENTORY = "nhi:send-inventory"
+    CUSTOM_TAGS_READ = "custom_tags:read"
+    CUSTOM_TAGS_WRITE = "custom_tags:write"
+    SECRET_READ = "secrets:read"
 
 
 class APITokensResponseSchema(BaseSchema):
@@ -764,7 +768,7 @@ class APITokensResponseSchema(BaseSchema):
     revoked_at = fields.AwareDateTime(allow_none=True)
     member_id = fields.Int(allow_none=True)
     creator_id = fields.Int(allow_none=True)
-    scopes = fields.List(fields.Enum(TokenScope, by_value=True), required=False)
+    scopes = fields.List(fields.String, required=False)
 
     @post_load
     def make_api_tokens_response(
@@ -789,7 +793,7 @@ class APITokensResponse(Base, FromDictMixin):
         revoked_at: Optional[datetime] = None,
         member_id: Optional[int] = None,
         creator_id: Optional[int] = None,
-        scopes: Optional[List[TokenScope]] = None,
+        scopes: Optional[List[str]] = None,
     ):
         self.id = id
         self.name = name

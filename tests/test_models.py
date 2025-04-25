@@ -80,7 +80,7 @@ class TestModel:
                     "revoked_at": "2023-05-27T12:40:55.662949Z",
                     "member_id": 22015,
                     "creator_id": 22015,
-                    "scopes": ["incidents:read", "scan"],
+                    "scopes": ["incidents:read", "scan", "unplanned:scope"],
                 },
             ),
             (MatchSchema, Match, {"match": "hello", "type": "hello"}),
