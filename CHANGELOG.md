@@ -1,5 +1,17 @@
 # Changelog
 
+<a id='changelog-1.21.0'></a>
+
+## 1.21.0 — 2025-04-29
+
+### Added
+
+- Add extra information to scan results: detector name, detector group name, and documentation URL.
+
+### Fixed
+
+- Add missing scopes to the TokenScope Enum.
+
 <a id='changelog-1.20.0'></a>
 
 ## 1.20.0 — 2025-02-25
