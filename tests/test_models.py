@@ -173,7 +173,7 @@ class TestModel:
                     "is_excluded": False,
                     "exclude_reason": None,
                     "diff_kind": None,
-                    "is_secret_vaulted": False,
+                    "is_vaulted": False,
                 },
             ),
             (
@@ -192,7 +192,7 @@ class TestModel:
                     "is_excluded": False,
                     "exclude_reason": None,
                     "diff_kind": "addition",
-                    "is_secret_vaulted": True,
+                    "is_vaulted": True,
                 },
             ),
             (
