@@ -231,9 +231,7 @@ class PolicyBreakSchema(BaseSchema):
     diff_kind = fields.Enum(
         DiffKind, by_value=True, required=False, load_default=None, dump_default=None
     )
-    is_secret_vaulted = fields.Boolean(
-        required=False, load_default=False, dump_default=False
-    )
+    is_vaulted = fields.Boolean(required=False, load_default=False, dump_default=False)
 
     @post_load
     def make_policy_break(self, data: Dict[str, Any], **kwargs: Any) -> "PolicyBreak":
@@ -264,7 +262,7 @@ class PolicyBreak(FromDictWithBase):
         is_excluded: bool = False,
         exclude_reason: Optional[str] = None,
         diff_kind: Optional[DiffKind] = None,
-        is_secret_vaulted: bool = False,
+        is_vaulted: bool = False,
         **kwargs: Any,
     ) -> None:
         super().__init__()
@@ -280,7 +278,7 @@ class PolicyBreak(FromDictWithBase):
         self.is_excluded = is_excluded
         self.exclude_reason = exclude_reason
         self.diff_kind = diff_kind
-        self.is_secret_vaulted = is_secret_vaulted
+        self.is_vaulted = is_vaulted
 
     @property
     def is_secret(self) -> bool:
