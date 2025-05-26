@@ -1,16 +1,24 @@
 # Changelog
 
+<a id='changelog-1.22.0'></a>
+
+## 1.22.0 — 2025-05-26
+
+### Added
+
+- Added `is_vaulted` field to `PolicyBreak`.
+
 <a id='changelog-1.21.0'></a>
 
 ## 1.21.0 — 2025-04-29
 
 ### Added
 
-- Add extra information to scan results: detector name, detector group name, and documentation URL.
+- Added extra information to scan results: detector name, detector group name, and documentation URL.
 
 ### Fixed
 
-- Add missing scopes to the TokenScope Enum.
+- Added missing scopes to the `TokenScope` enum.
 
 <a id='changelog-1.20.0'></a>
 
