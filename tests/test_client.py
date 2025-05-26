@@ -434,10 +434,10 @@ def test_content_scan(
         else:
             pytest.fail("returned should be a ScanResult")
 
-        assert type(scan_result.to_dict()) == OrderedDict
+        assert isinstance(scan_result.to_dict(), OrderedDict)
         scan_result_json = scan_result.to_json()
-        assert type(scan_result_json) == str
-        assert type(json.loads(scan_result_json)) == dict
+        assert isinstance(scan_result_json, str)
+        assert isinstance(json.loads(scan_result_json), dict)
 
 
 @my_vcr.use_cassette
@@ -771,10 +771,10 @@ def test_quota_overview(client: GGClient):
         else:
             pytest.fail("returned should be a QuotaResponse")
 
-        assert type(quota_response.to_dict()) == OrderedDict
+        assert isinstance(quota_response.to_dict(), OrderedDict)
         quota_response_json = quota_response.to_json()
-        assert type(quota_response_json) == str
-        assert type(json.loads(quota_response_json)) == dict
+        assert isinstance(quota_response_json, str)
+        assert isinstance(json.loads(quota_response_json), dict)
 
 
 @pytest.mark.parametrize("method", ["GET", "POST"])

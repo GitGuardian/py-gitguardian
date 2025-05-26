@@ -298,26 +298,18 @@ class GGClient:
 
     @property
     def app_version(self) -> Optional[str]:
-        global VERSIONS
-
         return VERSIONS.app_version
 
     @app_version.setter
     def app_version(self, value: Optional[str]) -> None:
-        global VERSIONS
-
         VERSIONS.app_version = value
 
     @property
     def secrets_engine_version(self) -> Optional[str]:
-        global VERSIONS
-
         return VERSIONS.secrets_engine_version
 
     @secrets_engine_version.setter
     def secrets_engine_version(self, value: Optional[str]) -> None:
-        global VERSIONS
-
         VERSIONS.secrets_engine_version = value
 
     def get(
