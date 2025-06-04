@@ -557,7 +557,13 @@ def test_scan_parameters(client: GGClient, all_secrets):
 @responses.activate
 @pytest.mark.parametrize("ignore_known_secrets", (None, True, False))
 @pytest.mark.parametrize("all_secrets", (None, True, False))
-def test_multiscan_parameters(client: GGClient, ignore_known_secrets, all_secrets):
+@pytest.mark.parametrize("source_uuid", (None, "test-source-uuid"))
+def test_multiscan_parameters(
+    client: GGClient,
+    ignore_known_secrets: Optional[bool],
+    all_secrets: Optional[bool],
+    source_uuid: Optional[str],
+) -> None:
     """
     GIVEN a ggclient
     WHEN calling multi_content_scan with parameters
@@ -569,6 +575,8 @@ def test_multiscan_parameters(client: GGClient, ignore_known_secrets, all_secret
         to_match["ignore_known_secrets"] = ignore_known_secrets
     if all_secrets is not None:
         to_match["all_secrets"] = all_secrets
+    if source_uuid is not None:
+        to_match["source_uuid"] = source_uuid
 
     mock_response = responses.post(
         url=client._url_from_endpoint("multiscan", "v1"),
@@ -601,6 +609,7 @@ def test_multiscan_parameters(client: GGClient, ignore_known_secrets, all_secret
         [{"filename": FILENAME, "document": DOCUMENT}],
         ignore_known_secrets=ignore_known_secrets,
         all_secrets=all_secrets,
+        source_uuid=source_uuid,
     )
 
     assert mock_response.call_count == 1
