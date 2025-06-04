@@ -482,6 +482,7 @@ class GGClient:
         ignore_known_secrets: Optional[bool] = None,
         *,
         all_secrets: Optional[bool] = None,
+        source_uuid: Optional[str] = None,
     ) -> Union[Detail, MultiScanResult]:
         """
         multi_content_scan handles the /multiscan endpoint of the API.
@@ -495,6 +496,8 @@ class GGClient:
         :param extra_headers: additional headers to add to the request
         :param ignore_known_secrets: indicates whether known secrets should be ignored
         :param all_secrets: indicates whether all secrets should be returned
+        :param source_uuid: if provided, the source UUID will be used to identify the custom source, for which
+        incidents will be created
         :return: Detail or ScanResult response and status code
         """
         max_documents = self.secret_scan_preferences.maximum_documents_per_scan
@@ -520,6 +523,8 @@ class GGClient:
             params["ignore_known_secrets"] = ignore_known_secrets
         if all_secrets is not None:
             params["all_secrets"] = all_secrets
+        if source_uuid is not None:
+            params["source_uuid"] = source_uuid
 
         resp = self.post(
             endpoint="multiscan",
