@@ -216,8 +216,10 @@ class DiffKind(str, Enum):
 
 class PolicyBreakSchema(BaseSchema):
     break_type = fields.String(data_key="type", required=True)
-    detector_name = fields.String(required=True)
-    detector_group_name = fields.String(required=True)
+    detector_name = fields.String(required=False, load_default=None, dump_default=None)
+    detector_group_name = fields.String(
+        required=False, load_default=None, dump_default=None
+    )
     documentation_url = fields.String(
         required=False, load_default=None, dump_default=None
     )
@@ -251,11 +253,11 @@ class PolicyBreak(FromDictWithBase):
     def __init__(
         self,
         break_type: str,
-        detector_name: str,
-        detector_group_name: str,
         policy: str,
         validity: str,
         matches: List[Match],
+        detector_name: Optional[str] = None,
+        detector_group_name: Optional[str] = None,
         documentation_url: Optional[str] = None,
         known_secret: bool = False,
         incident_url: Optional[str] = None,

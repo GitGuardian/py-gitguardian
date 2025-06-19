@@ -117,9 +117,6 @@ class TestModel:
                 PolicyBreak,
                 {
                     "type": "hello",
-                    "detector_name": "hello",
-                    "detector_group_name": "hello",
-                    "documentation_url": None,
                     "policy": "hello",
                     "validity": "hey",
                     "matches": [{"match": "hello", "type": "hello"}],
