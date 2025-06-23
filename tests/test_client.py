@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import tarfile
 from collections import OrderedDict
@@ -1248,11 +1249,16 @@ def test_delete_member(client: GGClient):
     WHEN calling DELETE /members/{id} endpoint
     THEN the member is deleted
     """
-
+    # To be able to quickly recreate the membership, the email of the member to delete
+    # can be provided via an env var
+    email = os.environ.get("DELETE_MEMBER_EMAIL")
     members = client.list_members(MembersParameters(access_level=AccessLevel.MEMBER))
     assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
-    member = members.data[0]
+    member = next(
+        (member for member in members.data if member.email == email), members.data[0]
+    )
+
     result = client.delete_member(DeleteMemberParameters(id=member.id))
 
     assert result is None, result
