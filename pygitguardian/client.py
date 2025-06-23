@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
+from uuid import UUID
 
 import requests
 from requests import Response, Session, codes
@@ -30,6 +31,7 @@ from .models import (
     Detail,
     Document,
     DocumentSchema,
+    DocumentsForIncidentCreation,
     HealthCheckResponse,
     HoneytokenResponse,
     HoneytokenWithContextResponse,
@@ -510,6 +512,7 @@ class GGClient:
         else:
             raise TypeError("each document must be a dict")
 
+        # Validate documents using DocumentSchema
         for document in request_obj:
             DocumentSchema.validate_size(
                 document, self.secret_scan_preferences.maximum_document_size
@@ -524,6 +527,71 @@ class GGClient:
         resp = self.post(
             endpoint="multiscan",
             data=request_obj,
+            extra_headers=extra_headers,
+            params=params,
+        )
+
+        obj: Union[Detail, MultiScanResult]
+        if is_ok(resp):
+            obj = MultiScanResult.from_dict({"scan_results": resp.json()})
+        else:
+            obj = load_detail(resp)
+
+        obj.status_code = resp.status_code
+
+        return obj
+
+    def scan_and_create_incidents(
+        self,
+        documents: List[Dict[str, str]],
+        source_uuid: UUID,
+        extra_headers: Optional[Dict[str, str]] = None,
+        params: Optional[Dict[str, Any]] = None,
+    ) -> Union[Detail, MultiScanResult]:
+        """
+        scan_and_create_incidents handles the /scan/create-incidents endpoint of the API.
+
+        If documents contain `0` bytes, they will be replaced with the ASCII substitute
+        character.
+
+        :param documents: List of dictionaries containing the keys document
+        and, optionally, filename.
+            example: [{"document":"example content","filename":"intro.py"}]
+        :param source_uuid: the source UUID that will be used to identify the custom source, for which
+        incidents will be created
+        :param extra_headers: additional headers to add to the request
+        :param params: additional parameters to add to the request
+        :return: Detail or ScanResult response and status code
+        """
+        max_documents = self.secret_scan_preferences.maximum_documents_per_scan
+        if len(documents) > max_documents:
+            raise ValueError(
+                f"too many documents submitted for scan (max={max_documents})"
+            )
+
+        if all(isinstance(doc, dict) for doc in documents):
+            # Create Document objects directly from the input dictionaries
+            document_objects = [
+                Document(document=doc["document"], filename=doc.get("filename"))
+                for doc in documents
+            ]
+        else:
+            raise TypeError("each document must be a dict")
+
+        # Validate documents using DocumentSchema
+        for document in document_objects:
+            DocumentSchema.validate_size(
+                {"document": document.document, "filename": document.filename},
+                self.secret_scan_preferences.maximum_document_size,
+            )
+
+        payload = DocumentsForIncidentCreation(
+            documents=document_objects, source_uuid=source_uuid
+        )
+
+        resp = self.post(
+            endpoint="scan/create-incidents",
+            data=payload.SCHEMA.dump(payload),
             extra_headers=extra_headers,
             params=params,
         )

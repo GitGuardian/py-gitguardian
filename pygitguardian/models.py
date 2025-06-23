@@ -96,6 +96,43 @@ class Document(Base):
         return f"filename:{self.filename}, document:{self.document}"
 
 
+class DocumentsForIncidentCreationSchema(BaseSchema):
+    documents = fields.List(fields.Nested(DocumentSchema), required=True)
+    source_uuid = fields.UUID(required=True)
+
+    @post_dump
+    def transform_filename_to_document_identifier(
+        self, data: Dict[str, Any], **kwargs: Any
+    ) -> Dict[str, Any]:
+        """Transform filename field to document_identifier in the documents list"""
+        if "documents" in data:
+            for document in data["documents"]:
+                if "filename" in document:
+                    document["document_identifier"] = document.pop("filename")
+        return data
+
+
+class DocumentsForIncidentCreation(Base):
+    """
+    DocumentsForIncidentCreation is a request object for communicating a list of documents
+    along with a source UUID to the API for incident creation
+
+    Attributes:
+        documents (List[Document]): list of documents to scan
+        source_uuid (UUID): UUID identifying the source
+    """
+
+    SCHEMA = DocumentsForIncidentCreationSchema()
+
+    def __init__(self, documents: List[Document], source_uuid: UUID, **kwargs: Any):
+        super().__init__()
+        self.documents = documents
+        self.source_uuid = source_uuid
+
+    def __repr__(self) -> str:
+        return f"documents:{len(self.documents)}, source_uuid:{self.source_uuid}"
+
+
 class DetailSchema(BaseSchema):
     detail = fields.String(required=True)
 
@@ -757,6 +794,7 @@ class TokenScope(str, Enum):
     CUSTOM_TAGS_READ = "custom_tags:read"
     CUSTOM_TAGS_WRITE = "custom_tags:write"
     SECRET_READ = "secrets:read"
+    SCAN_CREATE_INCIDENTS = "scan:create-incidents"
 
 
 class APITokensResponseSchema(BaseSchema):
