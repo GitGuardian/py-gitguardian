@@ -45,7 +45,7 @@ T = TypeVar("T")
 PaginatedDataType = TypeVar("PaginatedDataType", bound=FromDictWithBase)
 
 MIN_NB_TEAM = 2
-MIN_NB_MEMBER = 3  # 1 owner, 1 manager and at least one member
+MIN_NB_MEMBER = 4  # 1 owner, 1 manager and at least two members
 MIN_NB_TEAM_MEMBER = 2
 # This is the team that is created in the tests, it should be deleted before we run the tests
 PYGITGUARDIAN_TEST_TEAM = "PyGitGuardian team"
@@ -106,8 +106,8 @@ def ensure_member_coherence():
     members = ensure_success(client.list_members(MembersParameters(per_page=5)))
 
     assert (
-        len(members.data) > MIN_NB_MEMBER
-    ), "There must be at least 3 members in the workspace"
+        len(members.data) >= MIN_NB_MEMBER
+    ), f"There must be at least {MIN_NB_MEMBER} members in the workspace"
 
 
 def add_source_to_team(team: Team, available_sources: Iterable[Source] | None = None):
