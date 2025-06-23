@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.23.0'></a>
+
+## 1.23.0 — 2025-06-23
+
+### Changed
+
+- Set PolicyBreak's detector_name and detector_group_name fields as optional to fix backwards compatibility with the GitGuardian API
+
 <a id='changelog-1.22.0'></a>
 
 ## 1.22.0 — 2025-05-26
