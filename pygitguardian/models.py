@@ -757,6 +757,7 @@ class TokenScope(str, Enum):
     CUSTOM_TAGS_READ = "custom_tags:read"
     CUSTOM_TAGS_WRITE = "custom_tags:write"
     SECRET_READ = "secrets:read"
+    SCAN_CREATE_INCIDENTS = "scan:create-incidents"
 
 
 class APITokensResponseSchema(BaseSchema):
