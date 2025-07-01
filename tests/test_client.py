@@ -608,6 +608,90 @@ def test_multiscan_parameters(client: GGClient, ignore_known_secrets, all_secret
 
 
 @responses.activate
+def test_scan_and_create_incidents_parameters(client: GGClient):
+    """
+    GIVEN a ggclient
+    WHEN calling scan_and_create_incidents with parameters
+    THEN the parameters are passed in the request
+    """
+
+    to_match = {}
+
+    mock_response = responses.post(
+        url=client._url_from_endpoint("scan/create-incidents", "v1"),
+        status=200,
+        match=[matchers.query_param_matcher(to_match)],
+        json=[
+            {
+                "policy_break_count": 1,
+                "policies": ["pol"],
+                "policy_breaks": [
+                    {
+                        "type": "break",
+                        "detector_name": "break",
+                        "detector_group_name": "break",
+                        "documentation_url": None,
+                        "policy": "mypol",
+                        "matches": [
+                            {
+                                "match": "hello",
+                                "type": "hello",
+                            }
+                        ],
+                    }
+                ],
+            }
+        ],
+    )
+
+    client.scan_and_create_incidents(
+        [{"filename": FILENAME, "document": DOCUMENT}],
+        source_uuid="123e4567-e89b-12d3-a456-426614174000",
+    )
+
+    assert mock_response.call_count == 1
+
+
+@responses.activate
+def test_scan_and_create_incidents_payload_structure(client: GGClient):
+    """
+    GIVEN a ggclient
+    WHEN calling scan_and_create_incidents
+    THEN the payload is structured correctly with documents and source_uuid
+    """
+
+    documents = [{"filename": FILENAME, "document": DOCUMENT}]
+    source_uuid = "123e4567-e89b-12d3-a456-426614174000"
+
+    expected_payload = {
+        "documents": [
+            {
+                "document": DOCUMENT,
+                "document_identifier": FILENAME,
+            }
+        ],
+        "source_uuid": source_uuid,
+    }
+
+    mock_response = responses.post(
+        url=client._url_from_endpoint("scan/create-incidents", "v1"),
+        status=200,
+        match=[matchers.json_params_matcher(expected_payload)],
+        json=[
+            {
+                "policy_break_count": 0,
+                "policies": ["pol"],
+                "policy_breaks": [],
+            }
+        ],
+    )
+
+    client.scan_and_create_incidents(documents, source_uuid)
+
+    assert mock_response.call_count == 1
+
+
+@responses.activate
 def test_retrieve_secret_incident(client: GGClient):
     """
     GIVEN a ggclient
