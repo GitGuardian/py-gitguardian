@@ -171,6 +171,8 @@ class TestModel:
                     "exclude_reason": None,
                     "diff_kind": None,
                     "is_vaulted": False,
+                    "vault_path": None,
+                    "vault_path_count": None,
                 },
             ),
             (
@@ -190,6 +192,8 @@ class TestModel:
                     "exclude_reason": None,
                     "diff_kind": "addition",
                     "is_vaulted": True,
+                    "vault_path": "hashicorpvault:my-vault:my-secret",
+                    "vault_path_count": 3,
                 },
             ),
             (
