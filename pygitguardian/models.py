@@ -234,6 +234,10 @@ class PolicyBreakSchema(BaseSchema):
         DiffKind, by_value=True, required=False, load_default=None, dump_default=None
     )
     is_vaulted = fields.Boolean(required=False, load_default=False, dump_default=False)
+    vault_type = fields.String(required=False, load_default=None, dump_default=None)
+    vault_name = fields.String(required=False, load_default=None, dump_default=None)
+    vault_path = fields.String(required=False, load_default=None, dump_default=None)
+    vault_path_count = fields.Int(required=False, load_default=None, dump_default=None)
 
     @post_load
     def make_policy_break(self, data: Dict[str, Any], **kwargs: Any) -> "PolicyBreak":
@@ -265,6 +269,10 @@ class PolicyBreak(FromDictWithBase):
         exclude_reason: Optional[str] = None,
         diff_kind: Optional[DiffKind] = None,
         is_vaulted: bool = False,
+        vault_type: Optional[str] = None,
+        vault_name: Optional[str] = None,
+        vault_path: Optional[str] = None,
+        vault_path_count: Optional[int] = None,
         **kwargs: Any,
     ) -> None:
         super().__init__()
@@ -281,6 +289,10 @@ class PolicyBreak(FromDictWithBase):
         self.exclude_reason = exclude_reason
         self.diff_kind = diff_kind
         self.is_vaulted = is_vaulted
+        self.vault_type = vault_type
+        self.vault_name = vault_name
+        self.vault_path = vault_path
+        self.vault_path_count = vault_path_count
 
     @property
     def is_secret(self) -> bool:
