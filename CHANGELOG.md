@@ -1,5 +1,15 @@
 # Changelog
 
+<a id='changelog-1.24.0'></a>
+
+## 1.24.0 — 2025-07-28
+
+### Added
+
+- Added `GGClient.scan_and_create_incidents()` function to scan content for secrets and automatically create incidents.
+
+- Added `vault_type`, `vault_name`, `vault_path` and `vault_path_count` fields to `PolicyBreak`.
+
 <a id='changelog-1.23.0'></a>
 
 ## 1.23.0 — 2025-06-23
