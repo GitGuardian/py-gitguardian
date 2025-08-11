@@ -584,7 +584,7 @@ class GGClient:
             "source_uuid": source_uuid,
             "documents": [
                 {
-                    "document_identifier": document["filename"],
+                    "filename": document["filename"],
                     "document": document["document"],
                 }
                 for document in request_obj
