@@ -667,7 +667,7 @@ def test_scan_and_create_incidents_payload_structure(client: GGClient):
         "documents": [
             {
                 "document": DOCUMENT,
-                "document_identifier": FILENAME,
+                "filename": FILENAME,
             }
         ],
         "source_uuid": source_uuid,
