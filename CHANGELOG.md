@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.25.0'></a>
+
+## 1.25.0 — 2025-08-26
+
+### Changed
+
+- Updated `Client.scan_and_create_incidents()` to match server-side API changes.
+
 <a id='changelog-1.24.0'></a>
 
 ## 1.24.0 — 2025-07-28
