@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.26.0'></a>
+
+## 1.26.0 — 2025-10-27
+
+### Fixed
+
+- Missing scope leading to validation errors
+
 <a id='changelog-1.25.0'></a>
 
 ## 1.25.0 — 2025-08-26
