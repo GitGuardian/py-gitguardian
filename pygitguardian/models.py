@@ -771,6 +771,7 @@ class TokenScope(str, Enum):
     CUSTOM_TAGS_READ = "custom_tags:read"
     CUSTOM_TAGS_WRITE = "custom_tags:write"
     SECRET_READ = "secrets:read"
+    SECRET_WRITE = "secrets:write"
     SCAN_CREATE_INCIDENTS = "scan:create-incidents"
     PUBLIC_PERIMETER_VIEW = "public-perimeter:read"
 
