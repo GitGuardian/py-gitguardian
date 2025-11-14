@@ -911,12 +911,15 @@ Tag = Literal[
     "CHECK_RUN_SKIP_LOW_RISK",
     "CHECK_RUN_SKIP_TEST_CRED",
     "IGNORED_IN_CHECK_RUN",
-    "FALSE_POSITIVE",
+    "PUBLIC",
     "PUBLICLY_EXPOSED",
     "PUBLICLY_LEAKED",
     "REGRESSION",
     "SENSITIVE_FILE",
     "TEST_FILE",
+    "FALSE_POSITIVE",
+    "VAULTED",
+    "REVOCABLE_BY_GG",
 ]
 IgnoreReason = Literal["test_credential", "false_positive", "low_risk"]
 OccurrenceKind = Literal["realtime", "historical"]

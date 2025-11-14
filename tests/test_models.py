@@ -323,7 +323,13 @@ class TestModel:
                     "validity": "valid",
                     "resolved_at": None,
                     "share_url": "https://dashboard.gitguardian.com/share/incidents/11111111-11111",
-                    "tags": ["FROM_HISTORICAL_SCAN", "SENSITIVE_FILE"],
+                    "tags": [
+                        "FROM_HISTORICAL_SCAN",
+                        "SENSITIVE_FILE",
+                        "REVOCABLE_BY_GG",
+                        "PUBLIC",
+                        "VAULTED",
+                    ],
                     "feedback_list": [
                         {
                             "created_at": "2021-05-20T12:40:55.662949Z",
