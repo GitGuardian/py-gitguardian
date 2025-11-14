@@ -903,25 +903,6 @@ class Detector(Base, FromDictMixin):
 
 Severity = Literal["info", "low", "medium", "high", "critical", "unknown"]
 ValidityStatus = Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
-IncidentStatus = Literal["IGNORED", "TRIGGERED", "RESOLVED", "ASSIGNED"]
-Tag = Literal[
-    "DEFAULT_BRANCH",
-    "FROM_HISTORICAL_SCAN",
-    "CHECK_RUN_SKIP_FALSE_POSITIVE",
-    "CHECK_RUN_SKIP_LOW_RISK",
-    "CHECK_RUN_SKIP_TEST_CRED",
-    "IGNORED_IN_CHECK_RUN",
-    "FALSE_POSITIVE",
-    "PUBLICLY_EXPOSED",
-    "PUBLICLY_LEAKED",
-    "REGRESSION",
-    "SENSITIVE_FILE",
-    "TEST_FILE",
-]
-IgnoreReason = Literal["test_credential", "false_positive", "low_risk"]
-OccurrenceKind = Literal["realtime", "historical"]
-OccurrencePresence = Literal["present", "removed"]
-Visibility = Literal["private", "internal", "public"]
 
 
 @dataclass
@@ -1003,7 +984,7 @@ class Source(FromDictWithBase):
     open_incidents_count: int
     closed_incidents_count: int
     secret_incidents_breakdown: SecretIncidentsBreakdown
-    visibility: Visibility
+    visibility: str
     external_id: str
     source_criticality: SourceCriticality
     last_scan: Optional[Scan]
@@ -1044,7 +1025,7 @@ class OccurrenceMatch(Base, FromDictMixin):
 class SecretOccurrence(Base, FromDictMixin):
     id: int
     incident_id: int
-    kind: OccurrenceKind
+    kind: str
     source: Source
     author_name: str
     author_info: str
@@ -1053,7 +1034,7 @@ class SecretOccurrence(Base, FromDictMixin):
     matches: List[OccurrenceMatch]
     tags: List[str]
     sha: Optional[str]  # Commit sha
-    presence: OccurrencePresence
+    presence: str
     filepath: Optional[str]
 
 
@@ -1077,12 +1058,12 @@ class SecretIncident(Base, FromDictMixin):
     hmsl_hash: str
     gitguardian_url: str
     regression: bool
-    status: IncidentStatus
+    status: str
     assignee_id: Optional[int]
     assignee_email: Optional[str]
     occurrences_count: int
     secret_presence: SecretPresence
-    ignore_reason: Optional[IgnoreReason]
+    ignore_reason: Optional[str]
     triggered_at: Optional[datetime]
     ignored_at: Optional[datetime]
     ignorer_id: Optional[int]
@@ -1094,7 +1075,7 @@ class SecretIncident(Base, FromDictMixin):
     validity: ValidityStatus
     resolved_at: Optional[datetime]
     share_url: Optional[str]
-    tags: List[Tag]
+    tags: List[str]
     feedback_list: List[Feedback]
     occurrences: Optional[List[SecretOccurrence]]
 
@@ -1480,7 +1461,7 @@ class TeamSourceParameters(PaginationParameter, SearchParameter, ToDictMixin):
     health: Optional[SourceHealth] = None
     type: Optional[str] = None
     ordering: Optional[Literal["last_scan_date", "-last_scan_date"]] = None
-    visibility: Optional[Visibility] = None
+    visibility: Optional[str] = None
     external_id: Optional[str] = None
 
 
