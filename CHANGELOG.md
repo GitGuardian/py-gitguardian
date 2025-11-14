@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.27.0'></a>
+
+## 1.27.0 — 2025-11-14
+
+### Changed
+
+- Changed the following fields to `str`: `visibility`, `kind`, `presence status`, `ignore_reason`, `tag`.
+
 <a id='changelog-1.26.0'></a>
 
 ## 1.26.0 — 2025-10-27
