@@ -917,7 +917,7 @@ Tag = Literal[
     "SENSITIVE_FILE",
     "TEST_FILE",
 ]
-IgnoreReason = Literal["test_credential", "false_positive", "low_risk"]
+IgnoreReason = Literal["test_credential", "false_positive", "low_risk", "invalid"]
 OccurrenceKind = Literal["realtime", "historical"]
 OccurrencePresence = Literal["present", "removed"]
 Visibility = Literal["private", "internal", "public"]

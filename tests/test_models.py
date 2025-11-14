@@ -311,7 +311,7 @@ class TestModel:
                         "in_vcs": 3,
                         "removed_in_vcs": 0,
                     },
-                    "ignore_reason": "test_credential",
+                    "ignore_reason": "invalid",
                     "triggered_at": "2019-05-12T09:37:49Z",
                     "ignored_at": "2019-08-24T14:15:22Z",
                     "ignorer_id": 309,
