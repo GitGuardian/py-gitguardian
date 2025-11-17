@@ -1113,16 +1113,10 @@ class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
     ] = None
 
 
-class MembersParametersSchema(BaseSchema):
-    access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
-    active = fields.Bool(allow_none=True)
-    ordering = fields.Str(allow_none=True)
-
-    @post_load
-    def make_members_parameters(self, data: Dict[str, Any], **kwargs: Any):
-        return MembersParameters(**data)
-
-
+MembersParametersSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(MembersParameters, base_schema=BaseSchema),
+)
 MembersParameters.SCHEMA = MembersParametersSchema()
 
 
@@ -1298,17 +1292,10 @@ class TeamInvitationParameters(PaginationParameter, ToDictMixin):
     incident_permission: Optional[IncidentPermission] = None
 
 
-class TeamInvitationParameterSchema(BaseSchema):
-    invitation_id = fields.Int(allow_none=True)
-    is_team_leader = fields.Bool(allow_none=True)
-    incident_permission = fields.Enum(
-        IncidentPermission, by_value=True, allow_none=True
-    )
-
-    class Meta:
-        exclude_none = True
-
-
+TeamInvitationParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(TeamInvitationParameters, base_schema=BaseSchema),
+)
 TeamInvitationParameters.SCHEMA = TeamInvitationParameterSchema()
 
 
@@ -1374,21 +1361,10 @@ class TeamMemberParameters(PaginationParameter, SearchParameter, ToDictMixin):
     member_id: Optional[int] = None
 
 
-class TeamMembershipParameterSchema(BaseSchema):
-    is_team_leader = fields.Bool(allow_none=True)
-    incident_permission = fields.Enum(
-        IncidentPermission, by_value=True, allow_none=True
-    )
-    member_id = fields.Int(allow_none=True)
-
-    @post_load
-    def make_team_member_parameter(self, data: Dict[str, Any], **kwargs: Any):
-        return TeamMemberParameters(**data)
-
-    class Meta:
-        exclude_none = True
-
-
+TeamMembershipParameterSchema = cast(
+    Type[BaseSchema],
+    marshmallow_dataclass.class_schema(TeamMemberParameters, base_schema=BaseSchema),
+)
 TeamMemberParameters.SCHEMA = TeamMembershipParameterSchema()
 
 
