@@ -1112,6 +1112,9 @@ class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
         Literal["id", "-id", "created_at", "-created_at", "last_login", "-last_login"]
     ] = None
 
+    class Meta:
+        exclude_none = True
+
 
 MembersParametersSchema = cast(
     Type[BaseSchema],
@@ -1221,6 +1224,9 @@ DeleteMemberParameters.SCHEMA = DeleteMemberParametersSchema()
 class TeamsParameters(PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin):
     is_global: Optional[bool] = None
 
+    class Meta:
+        exclude_none = True
+
 
 TeamsParameterSchema = cast(
     Type[BaseSchema],
@@ -1291,6 +1297,9 @@ class TeamInvitationParameters(PaginationParameter, ToDictMixin):
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
 
+    class Meta:
+        exclude_none = True
+
 
 TeamInvitationParameterSchema = cast(
     Type[BaseSchema],
@@ -1359,6 +1368,9 @@ class TeamMemberParameters(PaginationParameter, SearchParameter, ToDictMixin):
     is_team_leader: Optional[bool] = None
     incident_permission: Optional[IncidentPermission] = None
     member_id: Optional[int] = None
+
+    class Meta:
+        exclude_none = True
 
 
 TeamMembershipParameterSchema = cast(
@@ -1440,6 +1452,9 @@ class TeamSourceParameters(PaginationParameter, SearchParameter, ToDictMixin):
     visibility: Optional[str] = None
     external_id: Optional[str] = None
 
+    class Meta:
+        exclude_none = True
+
 
 TeamSourceParametersSchema = cast(
     Type[BaseSchema],
@@ -1480,6 +1495,9 @@ class InvitationParameters(
     PaginationParameter, SearchParameter, FromDictMixin, ToDictMixin
 ):
     ordering: Optional[Literal["date", "-date"]] = None
+
+    class Meta:
+        exclude_none = True
 
 
 @dataclass
