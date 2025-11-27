@@ -68,7 +68,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams/19/team_memberships?is_team_leader=True
+      uri: https://api.gitguardian.com/v1/teams/19/team_memberships?cursor=&per_page=20&is_team_leader=True
     response:
       body:
         string: '[{"id":23,"team_id":19,"member_id":6,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"full_access"}]'

@@ -30,7 +30,9 @@ from .models_utils import (
     FromDictMixin,
     FromDictWithBase,
     PaginationParameter,
+    PaginationParameterSchema,
     SearchParameter,
+    SearchParameterSchema,
     ToDictMixin,
 )
 
@@ -1113,7 +1115,10 @@ class MembersParameters(PaginationParameter, SearchParameter, ToDictMixin):
     ] = None
 
 
-class MembersParametersSchema(BaseSchema):
+class MembersParametersSchema(
+    PaginationParameterSchema,
+    SearchParameterSchema,  # pyright: ignore[reportGeneralTypeIssues]
+):
     access_level = fields.Enum(AccessLevel, by_value=True, allow_none=True)
     active = fields.Bool(allow_none=True)
     ordering = fields.Str(allow_none=True)
@@ -1298,7 +1303,10 @@ class TeamInvitationParameters(PaginationParameter, ToDictMixin):
     incident_permission: Optional[IncidentPermission] = None
 
 
-class TeamInvitationParameterSchema(BaseSchema):
+class TeamInvitationParameterSchema(
+    PaginationParameterSchema,
+    SearchParameterSchema,  # pyright: ignore[reportGeneralTypeIssues]
+):
     invitation_id = fields.Int(allow_none=True)
     is_team_leader = fields.Bool(allow_none=True)
     incident_permission = fields.Enum(
@@ -1374,7 +1382,10 @@ class TeamMemberParameters(PaginationParameter, SearchParameter, ToDictMixin):
     member_id: Optional[int] = None
 
 
-class TeamMembershipParameterSchema(BaseSchema):
+class TeamMembershipParameterSchema(
+    PaginationParameterSchema,
+    SearchParameterSchema,  # pyright: ignore[reportGeneralTypeIssues]
+):
     is_team_leader = fields.Bool(allow_none=True)
     incident_permission = fields.Enum(
         IncidentPermission, by_value=True, allow_none=True
