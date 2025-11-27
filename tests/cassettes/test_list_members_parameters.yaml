@@ -11,7 +11,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/members?access_level=manager
+      uri: https://api.gitguardian.com/v1/members?cursor=&per_page=20&access_level=manager
     response:
       body:
         string: '[]'

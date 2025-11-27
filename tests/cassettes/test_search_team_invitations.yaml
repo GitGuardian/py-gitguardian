@@ -68,7 +68,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/teams/19/team_invitations?incident_permission=can_view
+      uri: https://api.gitguardian.com/v1/teams/19/team_invitations?cursor=&per_page=20&incident_permission=can_view
     response:
       body:
         string: '[{"id":7,"team_id":19,"invitation_id":13,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"can_view"}]'
