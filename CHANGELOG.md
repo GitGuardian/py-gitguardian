@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.28.0'></a>
+
+## 1.28.0 — 2025-12-29
+
+### Fixed
+
+- MembersParameters, TeamInvitationParameters, and TeamMembershipParameters now properly apply pagination and search queries.
+
 <a id='changelog-1.27.0'></a>
 
 ## 1.27.0 — 2025-11-14
