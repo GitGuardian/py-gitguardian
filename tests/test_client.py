@@ -744,6 +744,23 @@ def test_retrieve_secret_incident(client: GGClient):
             "resolved_at": None,
             "share_url": "https://dashboard.gitguardian.com/share/incidents/11111111-1111-1111-1111-111111111111",
             "tags": ["FROM_HISTORICAL_SCAN", "SENSITIVE_FILE"],
+            "custom_tags": [
+                {
+                    "id": "9df8c1c9-7367-4c77-a0f0-9f2d4b22bdda",
+                    "key": "commiter",
+                    "value": "leaky mcgee",
+                },
+                {
+                    "id": "1aa3ae34-f9f0-42e1-a687-9fed877a9037",
+                    "key": "confrence",
+                    "value": "grrcon",
+                },
+                {
+                    "id": "2cade8a1-71ff-46d2-bbe3-c2bf71437ae7",
+                    "key": "confrence test",
+                    "value": "hacktivity",
+                },
+            ],
             "feedback_list": [
                 {
                     "created_at": "2021-05-20T12:40:55.662949Z",
@@ -771,6 +788,23 @@ def test_retrieve_secret_incident(client: GGClient):
     assert result.detector.name == "slack_bot_token"
     assert result.ignore_reason == "test_credential"
     assert result.secret_revoked is False
+    assert result.custom_tags == [
+        {
+            "id": "9df8c1c9-7367-4c77-a0f0-9f2d4b22bdda",
+            "key": "commiter",
+            "value": "leaky mcgee",
+        },
+        {
+            "id": "1aa3ae34-f9f0-42e1-a687-9fed877a9037",
+            "key": "confrence",
+            "value": "grrcon",
+        },
+        {
+            "id": "2cade8a1-71ff-46d2-bbe3-c2bf71437ae7",
+            "key": "confrence test",
+            "value": "hacktivity",
+        },
+    ]
 
 
 @responses.activate
