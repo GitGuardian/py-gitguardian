@@ -32,6 +32,7 @@ from pygitguardian.models import (
     CreateTeamInvitation,
     CreateTeamMember,
     CreateTeamMemberParameters,
+    CustomTag,
     DeleteMemberParameters,
     Detail,
     HoneytokenResponse,
@@ -789,21 +790,21 @@ def test_retrieve_secret_incident(client: GGClient):
     assert result.ignore_reason == "test_credential"
     assert result.secret_revoked is False
     assert result.custom_tags == [
-        {
-            "id": "9df8c1c9-7367-4c77-a0f0-9f2d4b22bdda",
-            "key": "commiter",
-            "value": "leaky mcgee",
-        },
-        {
-            "id": "1aa3ae34-f9f0-42e1-a687-9fed877a9037",
-            "key": "confrence",
-            "value": "grrcon",
-        },
-        {
-            "id": "2cade8a1-71ff-46d2-bbe3-c2bf71437ae7",
-            "key": "confrence test",
-            "value": "hacktivity",
-        },
+        CustomTag(
+            id="9df8c1c9-7367-4c77-a0f0-9f2d4b22bdda",
+            key="commiter",
+            value="leaky mcgee",
+        ),
+        CustomTag(
+            id="1aa3ae34-f9f0-42e1-a687-9fed877a9037",
+            key="confrence",
+            value="grrcon",
+        ),
+        CustomTag(
+            id="2cade8a1-71ff-46d2-bbe3-c2bf71437ae7",
+            key="confrence test",
+            value="hacktivity",
+        ),
     ]
 
 

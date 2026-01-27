@@ -932,8 +932,15 @@ class Feedback(Base, FromDictMixin):
     created_at: datetime
     updated_at: datetime
     member_id: Optional[int]
-    email: Optional[str]
+    email: str
     answers: List[Answer]
+
+
+@dataclass
+class CustomTag(Base, FromDictMixin):
+    id: str
+    key: str
+    value: str
 
 
 @dataclass
@@ -1080,7 +1087,7 @@ class SecretIncident(Base, FromDictMixin):
     tags: List[str]
     occurrences: Optional[List[SecretOccurrence]]
     feedback_list: List[Feedback]
-    custom_tags: Optional[List[Dict[str, Any]]]
+    custom_tags: Optional[List[CustomTag]]
 
     def __repr__(self) -> str:
         return (
