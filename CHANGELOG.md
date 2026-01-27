@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.29.0'></a>
+
+## 1.29.0 — 2026-01-27
+
+### Added
+
+- Capture secret incident `custom_tags` dictionaries when calling `retrieve_secret_incident`.
+
 <a id='changelog-1.28.0'></a>
 
 ## 1.28.0 — 2025-12-29
