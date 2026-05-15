@@ -1,0 +1,39 @@
+interactions:
+  - request:
+      body: '{"activities": [{"user": {"hostname": "h", "username": "u", "machine_id":
+        "m", "user_email": null}, "tool": "t", "server": "s", "agent": "claude-code",
+        "model": "m", "cwd": "/tmp", "input": {}, "timestamp": "2026-04-01T09:00:00+00:00"},
+        {"user": {"hostname": "h", "username": "u", "machine_id": "m", "user_email":
+        null}, "tool": "t", "server": "s", "agent": "claude-code", "model": "m",
+        "cwd": "/tmp", "input": {}, "timestamp": "2026-04-01T09:00:00+00:00"}]}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '458'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.30.0 (Linux;py3.11.15)
+      method: POST
+      uri: https://api.gitguardian.com/v1/nhi/ai/mcp-activity/bulk
+    response:
+      body:
+        string: '{"ingested": 2, "duplicates": 0, "skipped": 0}'
+      headers:
+        Allow:
+          - POST, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '46'
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1
