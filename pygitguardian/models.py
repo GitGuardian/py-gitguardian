@@ -1815,6 +1815,8 @@ class MCPActivityRequest(FromDictMixin, ToDictMixin):
     model: str
     cwd: str
     input: Dict[str, Any]
+    timestamp: Optional[datetime] = None
+    idempotency_key: Optional[str] = None
 
 
 class MCPActivityRequestSchema(BaseSchema):
@@ -1825,6 +1827,8 @@ class MCPActivityRequestSchema(BaseSchema):
     model = fields.Str(required=True)
     cwd = fields.Str(required=True)
     input = fields.Dict(keys=fields.Str(), values=fields.Raw(), required=True)
+    timestamp = fields.DateTime(load_default=None, allow_none=True)
+    idempotency_key = fields.Str(load_default=None, allow_none=True)
 
     @post_load
     def make_mcp_activity_request(self, data: Dict[str, Any], **kwargs: Any):
@@ -1850,3 +1854,21 @@ class MCPActivityResponseSchema(BaseSchema):
 
 
 MCPActivityResponse.SCHEMA = MCPActivityResponseSchema()
+
+
+@dataclass
+class MCPActivityBulkResponse(FromDictWithBase):
+    ingested: int
+    duplicates: int
+
+
+class MCPActivityBulkResponseSchema(BaseSchema):
+    ingested = fields.Int(required=True)
+    duplicates = fields.Int(required=True)
+
+    @post_load
+    def make_mcp_activity_bulk_response(self, data: Dict[str, Any], **kwargs: Any):
+        return MCPActivityBulkResponse(**data)
+
+
+MCPActivityBulkResponse.SCHEMA = MCPActivityBulkResponseSchema()
