@@ -3,7 +3,7 @@ import os
 import re
 import tarfile
 from collections import OrderedDict
-from datetime import date
+from datetime import date, datetime, timezone
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple, Type
 from unittest.mock import Mock, patch
@@ -42,6 +42,7 @@ from pygitguardian.models import (
     Invitation,
     JWTResponse,
     JWTService,
+    MCPActivityBulkResponse,
     MCPActivityRequest,
     MCPActivityResponse,
     MCPConfiguration,
@@ -1970,3 +1971,56 @@ def test_log_mcp_activity(client: GGClient):
     )
 
     assert isinstance(result, MCPActivityResponse), result
+
+
+@responses.activate
+def test_log_mcp_activities_bulk_posts_to_correct_endpoint(
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling log_mcp_activities_bulk with a list of MCPActivityRequest
+    THEN a POST is made to the bulk endpoint
+    AND an MCPActivityBulkResponse is returned with ingested/duplicate counts
+    """
+    activities = [
+        MCPActivityRequest(
+            user=UserInfo(hostname="h", username="u", machine_id="m"),
+            tool="t",
+            server="s",
+            agent="claude-code",
+            model="m",
+            cwd="/tmp",
+            input={},
+            timestamp=datetime(2026, 4, 1, 9, 0, tzinfo=timezone.utc),
+            idempotency_key="a",
+        ),
+        MCPActivityRequest(
+            user=UserInfo(hostname="h", username="u", machine_id="m"),
+            tool="t",
+            server="s",
+            agent="claude-code",
+            model="m",
+            cwd="/tmp",
+            input={},
+            timestamp=datetime(2026, 4, 1, 9, 0, tzinfo=timezone.utc),
+            idempotency_key="b",
+        ),
+    ]
+
+    expected_payload = {"activities": [a.to_dict() for a in activities]}
+
+    mock_response = responses.post(
+        url=client._url_from_endpoint("nhi/ai/mcp-activity/bulk", "v1"),
+        content_type="application/json",
+        status=200,
+        json={"ingested": 2, "duplicates": 0},
+        match=[matchers.json_params_matcher(expected_payload)],
+    )
+
+    result = client.log_mcp_activities_bulk(activities)
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, MCPActivityBulkResponse)
+    assert result.ingested == 2
+    assert result.duplicates == 0
