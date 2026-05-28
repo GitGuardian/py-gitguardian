@@ -39,6 +39,7 @@ from .models import (
     InvitationParameters,
     JWTResponse,
     JWTService,
+    MCPActivityBulkResponse,
     MCPActivityRequest,
     MCPActivityResponse,
     Member,
@@ -1232,6 +1233,26 @@ class GGClient:
         obj: Union[Detail, MCPActivityResponse]
         if is_ok(response):
             obj = MCPActivityResponse.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def log_mcp_activities_bulk(
+        self,
+        activities: List[MCPActivityRequest],
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, MCPActivityBulkResponse]:
+        response = self.post(
+            endpoint="nhi/ai/mcp-activity/bulk",
+            data={"activities": [a.to_dict() for a in activities]},
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, MCPActivityBulkResponse]
+        if is_ok(response):
+            obj = MCPActivityBulkResponse.from_dict(response.json())
         else:
             obj = load_detail(response)
 
