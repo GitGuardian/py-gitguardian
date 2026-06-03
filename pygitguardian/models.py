@@ -1878,12 +1878,13 @@ MCPActivityBulkResponse.SCHEMA = MCPActivityBulkResponseSchema()
 @dataclass
 class AgentActivityResponse(FromDictWithBase):
     ingested: int
-    duplicates: int
+    # Records the server could not scan for secrets and dropped (never stored).
+    dropped: int = 0
 
 
 class AgentActivityResponseSchema(BaseSchema):
     ingested = fields.Int(required=True)
-    duplicates = fields.Int(required=True)
+    dropped = fields.Int(load_default=0)
 
     @post_load
     def make_agent_activity_response(self, data: Dict[str, Any], **kwargs: Any):

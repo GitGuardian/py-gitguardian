@@ -535,7 +535,7 @@ class TestModel:
                 AgentActivityResponse,
                 {
                     "ingested": 2,
-                    "duplicates": 0,
+                    "dropped": 0,
                 },
             ),
         ],

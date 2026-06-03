@@ -21,14 +21,14 @@ interactions:
       uri: https://api.gitguardian.com/v1/nhi/ai/activity
     response:
       body:
-        string: '{"ingested": 2, "duplicates": 0}'
+        string: '{"ingested": 2, "dropped": 0}'
       headers:
         Allow:
           - POST, OPTIONS
         Connection:
           - keep-alive
         Content-Length:
-          - '32'
+          - '29'
         Content-Type:
           - application/json
       status:

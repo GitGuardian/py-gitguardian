@@ -2055,7 +2055,7 @@ def test_send_agent_activity_posts_to_correct_endpoint(
 
     assert isinstance(result, AgentActivityResponse)
     assert result.ingested == 2
-    assert result.duplicates == 0
+    assert result.dropped == 0
 
 
 def test_send_agent_activity_includes_user_in_payload(client: GGClient):
@@ -2087,7 +2087,7 @@ def test_send_agent_activity_includes_user_in_payload(client: GGClient):
         resp = Mock()
         resp.status_code = 200
         resp.headers = {"content-type": "application/json"}
-        resp.json.return_value = {"ingested": 1, "duplicates": 0}
+        resp.json.return_value = {"ingested": 1, "dropped": 2}
         return resp
 
     with patch.object(client, "post", side_effect=_fake_post):
@@ -2098,3 +2098,4 @@ def test_send_agent_activity_includes_user_in_payload(client: GGClient):
     assert captured["data"]["events"] == events
     assert isinstance(result, AgentActivityResponse)
     assert result.ingested == 1
+    assert result.dropped == 2  # parsed; defaults to 0 if the server omits it
