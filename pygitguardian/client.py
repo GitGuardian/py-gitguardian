@@ -64,6 +64,7 @@ from .models import (
     UpdateMember,
     UpdateTeam,
     UpdateTeamSource,
+    UserInfo,
 )
 from .models_utils import CursorPaginatedResponse
 
@@ -1263,6 +1264,7 @@ class GGClient:
     def send_agent_activity(
         self,
         events: List[Dict[str, Any]],
+        user: UserInfo,
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, AgentActivityResponse]:
         """Ship AI-agent activity records to GitGuardian.
@@ -1272,10 +1274,16 @@ class GGClient:
         verbatim: GitGuardian scans it and strips secrets server-side before
         storing it. Records are kept opaque here — no client-side schema is
         imposed on them on purpose — and land in the staging table.
+
+        user is the reporting machine/user (a serialised UserInfo); the server
+        stores its machine_id with each record so activity can be attributed
+        and correlated with the machine inventory.
         """
+        data: Dict[str, Any] = {"events": events}
+        data["user"] = user.to_dict()
         response = self.post(
             endpoint="nhi/ai/activity",
-            data={"events": events},
+            data=data,
             extra_headers=extra_headers,
         )
 

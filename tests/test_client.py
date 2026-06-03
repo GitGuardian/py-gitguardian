@@ -2048,8 +2048,53 @@ def test_send_agent_activity_posts_to_correct_endpoint(
         },
     ]
 
-    result = client.send_agent_activity(events)
+    user = UserInfo(
+        hostname="h", username="u", machine_id="m", user_email="u@example.com"
+    )
+    result = client.send_agent_activity(events, user)
 
     assert isinstance(result, AgentActivityResponse)
     assert result.ingested == 2
     assert result.duplicates == 0
+
+
+def test_send_agent_activity_includes_user_in_payload(client: GGClient):
+    """
+    GIVEN a user (serialised UserInfo) passed to send_agent_activity
+    WHEN the request is built
+    THEN the POST body carries the user alongside the events
+    """
+    user = UserInfo(
+        hostname="dev-laptop",
+        username="dev",
+        machine_id="machine-001",
+        user_email="dev@example.com",
+    )
+    events = [
+        {
+            "agent_name": "claude-code",
+            "source_kind": "session_transcript",
+            "source_path": "p.jsonl",
+            "record_offset": "0",
+            "content": "{}",
+        }
+    ]
+    captured = {}
+
+    def _fake_post(endpoint, data=None, **kwargs):
+        captured["endpoint"] = endpoint
+        captured["data"] = data
+        resp = Mock()
+        resp.status_code = 200
+        resp.headers = {"content-type": "application/json"}
+        resp.json.return_value = {"ingested": 1, "duplicates": 0}
+        return resp
+
+    with patch.object(client, "post", side_effect=_fake_post):
+        result = client.send_agent_activity(events, user=user)
+
+    assert captured["endpoint"] == "nhi/ai/activity"
+    assert captured["data"]["user"] == user.to_dict()
+    assert captured["data"]["events"] == events
+    assert isinstance(result, AgentActivityResponse)
+    assert result.ingested == 1
