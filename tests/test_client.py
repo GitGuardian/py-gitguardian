@@ -25,6 +25,7 @@ from pygitguardian.config import (
 )
 from pygitguardian.models import (
     AccessLevel,
+    AgentActivityResponse,
     AIDiscovery,
     APITokensResponse,
     CreateInvitation,
@@ -2015,3 +2016,40 @@ def test_log_mcp_activities_bulk_posts_to_correct_endpoint(
     assert result.ingested == 2
     assert result.duplicates == 0
     assert result.skipped == 0
+
+
+@my_vcr.use_cassette(
+    "test_send_agent_activity_posts_to_correct_endpoint.yaml",
+    ignore_localhost=False,
+)
+def test_send_agent_activity_posts_to_correct_endpoint(
+    client: GGClient,
+):
+    """
+    GIVEN a ggclient
+    WHEN calling send_agent_activity with a list of opaque record dicts
+    THEN a POST is made to the activity endpoint
+    AND a AgentActivityResponse is returned with ingested/duplicate counts
+    """
+    events = [
+        {
+            "agent_name": "claude-code",
+            "source_kind": "session_transcript",
+            "source_path": "projects/-p/bc7b2260.jsonl",
+            "record_offset": "0",
+            "content": '{"type": "user"}',
+        },
+        {
+            "agent_name": "cursor",
+            "source_kind": "composer_bubble",
+            "source_path": "globalStorage/state.vscdb",
+            "record_offset": "bubbleId:abc:xyz",
+            "content": '{"role": "assistant"}',
+        },
+    ]
+
+    result = client.send_agent_activity(events)
+
+    assert isinstance(result, AgentActivityResponse)
+    assert result.ingested == 2
+    assert result.duplicates == 0

@@ -1873,3 +1873,21 @@ class MCPActivityBulkResponseSchema(BaseSchema):
 
 
 MCPActivityBulkResponse.SCHEMA = MCPActivityBulkResponseSchema()
+
+
+@dataclass
+class AgentActivityResponse(FromDictWithBase):
+    ingested: int
+    duplicates: int
+
+
+class AgentActivityResponseSchema(BaseSchema):
+    ingested = fields.Int(required=True)
+    duplicates = fields.Int(required=True)
+
+    @post_load
+    def make_agent_activity_response(self, data: Dict[str, Any], **kwargs: Any):
+        return AgentActivityResponse(**data)
+
+
+AgentActivityResponse.SCHEMA = AgentActivityResponseSchema()

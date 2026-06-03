@@ -1,0 +1,37 @@
+interactions:
+  - request:
+      body:
+        '{"events": [{"agent_name": "claude-code", "source_kind": "session_transcript",
+        "source_path": "projects/-p/bc7b2260.jsonl", "record_offset": "0", "content":
+        "{\"type\": \"user\"}"}, {"agent_name": "cursor", "source_kind": "composer_bubble",
+        "source_path": "globalStorage/state.vscdb", "record_offset": "bubbleId:abc:xyz",
+        "content": "{\"role\": \"assistant\"}"}]}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.30.0 (Linux;py3.11.15)
+      method: POST
+      uri: https://api.gitguardian.com/v1/nhi/ai/activity
+    response:
+      body:
+        string: '{"ingested": 2, "duplicates": 0}'
+      headers:
+        Allow:
+          - POST, OPTIONS
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '32'
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1
