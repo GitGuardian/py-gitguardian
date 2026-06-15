@@ -1,5 +1,17 @@
 # Changelog
 
+<a id='changelog-1.31.0'></a>
+
+## 1.31.0 — 2026-06-15
+
+### Added
+
+- New endpoint `log_mcp_activities_bulk()`: send a batch of historical `MCPActivityRequest` to GitGuardian and receive ingested/duplicate counts. Adds `MCPActivityBulkResponse` model.
+
+- Optional `timestamp` field on `MCPActivityRequest`, used by the bulk endpoint to record historical events. Live (single-event) `log_mcp_activity` callers are unaffected; the new field defaults to `None`.
+
+- New `endpoints:send` token scope.
+
 <a id='changelog-1.30.0'></a>
 
 ## 1.30.0 — 2026-04-28
