@@ -2,8 +2,9 @@ import json
 import os
 import re
 import tarfile
+import uuid
 from collections import OrderedDict
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple, Type
 from unittest.mock import Mock, patch
@@ -1986,27 +1987,24 @@ def test_log_mcp_activities_bulk_posts_to_correct_endpoint(
     THEN a POST is made to the bulk endpoint
     AND an MCPActivityBulkResponse is returned with ingested/duplicate counts
     """
+    # Fresh, per-run-unique events so the cassette-less release run
+    # (`scripts/release run-tests`) always ingests them: a stale timestamp is
+    # rejected by the backfill window and repeated events are deduplicated.
+    # Cassette replay matches on method+url (see conftest.my_vcr), so the
+    # request body here does not affect recorded-cassette runs.
+    recent = datetime.now(timezone.utc) - timedelta(hours=1)
     activities = [
         MCPActivityRequest(
-            user=UserInfo(hostname="h", username="u", machine_id="m"),
+            user=UserInfo(hostname="h", username="u", machine_id=uuid.uuid4().hex),
             tool="t",
             server="s",
             agent="claude-code",
             model="m",
             cwd="/tmp",
             input={},
-            timestamp=datetime(2026, 4, 1, 9, 0, tzinfo=timezone.utc),
-        ),
-        MCPActivityRequest(
-            user=UserInfo(hostname="h", username="u", machine_id="m"),
-            tool="t",
-            server="s",
-            agent="claude-code",
-            model="m",
-            cwd="/tmp",
-            input={},
-            timestamp=datetime(2026, 4, 1, 9, 0, tzinfo=timezone.utc),
-        ),
+            timestamp=recent,
+        )
+        for _ in range(2)
     ]
 
     result = client.log_mcp_activities_bulk(activities)
