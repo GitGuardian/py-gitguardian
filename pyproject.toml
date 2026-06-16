@@ -30,9 +30,9 @@ classifiers = [
 license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = [
-    "marshmallow>=3.5, <4",
+    "marshmallow>=3.18, <5",
     "requests>=2, <3",
-    "marshmallow-dataclass >=8.5.8, <8.6.0",
+    "marshmallow-dataclass >=8.7, <8.8",
     "typing-extensions",
     "setuptools>=70.1.0",
 ]

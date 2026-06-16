@@ -21,6 +21,10 @@ with all the response codes and expected structures on each method.
 
 Python 3.8+
 
+> [!WARNING]
+> Python 3.8 support is deprecated and will be removed in a future release.
+> On Python 3.8, `marshmallow` 3.x is used; Python 3.9+ uses `marshmallow` 4.x.
+
 ## Projects using `py-gitguardian`
 
 - [**GitGuardian Shield**](https://github.com/GitGuardian/gg-shield) - Scan for secrets in your CI and pre-commit.

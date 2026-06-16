@@ -56,7 +56,6 @@ class FromDictMixin:
 
 class BaseSchema(Schema):
     class Meta:
-        ordered = True
         unknown = EXCLUDE
 
 
