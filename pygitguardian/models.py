@@ -573,7 +573,7 @@ class HoneytokenResponseSchema(BaseSchema):
     revoker_id = fields.Int(allow_none=True)
     creator_api_token_id = fields.String(allow_none=True)
     revoker_api_token_id = fields.String(allow_none=True)
-    token = fields.Mapping(fields.String(), fields.String())
+    token = fields.Dict(keys=fields.String(), values=fields.String())
     tags = fields.List(fields.String())
 
     @post_load

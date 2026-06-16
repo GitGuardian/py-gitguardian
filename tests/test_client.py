@@ -3,7 +3,6 @@ import os
 import re
 import tarfile
 import uuid
-from collections import OrderedDict
 from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple, Type
@@ -272,7 +271,7 @@ def test_health_check(client: GGClient):
     assert bool(health)
     assert health.success
 
-    assert type(health.to_dict()) == OrderedDict
+    assert type(health.to_dict()) == dict
     assert type(health.to_json()) == str
 
 
@@ -314,7 +313,7 @@ def test_multi_content_scan(
     assert multiscan.status_code == 200
     assert isinstance(multiscan, MultiScanResult)
 
-    assert type(multiscan.to_dict()) == OrderedDict
+    assert type(multiscan.to_dict()) == dict
     assert type(multiscan.to_json()) == str
     assert type(repr(multiscan)) == str
     assert type(str(multiscan)) == str
@@ -444,7 +443,7 @@ def test_content_scan(
         else:
             pytest.fail("returned should be a ScanResult")
 
-        assert isinstance(scan_result.to_dict(), OrderedDict)
+        assert isinstance(scan_result.to_dict(), dict)
         scan_result_json = scan_result.to_json()
         assert isinstance(scan_result_json, str)
         assert isinstance(json.loads(scan_result_json), dict)
@@ -940,7 +939,7 @@ def test_quota_overview(client: GGClient):
         else:
             pytest.fail("returned should be a QuotaResponse")
 
-        assert isinstance(quota_response.to_dict(), OrderedDict)
+        assert isinstance(quota_response.to_dict(), dict)
         quota_response_json = quota_response.to_json()
         assert isinstance(quota_response_json, str)
         assert isinstance(json.loads(quota_response_json), dict)

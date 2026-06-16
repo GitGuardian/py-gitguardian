@@ -1,5 +1,3 @@
-from typing import OrderedDict
-
 import pytest
 
 from pygitguardian.models import (
@@ -65,10 +63,10 @@ class TestModel:
     @pytest.mark.parametrize(
         "schema_klass, expected_klass, instance_data",
         [
-            (DocumentSchema, OrderedDict, {"filename": "hello", "document": "hello"}),
+            (DocumentSchema, dict, {"filename": "hello", "document": "hello"}),
             (
                 HealthCheckResponseSchema,
-                OrderedDict,
+                dict,
                 {"detail": "hello", "status_code": 200},
             ),
             (
