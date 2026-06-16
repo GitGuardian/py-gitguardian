@@ -15,7 +15,7 @@ if sys.version_info < (3, 9):
     )
 
 
-__version__ = "1.31.0"
+__version__ = "1.32.0"
 GGClient._version = __version__
 
 __all__ = ["GGClient", "GGClientCallbacks", "ContentTooLarge"]
