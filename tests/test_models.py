@@ -1,6 +1,8 @@
 import pytest
 
 from pygitguardian.models import (
+    AgentActivityResponse,
+    AgentActivityResponseSchema,
     AIDiscovery,
     AIDiscoverySchema,
     APITokensResponse,
@@ -524,6 +526,14 @@ class TestModel:
                 {
                     "allowed": True,
                     "reason": "test",
+                },
+            ),
+            (
+                AgentActivityResponseSchema,
+                AgentActivityResponse,
+                {
+                    "ingested": 2,
+                    "dropped": 0,
                 },
             ),
         ],

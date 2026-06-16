@@ -20,6 +20,7 @@ from .config import (
     MAXIMUM_PAYLOAD_SIZE,
 )
 from .models import (
+    AgentActivityResponse,
     AIDiscovery,
     APITokensResponse,
     CreateInvitation,
@@ -63,6 +64,7 @@ from .models import (
     UpdateMember,
     UpdateTeam,
     UpdateTeamSource,
+    UserInfo,
 )
 from .models_utils import CursorPaginatedResponse
 
@@ -1253,6 +1255,41 @@ class GGClient:
         obj: Union[Detail, MCPActivityBulkResponse]
         if is_ok(response):
             obj = MCPActivityBulkResponse.from_dict(response.json())
+        else:
+            obj = load_detail(response)
+
+        obj.status_code = response.status_code
+        return obj
+
+    def send_agent_activity(
+        self,
+        events: List[Dict[str, Any]],
+        user: UserInfo,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Union[Detail, AgentActivityResponse]:
+        """Ship AI-agent activity records to GitGuardian.
+
+        Each entry in events is an opaque record dict (one raw transcript line
+        or database row, serialised by the caller). The content is sent
+        verbatim: GitGuardian scans it and strips secrets server-side before
+        storing it. Records are kept opaque here — no client-side schema is
+        imposed on them on purpose — and land in the staging table.
+
+        user is the reporting machine/user (a serialised UserInfo); the server
+        stores its machine_id with each record so activity can be attributed
+        and correlated with the machine inventory.
+        """
+        data: Dict[str, Any] = {"events": events}
+        data["user"] = user.to_dict()
+        response = self.post(
+            endpoint="nhi/ai/activity",
+            data=data,
+            extra_headers=extra_headers,
+        )
+
+        obj: Union[Detail, AgentActivityResponse]
+        if is_ok(response):
+            obj = AgentActivityResponse.from_dict(response.json())
         else:
             obj = load_detail(response)
 
