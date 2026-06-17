@@ -2090,7 +2090,7 @@ def test_send_agent_activity_includes_user_in_payload(client: GGClient):
     with patch.object(client, "post", side_effect=_fake_post):
         result = client.send_agent_activity(events, user=user)
 
-    assert captured["endpoint"] == "nhi/ai/activity"
+    assert captured["endpoint"] == "agent-activity/activity"
     assert captured["data"]["user"] == user.to_dict()
     assert captured["data"]["events"] == events
     assert isinstance(result, AgentActivityResponse)

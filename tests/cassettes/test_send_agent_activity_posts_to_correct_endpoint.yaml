@@ -18,7 +18,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.30.0 (Linux;py3.11.15)
       method: POST
-      uri: https://api.gitguardian.com/v1/nhi/ai/activity
+      uri: https://api.gitguardian.com/v1/agent-activity/activity
     response:
       body:
         string: '{"ingested": 2, "dropped": 0}'
