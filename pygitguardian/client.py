@@ -1282,7 +1282,7 @@ class GGClient:
         data: Dict[str, Any] = {"events": events}
         data["user"] = user.to_dict()
         response = self.post(
-            endpoint="nhi/ai/activity",
+            endpoint="agent-activity/activity",
             data=data,
             extra_headers=extra_headers,
         )
