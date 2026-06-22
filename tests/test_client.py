@@ -53,6 +53,7 @@ from pygitguardian.models import (
     MultiScanResult,
     QuotaResponse,
     ScanResult,
+    SecretBlockRequest,
     Source,
     SourceParameters,
     Team,
@@ -1972,6 +1973,32 @@ def test_log_mcp_activity(client: GGClient):
     )
 
     assert isinstance(result, MCPActivityResponse), result
+
+
+@my_vcr.use_cassette("test_log_secret_block.yaml", ignore_localhost=False)
+def test_log_secret_block(client: GGClient):
+    """
+    GIVEN a client
+    WHEN calling POST /agent-activity/secret-block endpoint
+    THEN the secret block is logged and None is returned on success (204)
+    """
+    result = client.log_secret_block(
+        SecretBlockRequest(
+            user=UserInfo(
+                user_email="toto@gitguardian.com",
+                hostname="toto-laptop",
+                username="toto",
+                machine_id="1234567890",
+            ),
+            tool="Write",
+            agent="claude",
+            cwd="/home/user/project",
+            secret_count=2,
+            detectors=["AWS Keys", "GitHub Token"],
+        )
+    )
+
+    assert result is None, result
 
 
 @my_vcr.use_cassette(

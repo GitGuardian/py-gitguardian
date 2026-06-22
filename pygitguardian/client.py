@@ -49,6 +49,7 @@ from .models import (
     QuotaResponse,
     RemediationMessages,
     ScanResult,
+    SecretBlockRequest,
     SecretIncident,
     SecretScanPreferences,
     ServerMetadata,
@@ -1260,6 +1261,25 @@ class GGClient:
 
         obj.status_code = response.status_code
         return obj
+
+    def log_secret_block(
+        self,
+        block: SecretBlockRequest,
+        extra_headers: Optional[Dict[str, str]] = None,
+    ) -> Optional[Detail]:
+        """Report a secret blocked by an AI hook.
+
+        The endpoint returns 204 No Content on success, so this returns None on
+        success and a Detail on error.
+        """
+        response = self.post(
+            endpoint="agent-activity/secret-block",
+            data=block.to_dict(),
+            extra_headers=extra_headers,
+        )
+
+        if not is_delete_ok(response):
+            return load_detail(response)
 
     def send_agent_activity(
         self,

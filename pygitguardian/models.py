@@ -1838,6 +1838,34 @@ MCPActivityRequest.SCHEMA = MCPActivityRequestSchema()
 
 
 @dataclass
+class SecretBlockRequest(FromDictMixin, ToDictMixin):
+    user: UserInfo
+    tool: str
+    agent: str
+    cwd: str
+    secret_count: int
+    detectors: List[str] = field(default_factory=list)
+    timestamp: Optional[datetime] = None
+
+
+class SecretBlockRequestSchema(BaseSchema):
+    user = fields.Nested(UserInfoSchema, required=True)
+    tool = fields.Str(required=True)
+    agent = fields.Str(required=True)
+    cwd = fields.Str(required=True)
+    secret_count = fields.Int(required=True)
+    detectors = fields.List(fields.Str(), load_default=[], dump_default=[])
+    timestamp = fields.DateTime(load_default=None, allow_none=True)
+
+    @post_load
+    def make_secret_block_request(self, data: Dict[str, Any], **kwargs: Any):
+        return SecretBlockRequest(**data)
+
+
+SecretBlockRequest.SCHEMA = SecretBlockRequestSchema()
+
+
+@dataclass
 class MCPActivityResponse(FromDictWithBase):
     allowed: bool
     reason: str

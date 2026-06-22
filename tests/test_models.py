@@ -32,6 +32,8 @@ from pygitguardian.models import (
     QuotaSchema,
     ScanResult,
     ScanResultSchema,
+    SecretBlockRequest,
+    SecretBlockRequestSchema,
     SecretIncident,
     SecretIncidentSchema,
     SecretOccurrence,
@@ -526,6 +528,23 @@ class TestModel:
                 {
                     "allowed": True,
                     "reason": "test",
+                },
+            ),
+            (
+                SecretBlockRequestSchema,
+                SecretBlockRequest,
+                {
+                    "user": {
+                        "user_email": "toto@gitguardian.com",
+                        "machine_id": "1234567890",
+                        "hostname": "toto-laptop",
+                        "username": "toto",
+                    },
+                    "tool": "Write",
+                    "agent": "claude",
+                    "cwd": "/home/user/project",
+                    "secret_count": 2,
+                    "detectors": ["AWS Keys", "GitHub Token"],
                 },
             ),
             (
