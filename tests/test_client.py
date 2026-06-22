@@ -1003,7 +1003,7 @@ def test_api_tokens(client: GGClient, token):
     mock_response = responses.get(
         url=client._url_from_endpoint(f"api_tokens/{token}", "v1"),
         content_type="application/json",
-        status=201,
+        status=200,
         json={
             "id": "5ddaad0c-5a0c-4674-beb5-1cd198d13360",
             "name": "myTokenName",
@@ -1048,6 +1048,28 @@ def test_api_tokens_error(
 
     assert mock_response.call_count == 1
     assert isinstance(result, Detail)
+
+
+@responses.activate
+def test_api_tokens_non_json_body(client: GGClient):
+    """
+    GIVEN an api_tokens endpoint answering 200 with a non-JSON body
+        (e.g. the dashboard SPA's HTML, served when the instance URL is wrong)
+    WHEN calling api_tokens
+    THEN it returns a Detail instead of raising a raw JSONDecodeError
+    """
+    mock_response = responses.get(
+        url=client._url_from_endpoint("api_tokens/self", "v1"),
+        content_type="text/html",
+        status=200,
+        body="<!doctype html><html><body>GitGuardian</body></html>",
+    )
+
+    result = client.api_tokens()
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, Detail)
+    assert result.status_code == 200
 
 
 @responses.activate
@@ -1188,6 +1210,32 @@ def test_create_honeytoken_with_context_error(
 
     assert mock_response.call_count == 1
     assert isinstance(result, Detail)
+
+
+@responses.activate
+def test_create_honeytoken_with_context_non_json_body(client: GGClient):
+    """
+    GIVEN the honeytoken with-context endpoint answering 2xx with a non-JSON body
+    WHEN calling create_honeytoken_with_context
+    THEN it returns a Detail instead of raising a raw JSONDecodeError
+    """
+    mock_response = responses.post(
+        url=client._url_from_endpoint("honeytokens/with-context", "v1"),
+        content_type="text/html",
+        status=201,
+        body="<!doctype html><html></html>",
+    )
+
+    result = client.create_honeytoken_with_context(
+        name="honeytoken A",
+        description="honeytoken used in the repository AA",
+        type_="AWS",
+        filename="aws.yaml",
+    )
+
+    assert mock_response.call_count == 1
+    assert isinstance(result, Detail)
+    assert result.status_code == 201
 
 
 @responses.activate
