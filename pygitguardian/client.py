@@ -425,7 +425,7 @@ class GGClient:
             result = Detail("The request timed out.")
             result.status_code = 504
         else:
-            if resp.ok:
+            if is_ok(resp):
                 result = APITokensResponse.from_dict(resp.json())
             else:
                 result = load_detail(resp)
@@ -741,7 +741,7 @@ class GGClient:
             result = Detail("The request timed out.")
             result.status_code = 504
         else:
-            if resp.ok:
+            if is_create_ok(resp):
                 result = HoneytokenWithContextResponse.from_dict(resp.json())
             else:
                 result = load_detail(resp)
