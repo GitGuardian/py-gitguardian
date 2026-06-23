@@ -26,6 +26,7 @@ from pygitguardian.config import (
 from pygitguardian.models import (
     AccessLevel,
     AgentActivityResponse,
+    AgentInfo,
     AIDiscovery,
     APITokensResponse,
     CreateInvitation,
@@ -1938,6 +1939,13 @@ def test_send_ai_discovery(client: GGClient):
                             url="https://mcp-server-1.com",
                         )
                     ],
+                )
+            ],
+            agents=[
+                AgentInfo(
+                    name="cursor",
+                    hooks_installed=True,
+                    hooks_command="ggshield hooks install cursor",
                 )
             ],
         )
