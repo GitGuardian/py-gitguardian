@@ -20,7 +20,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.29.0 (Linux;py3.11.15)
       method: POST
-      uri: https://api.gitguardian.com/v1/nhi/ai/discovery
+      uri: https://api.gitguardian.com/v1/agent-activity/discovery
     response:
       body:
         string: '{"user":{"hostname":"toto-laptop","username":"toto","machine_id":"1234567890","user_email":"toto@gitguardian.com"},"servers":[{"name":"https://mcp-server-1.com","display_name":"","tools":[],"resources":[],"prompts":[],"configurations":[{"name":"mcp-configuration-1","agent":"cursor","scope":"user","transport":"http","project":null,"command":null,"args":[],"env":{},"url":"https://mcp-server-1.com","headers":{}}]}],"discovery_duration":0.5}'

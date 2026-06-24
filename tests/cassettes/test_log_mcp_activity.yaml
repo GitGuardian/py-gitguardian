@@ -18,7 +18,7 @@ interactions:
         User-Agent:
           - pygitguardian/1.29.0 (Linux;py3.11.15)
       method: POST
-      uri: https://api.gitguardian.com/v1/nhi/ai/mcp-activity
+      uri: https://api.gitguardian.com/v1/agent-activity/mcp-activity
     response:
       body:
         string: '{"allowed":true,"reason":""}'
