@@ -1962,7 +1962,7 @@ def test_delete_invitation(client: GGClient):
 def test_send_ai_discovery(client: GGClient):
     """
     GIVEN a client
-    WHEN calling POST /nhi/ai/discovery endpoint
+    WHEN calling POST /agent-activity/discovery endpoint
     THEN an AI discovery is sent
     """
 
@@ -2006,7 +2006,7 @@ def test_send_ai_discovery(client: GGClient):
 def test_log_mcp_activity(client: GGClient):
     """
     GIVEN a client
-    WHEN calling POST /nhi/ai/mcp-activity endpoint
+    WHEN calling POST /agent-activity/mcp-activity endpoint
     THEN an MCP activity is logged
     """
 

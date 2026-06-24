@@ -1207,7 +1207,7 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, AIDiscovery]:
         response = self.post(
-            endpoint="nhi/ai/discovery",
+            endpoint="agent-activity/discovery",
             data=ai_discovery.to_dict(),
             extra_headers=extra_headers,
         )
@@ -1227,7 +1227,7 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, MCPActivityResponse]:
         response = self.post(
-            endpoint="nhi/ai/mcp-activity",
+            endpoint="agent-activity/mcp-activity",
             data=activity.to_dict(),
             extra_headers=extra_headers,
         )
@@ -1247,7 +1247,7 @@ class GGClient:
         extra_headers: Optional[Dict[str, str]] = None,
     ) -> Union[Detail, MCPActivityBulkResponse]:
         response = self.post(
-            endpoint="nhi/ai/mcp-activity/bulk",
+            endpoint="agent-activity/mcp-activity/bulk",
             data={"activities": [a.to_dict() for a in activities]},
             extra_headers=extra_headers,
         )
