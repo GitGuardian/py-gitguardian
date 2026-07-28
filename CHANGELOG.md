@@ -1,5 +1,13 @@
 # Changelog
 
+<a id='changelog-1.33.1'></a>
+
+## 1.33.1 — 2026-07-28
+
+### Fixed
+
+- Fix `create_honeytoken_with_context()` that treated every successful response as an error: 1.33.0 started requiring a `201` status, but the `/v1/honeytokens/with-context` endpoint answers `200`. Successful responses were parsed as an error `Detail`, raising a `ValidationError`.
+
 <a id='changelog-1.33.0'></a>
 
 ## 1.33.0 — 2026-07-28
