@@ -1157,7 +1157,7 @@ def test_create_honeytoken_with_context(
     mock_response = responses.post(
         url=client._url_from_endpoint("honeytokens/with-context", "v1"),
         content_type="application/json",
-        status=201,
+        status=200,
         json={
             "content": "def return_aws_credentials():\n \
                             aws_access_key_id = XXXXXXXX\n \
@@ -1222,7 +1222,7 @@ def test_create_honeytoken_with_context_non_json_body(client: GGClient):
     mock_response = responses.post(
         url=client._url_from_endpoint("honeytokens/with-context", "v1"),
         content_type="text/html",
-        status=201,
+        status=200,
         body="<!doctype html><html></html>",
     )
 
@@ -1235,7 +1235,7 @@ def test_create_honeytoken_with_context_non_json_body(client: GGClient):
 
     assert mock_response.call_count == 1
     assert isinstance(result, Detail)
-    assert result.status_code == 201
+    assert result.status_code == 200
 
 
 @responses.activate
