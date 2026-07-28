@@ -1,5 +1,25 @@
 # Changelog
 
+<a id='changelog-1.33.0'></a>
+
+## 1.33.0 — 2026-07-28
+
+### Added
+
+- New endpoint `send_agent_activity()`: ship a batch of raw AI-agent activity records (one per transcript line or database row) to GitGuardian and receive ingested/duplicate counts. Adds the `AgentActivityResponse` model. Records are opaque to the SDK and sent verbatim; GitGuardian scans the content and strips secrets server-side before storing it. Optionally carries the reporting machine/user (a serialised `UserInfo`) so records can be attributed and correlated with the machine inventory. The response reports ingested/duplicate/dropped counts (dropped = records the server could not scan and refused to store).
+
+- AI discovery now also sends whether hooks are globally installed, per agent.
+
+- New `ai-discover:send` token scope.
+
+### Changed
+
+- Update MCP endpoint paths from `nhi/ai/...` to `agent-activity/...` following server-side route migration.
+
+### Fixed
+
+- `api_tokens()` and `create_honeytoken_with_context()` now return a `Detail` instead of raising a raw `JSONDecodeError` when the server answers a `2xx` with a non-JSON body (e.g. an HTML page served when the instance URL is wrong). Like the other endpoints, they now gate JSON parsing on the response status and content type.
+
 <a id='changelog-1.32.0'></a>
 
 ## 1.32.0 — 2026-06-16
