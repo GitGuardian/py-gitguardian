@@ -1792,12 +1792,16 @@ class AgentInfo(FromDictMixin, ToDictMixin):
     # Whether the ggshield AI hooks are installed for this agent (globally).
     hooks_installed: bool
     hooks_command: Optional[str] = None
+    # Email of the assistant subscription this agent is signed into, when readable
+    # locally. Per-agent: one machine can mix a work seat and a personal one.
+    subscription_email: Optional[str] = None
 
 
 class AgentInfoSchema(BaseSchema):
     name = fields.Str(required=True)
     hooks_installed = fields.Bool(required=True)
     hooks_command = fields.Str(load_default=None, dump_default=None)
+    subscription_email = fields.Str(load_default=None, dump_default=None)
 
     @post_load
     def make_agent_info(self, data: Dict[str, Any], **kwargs: Any):
