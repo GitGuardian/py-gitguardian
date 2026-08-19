@@ -1,5 +1,18 @@
 # Changelog
 
+<a id='changelog-1.34.0'></a>
+
+## 1.34.0 — 2026-08-19
+
+### Added
+
+- `AgentInfo.subscription_email`: the email of the assistant subscription an AI agent is signed into, so a personal
+  subscription can be told apart from a company one. Optional — agents that keep no account readable on disk send nothing.
+
+### Fixed
+
+- `Source.last_scan.status`, `Source.health`, `Source.source_criticality`, `Member.access_level`, `Invitation.access_level`, `TeamMember`/`TeamInvitation` permission fields, and related models no longer raise `marshmallow.exceptions.ValidationError` when the API returns a value added after this SDK version (e.g. the new `skipped`/`launched`/`running_failed`/`running_cancelled` scan statuses). These fields now accept any string, falling back to the raw value for statuses/levels the SDK doesn't have a named constant for yet, instead of failing to deserialize the whole object.
+
 <a id='changelog-1.33.1'></a>
 
 ## 1.33.1 — 2026-07-28
