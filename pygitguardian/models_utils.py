@@ -2,6 +2,7 @@
 # Disable this check because of multiple non-dangerous violations (SCHEMA variables,
 # BaseSchema.Meta class)
 from dataclasses import dataclass
+from enum import Enum
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -16,7 +17,7 @@ from typing import (
 )
 
 import marshmallow_dataclass
-from marshmallow import EXCLUDE, Schema
+from marshmallow import EXCLUDE, Schema, fields
 from typing_extensions import Self
 
 
@@ -57,6 +58,30 @@ class FromDictMixin:
 class BaseSchema(Schema):
     class Meta:
         unknown = EXCLUDE
+
+
+class LenientEnum(fields.Field):
+    """Like `fields.Enum(enum_class, by_value=True)`, but returns the raw
+    value instead of raising when it doesn't match a known member."""
+
+    def __init__(self, enum_class: Type[Enum], **kwargs: Any) -> None:
+        self.enum_class = enum_class
+        super().__init__(**kwargs)
+
+    def _serialize(
+        self, value: Any, attr: Optional[str], obj: Any, **kwargs: Any
+    ) -> Any:
+        if value is None:
+            return None
+        return value.value if isinstance(value, Enum) else value
+
+    def _deserialize(
+        self, value: Any, attr: Optional[str], data: Any, **kwargs: Any
+    ) -> Any:
+        try:
+            return self.enum_class(value)
+        except ValueError:
+            return value
 
 
 class Base(ToDictMixin):

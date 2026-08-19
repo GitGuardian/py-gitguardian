@@ -4,7 +4,7 @@
 from dataclasses import dataclass, field
 from datetime import date, datetime
 from enum import Enum
-from typing import Any, Dict, List, Literal, Optional, Type, cast
+from typing import Any, Dict, List, Literal, Optional, Type, Union, cast
 from uuid import UUID
 
 import marshmallow_dataclass
@@ -29,6 +29,7 @@ from .models_utils import (
     BaseSchema,
     FromDictMixin,
     FromDictWithBase,
+    LenientEnum,
     PaginationParameter,
     PaginationParameterSchema,
     SearchParameter,
@@ -972,15 +973,23 @@ class SecretIncidentsBreakdown(Base, FromDictMixin):
     closed_secret_incidents: SecretIncidentStats
 
 
-ScanStatus = Literal[
-    "pending",
-    "running",
-    "canceled",
-    "failed",
-    "too_large",
-    "timeout",
-    "pending_timeout",
-    "finished",
+# `str` fallback so a status the API adds later doesn't break deserialization.
+ScanStatus = Union[
+    Literal[
+        "pending",
+        "running",
+        "canceled",
+        "failed",
+        "too_large",
+        "timeout",
+        "pending_timeout",
+        "finished",
+        "launched",
+        "skipped",
+        "running_failed",
+        "running_cancelled",
+    ],
+    str,
 ]
 
 
@@ -994,8 +1003,9 @@ class Scan(Base, FromDictMixin):
     duration: str
 
 
-SourceHealth = Literal["safe", "unknown", "at_risk"]
-SourceCriticality = Literal["critical", "high", "medium", "low", "unknown"]
+# `str` fallback, same reasoning as ScanStatus above.
+SourceHealth = Union[Literal["safe", "unknown", "at_risk"], str]
+SourceCriticality = Union[Literal["critical", "high", "medium", "low", "unknown"], str]
 
 
 @dataclass
@@ -1163,7 +1173,7 @@ class Member(FromDictWithBase):
     """
 
     id: int
-    access_level: AccessLevel
+    access_level: Union[AccessLevel, str]
     email: str
     name: str
     created_at: datetime
@@ -1178,7 +1188,7 @@ class MemberSchema(BaseSchema):
     """
 
     id = fields.Int(required=True)
-    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    access_level = LenientEnum(AccessLevel, required=True)
     email = fields.Str(required=True)
     name = fields.Str(required=True)
     created_at = fields.AwareDateTime(required=True)
@@ -1350,8 +1360,8 @@ class TeamInvitation(FromDictWithBase):
     id: int
     invitation_id: int
     team_id: int
-    team_permission: TeamPermission
-    incident_permission: IncidentPermission
+    team_permission: Union[TeamPermission, str]
+    incident_permission: Union[IncidentPermission, str]
 
 
 class TeamInvitationSchema(BaseSchema):
@@ -1360,8 +1370,8 @@ class TeamInvitationSchema(BaseSchema):
     id = fields.Int(required=True)
     invitation_id = fields.Int(required=True)
     team_id = fields.Int(required=True)
-    team_permission = fields.Enum(TeamPermission, by_value=True, required=True)
-    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+    team_permission = LenientEnum(TeamPermission, required=True)
+    incident_permission = LenientEnum(IncidentPermission, required=True)
 
     @post_load
     def make_team_invitation(
@@ -1379,7 +1389,7 @@ TeamInvitation.SCHEMA = TeamInvitationSchema()
 class CreateTeamInvitation(FromDictWithBase):
     invitation_id: int
     is_team_leader: bool
-    incident_permission: IncidentPermission
+    incident_permission: Union[IncidentPermission, str]
 
 
 class CreateTeamInvitationSchema(BaseSchema):
@@ -1387,7 +1397,7 @@ class CreateTeamInvitationSchema(BaseSchema):
 
     invitation_id = fields.Int(required=True)
     is_team_leader = fields.Bool(required=True)
-    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+    incident_permission = LenientEnum(IncidentPermission, required=True)
 
     @post_load
     def make_team_invitation(self, data: Dict[str, Any], **kwargs: Any):
@@ -1434,8 +1444,8 @@ class TeamMember(FromDictWithBase):
     team_id: int
     member_id: int
     is_team_leader: bool
-    team_permission: TeamPermission
-    incident_permission: IncidentPermission
+    team_permission: Union[TeamPermission, str]
+    incident_permission: Union[IncidentPermission, str]
 
 
 class TeamMemberSchema(BaseSchema):
@@ -1443,8 +1453,8 @@ class TeamMemberSchema(BaseSchema):
     team_id = fields.Int(required=True)
     member_id = fields.Int(required=True)
     is_team_leader = fields.Bool(required=True)
-    team_permission = fields.Enum(TeamPermission, by_value=True, required=True)
-    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+    team_permission = LenientEnum(TeamPermission, required=True)
+    incident_permission = LenientEnum(IncidentPermission, required=True)
 
     @post_load
     def make_team_member(self, data: Dict[str, Any], **kwargs: Any):
@@ -1472,7 +1482,7 @@ CreateTeamMemberParameters.SCHEMA = CreateTeamMemberParameterSchema()
 class CreateTeamMember(FromDictWithBase):
     member_id: int
     is_team_leader: bool
-    incident_permission: IncidentPermission
+    incident_permission: Union[IncidentPermission, str]
 
 
 class CreateTeamMemberSchema(BaseSchema):
@@ -1480,7 +1490,7 @@ class CreateTeamMemberSchema(BaseSchema):
 
     member_id = fields.Int(required=True)
     is_team_leader = fields.Bool(required=True)
-    incident_permission = fields.Enum(IncidentPermission, by_value=True, required=True)
+    incident_permission = LenientEnum(IncidentPermission, required=True)
 
     @post_load
     def make_create_team_member(self, data: Dict[str, Any], **kwargs: Any):
@@ -1545,14 +1555,14 @@ class InvitationParameters(
 class Invitation(FromDictWithBase):
     id: int
     email: str
-    access_level: AccessLevel
+    access_level: Union[AccessLevel, str]
     date: datetime
 
 
 class InvitationSchema(BaseSchema):
     id = fields.Int(required=True)
     email = fields.Str(required=True)
-    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    access_level = LenientEnum(AccessLevel, required=True)
     date = fields.DateTime(required=True)
 
     @post_load
@@ -1580,12 +1590,12 @@ CreateInvitationParameters.SCHEMA = CreateInvitationParameterSchema()
 @dataclass
 class CreateInvitation(FromDictMixin, ToDictMixin):
     email: str
-    access_level: AccessLevel
+    access_level: Union[AccessLevel, str]
 
 
 class CreateInvitationSchema(BaseSchema):
     email = fields.Str(required=True)
-    access_level = fields.Enum(AccessLevel, by_value=True, required=True)
+    access_level = LenientEnum(AccessLevel, required=True)
 
     @post_load
     def make_create_invitation(self, data: Dict[str, Any], **kwargs: Any):
