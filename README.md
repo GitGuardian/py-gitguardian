@@ -1,5 +1,3 @@
-<a href="https://gitguardian.com/"><img src="https://cdn.jsdelivr.net/gh/gitguardian/py-gitguardian/doc/logo.svg"></a>
-
 # [py-gitguardian](https://github.com/GitGuardian/py-gitguardian) - GitGuardian API Client
 
 [![PyPI](https://img.shields.io/pypi/v/pygitguardian?color=%231B2D55&style=for-the-badge)](https://pypi.org/project/pygitguardian/)
