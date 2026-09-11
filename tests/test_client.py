@@ -811,6 +811,11 @@ def test_retrieve_secret_incident(client: GGClient):
                     "key": "confrence test",
                     "value": "hacktivity",
                 },
+                {
+                    "id": "3dade8a1-71ff-46d2-bbe3-c2bf71437ae8",
+                    "key": "no value",
+                    "value": None,
+                },
             ],
             "feedback_list": [
                 {
@@ -854,6 +859,11 @@ def test_retrieve_secret_incident(client: GGClient):
             id="2cade8a1-71ff-46d2-bbe3-c2bf71437ae7",
             key="confrence test",
             value="hacktivity",
+        ),
+        CustomTag(
+            id="3dade8a1-71ff-46d2-bbe3-c2bf71437ae8",
+            key="no value",
+            value=None,
         ),
     ]
 
