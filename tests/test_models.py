@@ -40,6 +40,8 @@ from pygitguardian.models import (
     SecretOccurrenceSchema,
 )
 
+from .conftest import create_secret_incident_payload
+
 
 class TestModel:
     def test_document_model(self):
@@ -291,65 +293,7 @@ class TestModel:
             (
                 SecretIncidentSchema,
                 SecretIncident,
-                {
-                    "id": 3759,
-                    "date": "2019-08-22T14:15:22Z",
-                    "detector": {
-                        "name": "slack_bot_token",
-                        "display_name": "Slack Bot Token",
-                        "nature": "specific",
-                        "family": "apikey",
-                        "detector_group_name": "slackbot_token",
-                        "detector_group_display_name": "Slack Bot Token",
-                    },
-                    "secret_hash": "Ri9FjVgdOlPnBmujoxP4XPJcbe82BhJXB/SAngijw/juCISuOMgPzYhV28m6OG24",
-                    "hmsl_hash": "05975add34ddc9a38a0fb57c7d3e676ffed57080516fc16bf8d8f14308fedb86",
-                    "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/incidents/3899",
-                    "regression": False,
-                    "status": "IGNORED",
-                    "assignee_id": 309,
-                    "assignee_email": "eric@gitguardian.com",
-                    "occurrences_count": 4,
-                    "secret_presence": {
-                        "files_requiring_code_fix": 1,
-                        "files_pending_merge": 1,
-                        "files_fixed": 1,
-                        "outside_vcs": 1,
-                        "removed_outside_vcs": 0,
-                        "in_vcs": 3,
-                        "removed_in_vcs": 0,
-                    },
-                    "ignore_reason": "test_credential",
-                    "triggered_at": "2019-05-12T09:37:49Z",
-                    "ignored_at": "2019-08-24T14:15:22Z",
-                    "ignorer_id": 309,
-                    "ignorer_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
-                    "resolver_id": 395,
-                    "resolver_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
-                    "secret_revoked": False,
-                    "severity": "high",
-                    "validity": "valid",
-                    "resolved_at": None,
-                    "share_url": "https://dashboard.gitguardian.com/share/incidents/11111111-11111",
-                    "tags": ["FROM_HISTORICAL_SCAN", "SENSITIVE_FILE"],
-                    "feedback_list": [
-                        {
-                            "created_at": "2021-05-20T12:40:55.662949Z",
-                            "updated_at": "2021-05-20T12:40:55.662949Z",
-                            "member_id": 42,
-                            "email": "eric@gitguardian.com",
-                            "answers": [
-                                {
-                                    "type": "boolean",
-                                    "field_ref": "actual_secret_yes_no",
-                                    "field_label": "Is it an actual secret?",
-                                    "boolean": True,
-                                }
-                            ],
-                        }
-                    ],
-                    "occurrences": None,
-                },
+                create_secret_incident_payload(),
             ),
             (
                 SecretOccurrenceSchema,
@@ -609,3 +553,20 @@ class TestModel:
         obj = PolicyBreakSchema().load(data)
 
         assert obj.known_secret is known_secret
+
+    def test_secret_incident_accepts_unknown_severity_and_validity(self):
+        """
+        GIVEN an incident whose severity and validity hold values added to the API
+        after this version of py-gitguardian was released
+        WHEN loading using the schema
+        THEN the incident loads and both unknown values are kept as-is
+        """
+        payload = create_secret_incident_payload(
+            severity="catastrophic",
+            validity="cannot_check",
+        )
+
+        incident = SecretIncident.SCHEMA.load(payload)
+
+        assert incident.severity == "catastrophic"
+        assert incident.validity == "cannot_check"

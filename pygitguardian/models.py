@@ -921,8 +921,11 @@ class Detector(Base, FromDictMixin):
     detector_group_display_name: str
 
 
-Severity = Literal["info", "low", "medium", "high", "critical", "unknown"]
-ValidityStatus = Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
+# `str` fallback, same reasoning as ScanStatus below.
+Severity = Union[Literal["info", "low", "medium", "high", "critical", "unknown"], str]
+ValidityStatus = Union[
+    Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"], str
+]
 
 
 @dataclass
