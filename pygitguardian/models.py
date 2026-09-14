@@ -958,7 +958,7 @@ class Feedback(Base, FromDictMixin):
 class CustomTag(Base, FromDictMixin):
     id: str
     key: str
-    value: str
+    value: Optional[str]
 
 
 @dataclass
