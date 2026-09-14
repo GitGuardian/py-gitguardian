@@ -609,3 +609,68 @@ class TestModel:
         obj = PolicyBreakSchema().load(data)
 
         assert obj.known_secret is known_secret
+
+    @pytest.mark.parametrize(
+        ("field", "value"),
+        [
+            ("severity", "catastrophic"),
+            ("validity", "cannot_check"),
+        ],
+    )
+    def test_secret_incident_accepts_unknown_severity_and_validity(self, field, value):
+        """
+        GIVEN an incident whose severity or validity holds a value the API added
+        after this version of py-gitguardian was released
+        WHEN loading using the schema
+        THEN the incident still loads and the raw value is kept
+        """
+        data = {
+            "id": 3759,
+            "date": "2019-08-22T14:15:22Z",
+            "detector": {
+                "name": "slack_bot_token",
+                "display_name": "Slack Bot Token",
+                "nature": "specific",
+                "family": "apikey",
+                "detector_group_name": "slackbot_token",
+                "detector_group_display_name": "Slack Bot Token",
+            },
+            "secret_hash": "Ri9FjVgdOlPnBmujoxP4XPJcbe82BhJXB/SAngijw",
+            "hmsl_hash": "05975add34ddc9a38a0fb57c7d3e676ffed57080516fc16bf8d8f14308fedb86",
+            "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/incidents/3899",
+            "regression": False,
+            "status": "IGNORED",
+            "assignee_id": None,
+            "assignee_email": None,
+            "occurrences_count": 4,
+            "secret_presence": {
+                "files_requiring_code_fix": 1,
+                "files_pending_merge": 1,
+                "files_fixed": 1,
+                "outside_vcs": 1,
+                "removed_outside_vcs": 0,
+                "in_vcs": 3,
+                "removed_in_vcs": 0,
+            },
+            "ignore_reason": None,
+            "triggered_at": None,
+            "ignored_at": None,
+            "ignorer_id": None,
+            "ignorer_api_token_id": None,
+            "resolver_id": None,
+            "resolver_api_token_id": None,
+            "secret_revoked": False,
+            "severity": "high",
+            "validity": "valid",
+            "resolved_at": None,
+            "share_url": None,
+            "tags": [],
+            "custom_tags": [],
+            "feedback_list": [],
+            "occurrences": None,
+            field: value,
+        }
+
+        incident = SecretIncident.SCHEMA.load(data)
+
+        assert getattr(incident, field) == value
