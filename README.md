@@ -17,11 +17,7 @@ with all the response codes and expected structures on each method.
 
 ## Requirements
 
-Python 3.8+
-
-> [!WARNING]
-> Python 3.8 support is deprecated and will be removed in a future release.
-> On Python 3.8, `marshmallow` 3.x is used; Python 3.9+ uses `marshmallow` 4.x.
+Python 3.9+
 
 ## Projects using `py-gitguardian`
 
