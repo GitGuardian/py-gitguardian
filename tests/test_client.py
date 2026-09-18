@@ -70,7 +70,7 @@ from pygitguardian.models import (
 )
 from pygitguardian.models_utils import CursorPaginatedResponse
 
-from .conftest import create_client, my_vcr
+from .conftest import create_client, create_secret_incident_payload, my_vcr
 from .utils import get_source, get_team
 
 
@@ -754,87 +754,7 @@ def test_retrieve_secret_incident(client: GGClient):
         url=client._url_from_endpoint("incidents/secrets/3759", "v1"),
         status=200,
         match=[matchers.query_param_matcher({"with_occurrences": 20})],
-        json={
-            "id": 3759,
-            "date": "2019-08-22T14:15:22Z",
-            "detector": {
-                "name": "slack_bot_token",
-                "display_name": "Slack Bot Token",
-                "nature": "specific",
-                "family": "apikey",
-                "detector_group_name": "slackbot_token",
-                "detector_group_display_name": "Slack Bot Token",
-            },
-            "secret_hash": "Ri9FjVgdOlPnBmujoxP4XPJcbe82BhJXB/SAngijw/juCISuOMgPzYhV28m6OG24",
-            "hmsl_hash": "05975add34ddc9a38a0fb57c7d3e676ffed57080516fc16bf8d8f14308fedb86",
-            "gitguardian_url": "https://dashboard.gitguardian.com/workspace/1/incidents/3899",
-            "regression": False,
-            "status": "IGNORED",
-            "assignee_id": 309,
-            "assignee_email": "eric@gitguardian.com",
-            "occurrences_count": 4,
-            "secret_presence": {
-                "files_requiring_code_fix": 1,
-                "files_pending_merge": 1,
-                "files_fixed": 1,
-                "outside_vcs": 1,
-                "removed_outside_vcs": 0,
-                "in_vcs": 3,
-                "removed_in_vcs": 0,
-            },
-            "ignore_reason": "test_credential",
-            "triggered_at": "2019-05-12T09:37:49Z",
-            "ignored_at": "2019-08-24T14:15:22Z",
-            "ignorer_id": 309,
-            "ignorer_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
-            "resolver_id": 395,
-            "resolver_api_token_id": "fdf075f9-1662-4cf1-9171-af50568158a8",
-            "secret_revoked": False,
-            "severity": "high",
-            "validity": "valid",
-            "resolved_at": None,
-            "share_url": "https://dashboard.gitguardian.com/share/incidents/11111111-1111-1111-1111-111111111111",
-            "tags": ["FROM_HISTORICAL_SCAN", "SENSITIVE_FILE"],
-            "custom_tags": [
-                {
-                    "id": "9df8c1c9-7367-4c77-a0f0-9f2d4b22bdda",
-                    "key": "commiter",
-                    "value": "leaky mcgee",
-                },
-                {
-                    "id": "1aa3ae34-f9f0-42e1-a687-9fed877a9037",
-                    "key": "confrence",
-                    "value": "grrcon",
-                },
-                {
-                    "id": "2cade8a1-71ff-46d2-bbe3-c2bf71437ae7",
-                    "key": "confrence test",
-                    "value": "hacktivity",
-                },
-                {
-                    "id": "3dade8a1-71ff-46d2-bbe3-c2bf71437ae8",
-                    "key": "no value",
-                    "value": None,
-                },
-            ],
-            "feedback_list": [
-                {
-                    "created_at": "2021-05-20T12:40:55.662949Z",
-                    "updated_at": "2021-05-20T12:40:55.662949Z",
-                    "member_id": 42,
-                    "email": "eric@gitguardian.com",
-                    "answers": [
-                        {
-                            "type": "boolean",
-                            "field_ref": "actual_secret_yes_no",
-                            "field_label": "Is it an actual secret?",
-                            "boolean": True,
-                        }
-                    ],
-                }
-            ],
-            "occurrences": None,
-        },
+        json=create_secret_incident_payload(),
     )
 
     result = client.retrieve_secret_incident(3759)

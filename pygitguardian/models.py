@@ -29,6 +29,7 @@ from .models_utils import (
     BaseSchema,
     FromDictMixin,
     FromDictWithBase,
+    Lenient,
     LenientEnum,
     PaginationParameter,
     PaginationParameterSchema,
@@ -247,8 +248,8 @@ class PolicyBreakSchema(BaseSchema):
     matches = fields.List(fields.Nested(MatchSchema), required=True)
     is_excluded = fields.Boolean(required=False, load_default=False, dump_default=False)
     exclude_reason = fields.String(required=False, load_default=None, dump_default=None)
-    diff_kind = fields.Enum(
-        DiffKind, by_value=True, required=False, load_default=None, dump_default=None
+    diff_kind = LenientEnum(
+        DiffKind, required=False, load_default=None, dump_default=None
     )
     is_vaulted = fields.Boolean(required=False, load_default=False, dump_default=False)
     vault_type = fields.String(required=False, load_default=None, dump_default=None)
@@ -284,7 +285,7 @@ class PolicyBreak(FromDictWithBase):
         incident_url: Optional[str] = None,
         is_excluded: bool = False,
         exclude_reason: Optional[str] = None,
-        diff_kind: Optional[DiffKind] = None,
+        diff_kind: Optional[Union[DiffKind, str]] = None,
         is_vaulted: bool = False,
         vault_type: Optional[str] = None,
         vault_name: Optional[str] = None,
@@ -800,8 +801,8 @@ class APITokensResponseSchema(BaseSchema):
     id = fields.UUID(required=True)
     name = fields.String(required=True)
     workspace_id = fields.Int(required=True)
-    type = fields.Enum(TokenType, by_value=True, required=True)
-    status = fields.Enum(TokenStatus, by_value=True, required=True)
+    type = LenientEnum(TokenType, required=True)
+    status = LenientEnum(TokenStatus, required=True)
     created_at = fields.AwareDateTime(required=True)
     last_used_at = fields.AwareDateTime(allow_none=True)
     expire_at = fields.AwareDateTime(allow_none=True)
@@ -825,8 +826,8 @@ class APITokensResponse(Base, FromDictMixin):
         id: UUID,
         name: str,
         workspace_id: int,
-        type: TokenType,
-        status: TokenStatus,
+        type: Union[TokenType, str],
+        status: Union[TokenStatus, str],
         created_at: datetime,
         last_used_at: Optional[datetime] = None,
         expire_at: Optional[datetime] = None,
@@ -921,8 +922,10 @@ class Detector(Base, FromDictMixin):
     detector_group_display_name: str
 
 
-Severity = Literal["info", "low", "medium", "high", "critical", "unknown"]
-ValidityStatus = Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
+Severity = Lenient[Literal["info", "low", "medium", "high", "critical", "unknown"]]
+ValidityStatus = Lenient[
+    Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
+]
 
 
 @dataclass
@@ -973,8 +976,7 @@ class SecretIncidentsBreakdown(Base, FromDictMixin):
     closed_secret_incidents: SecretIncidentStats
 
 
-# `str` fallback so a status the API adds later doesn't break deserialization.
-ScanStatus = Union[
+ScanStatus = Lenient[
     Literal[
         "pending",
         "running",
@@ -988,8 +990,7 @@ ScanStatus = Union[
         "skipped",
         "running_failed",
         "running_cancelled",
-    ],
-    str,
+    ]
 ]
 
 
@@ -1003,9 +1004,8 @@ class Scan(Base, FromDictMixin):
     duration: str
 
 
-# `str` fallback, same reasoning as ScanStatus above.
-SourceHealth = Union[Literal["safe", "unknown", "at_risk"], str]
-SourceCriticality = Union[Literal["critical", "high", "medium", "low", "unknown"], str]
+SourceHealth = Lenient[Literal["safe", "unknown", "at_risk"]]
+SourceCriticality = Lenient[Literal["critical", "high", "medium", "low", "unknown"]]
 
 
 @dataclass
