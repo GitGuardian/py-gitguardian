@@ -11,6 +11,7 @@ from pygitguardian.models import (
     APITokensResponseSchema,
     Detail,
     DetailSchema,
+    DiffKind,
     Document,
     DocumentSchema,
     HealthCheckResponseSchema,
@@ -553,6 +554,70 @@ class TestModel:
         obj = PolicyBreakSchema().load(data)
 
         assert obj.known_secret is known_secret
+
+    def test_policy_break_accepts_unknown_diff_kind(self):
+        """
+        GIVEN a policy break whose diff kind holds a value added to the API after
+        this version of py-gitguardian was released
+        WHEN loading using the schema
+        THEN the policy break loads and the unknown value is kept as-is
+        """
+        data = {
+            "type": "hello",
+            "policy": "hello",
+            "validity": "hey",
+            "matches": [{"match": "hello", "type": "hello"}],
+            "diff_kind": "modification",
+        }
+
+        obj = PolicyBreakSchema().load(data)
+
+        assert obj.diff_kind == "modification"
+
+    def test_policy_break_keeps_known_diff_kind_as_enum(self):
+        """
+        GIVEN a policy break with a diff kind this version knows about
+        WHEN loading using the schema
+        THEN the value is still turned into a DiffKind member
+        """
+        data = {
+            "type": "hello",
+            "policy": "hello",
+            "validity": "hey",
+            "matches": [{"match": "hello", "type": "hello"}],
+            "diff_kind": "deletion",
+        }
+
+        obj = PolicyBreakSchema().load(data)
+
+        assert obj.diff_kind is DiffKind.DELETION
+
+    def test_api_tokens_response_accepts_unknown_type_and_status(self):
+        """
+        GIVEN a token whose type and status hold values added to the API after this
+        version of py-gitguardian was released
+        WHEN loading using the schema
+        THEN the token loads and both unknown values are kept as-is
+        """
+        payload = {
+            "id": "5ddaad0c-5a0c-4674-beb5-1cd198d13360",
+            "name": "myTokenName",
+            "workspace_id": 42,
+            "type": "machine_identity",
+            "status": "suspended",
+            "created_at": "2023-05-20T12:40:55.662949Z",
+            "last_used_at": None,
+            "expire_at": None,
+            "revoked_at": None,
+            "member_id": None,
+            "creator_id": None,
+            "scopes": ["scan"],
+        }
+
+        token = APITokensResponse.SCHEMA.load(payload)
+
+        assert token.type == "machine_identity"
+        assert token.status == "suspended"
 
     def test_secret_incident_accepts_unknown_severity_and_validity(self):
         """
