@@ -29,6 +29,7 @@ from .models_utils import (
     BaseSchema,
     FromDictMixin,
     FromDictWithBase,
+    Lenient,
     LenientEnum,
     PaginationParameter,
     PaginationParameterSchema,
@@ -921,10 +922,9 @@ class Detector(Base, FromDictMixin):
     detector_group_display_name: str
 
 
-# `str` fallback, same reasoning as ScanStatus below.
-Severity = Union[Literal["info", "low", "medium", "high", "critical", "unknown"], str]
-ValidityStatus = Union[
-    Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"], str
+Severity = Lenient[Literal["info", "low", "medium", "high", "critical", "unknown"]]
+ValidityStatus = Lenient[
+    Literal["valid", "invalid", "failed_to_check", "no_checker", "unknown"]
 ]
 
 
@@ -976,8 +976,7 @@ class SecretIncidentsBreakdown(Base, FromDictMixin):
     closed_secret_incidents: SecretIncidentStats
 
 
-# `str` fallback so a status the API adds later doesn't break deserialization.
-ScanStatus = Union[
+ScanStatus = Lenient[
     Literal[
         "pending",
         "running",
@@ -991,8 +990,7 @@ ScanStatus = Union[
         "skipped",
         "running_failed",
         "running_cancelled",
-    ],
-    str,
+    ]
 ]
 
 
@@ -1006,9 +1004,8 @@ class Scan(Base, FromDictMixin):
     duration: str
 
 
-# `str` fallback, same reasoning as ScanStatus above.
-SourceHealth = Union[Literal["safe", "unknown", "at_risk"], str]
-SourceCriticality = Union[Literal["critical", "high", "medium", "low", "unknown"], str]
+SourceHealth = Lenient[Literal["safe", "unknown", "at_risk"]]
+SourceCriticality = Lenient[Literal["critical", "high", "medium", "low", "unknown"]]
 
 
 @dataclass

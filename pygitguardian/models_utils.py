@@ -13,6 +13,7 @@ from typing import (
     Optional,
     Type,
     TypeVar,
+    Union,
     cast,
 )
 
@@ -58,6 +59,13 @@ class FromDictMixin:
 class BaseSchema(Schema):
     class Meta:
         unknown = EXCLUDE
+
+
+_LenientT = TypeVar("_LenientT")
+
+# A value the API may extend: the literals document what we know, `str` keeps an
+# unrecognized value deserializing as itself instead of failing the whole object.
+Lenient = Union[_LenientT, str]
 
 
 class LenientEnum(fields.Field):
