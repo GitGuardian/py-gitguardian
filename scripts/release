@@ -116,18 +116,19 @@ def run_tests() -> None:
     still match production reality.
     """
 
-    # If CASSETTES_DIR does not exist, tests fail, so recreate it
-    log_progress("Removing cassettes")
-    shutil.rmtree(CASSETTES_DIR)
-    CASSETTES_DIR.mkdir()
+    try:
+        # If CASSETTES_DIR does not exist, tests fail, so recreate it
+        log_progress("Removing cassettes")
+        shutil.rmtree(CASSETTES_DIR)
+        CASSETTES_DIR.mkdir()
 
-    setup_test_workspace()
+        setup_test_workspace()
 
-    log_progress("Running tests")
-    check_run(["pytest", "tests"], cwd=ROOT_DIR)
-
-    log_progress("Restoring cassettes")
-    check_run(["git", "restore", CASSETTES_DIR], cwd=ROOT_DIR)
+        log_progress("Running tests")
+        check_run(["pytest", "tests"], cwd=ROOT_DIR)
+    finally:
+        log_progress("Restoring cassettes")
+        check_run(["git", "restore", CASSETTES_DIR], cwd=ROOT_DIR)
 
 
 def replace_once_in_file(path: Path, src: str, dst: str, flags: int = 0) -> None:
