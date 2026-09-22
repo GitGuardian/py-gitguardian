@@ -14,6 +14,8 @@ from pygitguardian.models import (
 from .fixture_members import (
     EMAIL_PREFIX,
     MANAGER_EMAIL,
+    expendable_member,
+    fixture_members,
     is_fixture,
     members_parameters,
     pool_problems,
@@ -259,3 +261,40 @@ def test_team_plan_never_touches_humans():
     plan = team_plan(team_members, POOL)
 
     assert plan.remove == []
+
+
+# After a GIM reseed, the recreated member1 gets the highest id, so the API lists
+# it last while the setup still seats it in the teams
+RESEEDED_MEMBER1 = member(MEMBER1.email, id=9)
+RESEEDED_POOL = [OWNER, HUMAN_MANAGER, MANAGER, MEMBER2, MEMBER3, RESEEDED_MEMBER1]
+
+
+def test_expendable_member_is_the_first_by_email_whatever_the_listing_order():
+    """
+    GIVEN the fixture members listed by ascending id after a reseed
+    WHEN picking the member test_delete_member may delete
+    THEN it is the first by email, not the first listed
+    """
+    assert expendable_member(RESEEDED_POOL) == RESEEDED_MEMBER1
+
+
+def test_team_plan_seats_the_expendable_member():
+    """
+    GIVEN a reseeded pool
+    WHEN planning a team
+    THEN the member it seats is the one test_delete_member deletes, so the two
+    other fixture members stay free for the two create team member tests
+    """
+    plan = team_plan([], RESEEDED_POOL)
+    expendable = expendable_member(RESEEDED_POOL)
+    assert expendable is not None
+
+    seated = [create.member_id for create in plan.add if not create.is_team_leader]
+    assert seated == [expendable.id]
+
+    spares = [
+        m
+        for m in fixture_members(RESEEDED_POOL)
+        if m.id not in seated and m != expendable
+    ]
+    assert len(spares) == 2

@@ -73,6 +73,7 @@ from .conftest import create_client, create_secret_incident_payload, my_vcr
 from .fixture_members import (
     EMAIL_PREFIX,
     MANAGER_EMAIL,
+    expendable_member,
     fixture_manager,
     fixture_members,
     members_parameters,
@@ -1405,11 +1406,11 @@ def test_delete_member(client: GGClient):
     members = client.list_members(members_parameters(access_level=AccessLevel.MEMBER))
     assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
-    candidates = fixture_members(members.data)
-    if not candidates:
+    member = expendable_member(members.data)
+    if member is None:
         pytest.skip(f"No member left with an email starting with {EMAIL_PREFIX}")
 
-    result = client.delete_member(DeleteMemberParameters(id=candidates[0].id))
+    result = client.delete_member(DeleteMemberParameters(id=member.id))
 
     assert result is None, result
 

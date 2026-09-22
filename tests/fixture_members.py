@@ -22,7 +22,7 @@ from pygitguardian.models import (
 
 EMAIL_PREFIX = "qa-team-testing+gglibraries-"
 MANAGER_EMAIL = f"{EMAIL_PREFIX}manager@gitguardian.com"
-# One for test_delete_member, two for the team member tests
+# The expendable one for test_delete_member, two for the create team member tests
 MIN_MEMBERS = 3
 SEED_COMMAND = "python manage.py seed_gglibraries_test_workspace --account-id 628984"
 
@@ -46,6 +46,16 @@ def fixture_manager(members: Iterable[Member]) -> Optional[Member]:
 def fixture_members(members: Iterable[Member]) -> List[Member]:
     """Fixtures other than the manager, whatever their current role or state"""
     return [m for m in members if is_fixture(m) and m.email != MANAGER_EMAIL]
+
+
+def expendable_member(members: Iterable[Member]) -> Optional[Member]:
+    """
+    The fixture member test_delete_member deletes and the setup seats in every
+    team: the first by email, so the choice does not depend on the order the API
+    lists members in (a reseeded fixture comes back with a higher id)
+    """
+    ordered = sorted(fixture_members(members), key=lambda member: member.email)
+    return ordered[0] if ordered else None
 
 
 def pool_problems(members: Iterable[Member]) -> List[str]:
@@ -92,19 +102,19 @@ def team_plan(
 ) -> TeamPlan:
     """
     Changes putting a team in its seeded state: the fixture manager leads it, the
-    first fixture member belongs to it, the other fixture members stay out. This
-    leaves test_create_team_member a fixture to add and test_delete_team_member one
-    to remove, whoever else is in the team.
+    expendable member belongs to it, the other fixture members stay out. Deleting
+    the expendable member thus frees no spare, and the two create team member
+    tests each keep one fixture to add, whoever else is in the team.
     """
     fixtures = list(fixtures)
     manager = fixture_manager(fixtures)
-    members = sorted(fixture_members(fixtures), key=lambda member: member.email)
+    seat = expendable_member(fixtures)
     wanted: Dict[int, bool] = {}
     if manager is not None:
         wanted[manager.id] = True
-    if members:
-        wanted[members[0].id] = False
-    spare_ids = {member.id for member in members[1:]}
+    if seat is not None:
+        wanted[seat.id] = False
+    spare_ids = {member.id for member in fixture_members(fixtures)} - set(wanted)
 
     present = {team_member.member_id: team_member for team_member in team_members}
     plan = TeamPlan()
