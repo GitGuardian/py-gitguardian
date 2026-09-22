@@ -21,6 +21,9 @@ pdm install -G dev
 pdm run pre-commit install -f --hook-type commit-msg --hook-type pre-commit
 ```
 
+py-gitguardian is a library, so no `pdm.lock` is committed and `pdm install` resolves
+dependencies fresh each time (see [#107](https://github.com/GitGuardian/py-gitguardian/pull/107)).
+
 ## Testing
 
 Pygitguardian testing is done with `pytest`. You should make sure your changes don't report any error on:

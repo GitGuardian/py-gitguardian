@@ -129,4 +129,5 @@ dist/
 
 #pdm
 .pdm-python
+# Library, not an app: no lockfile is committed (see #107)
 pdm.lock
