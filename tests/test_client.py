@@ -1,5 +1,4 @@
 import json
-import os
 import re
 import tarfile
 import uuid
@@ -71,6 +70,12 @@ from pygitguardian.models import (
 from pygitguardian.models_utils import CursorPaginatedResponse
 
 from .conftest import create_client, create_secret_incident_payload, my_vcr
+from .fixture_members import (
+    EMAIL_PREFIX,
+    MANAGER_EMAIL,
+    fixture_manager,
+    fixture_members,
+)
 from .utils import get_source, get_team
 
 
@@ -1368,19 +1373,19 @@ def test_search_member(client: GGClient):
 @my_vcr.use_cassette("test_update_member.yaml", ignore_localhost=False)
 def test_update_member(client: GGClient):
     """
-    GIVEN a client
+    GIVEN the fixture manager of the test workspace
     WHEN calling PATCH /members/{id} endpoint with a payload
     THEN it returns the updated member
     """
-
-    # This assumes there is at least one manager in the first page of members
     members = client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
     assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
+    manager = fixture_manager(members.data)
+    if manager is None:
+        pytest.skip(f"{MANAGER_EMAIL} is not a manager, run the setup script")
+
     result = client.update_member(
-        UpdateMember(
-            id=members.data[0].id, access_level=AccessLevel.MEMBER, active=False
-        )
+        UpdateMember(id=manager.id, access_level=AccessLevel.MEMBER, active=False)
     )
 
     assert isinstance(result, Member), result
@@ -1392,21 +1397,18 @@ def test_update_member(client: GGClient):
 @my_vcr.use_cassette("test_delete_member.yaml", ignore_localhost=False)
 def test_delete_member(client: GGClient):
     """
-    GIVEN a client
+    GIVEN a fixture member of the test workspace
     WHEN calling DELETE /members/{id} endpoint
     THEN the member is deleted
     """
-    # To be able to quickly recreate the membership, the email of the member to delete
-    # can be provided via an env var
-    email = os.environ.get("DELETE_MEMBER_EMAIL")
     members = client.list_members(MembersParameters(access_level=AccessLevel.MEMBER))
     assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
-    member = next(
-        (member for member in members.data if member.email == email), members.data[0]
-    )
+    candidates = fixture_members(members.data)
+    if not candidates:
+        pytest.skip(f"No member left with an email starting with {EMAIL_PREFIX}")
 
-    result = client.delete_member(DeleteMemberParameters(id=member.id))
+    result = client.delete_member(DeleteMemberParameters(id=candidates[0].id))
 
     assert result is None, result
 
