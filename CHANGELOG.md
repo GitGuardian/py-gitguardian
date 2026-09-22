@@ -1,5 +1,25 @@
 # Changelog
 
+<a id='changelog-1.35.0'></a>
+
+## 1.35.0 — 2026-09-22
+
+### Removed
+
+- Python 3.8 support. It reached end of life in October 2024 and was deprecated in 1.32.0. The minimum version is now Python 3.9.
+
+### Added
+
+- Python 3.13 and 3.14 are now tested on every supported OS and declared in the package classifiers.
+
+### Fixed
+
+- `CustomTag.value` no longer raises `marshmallow.exceptions.ValidationError` when the API returns `null` for a custom tag's value. The field is now typed as `Optional[str]`.
+
+- `SecretIncident.severity` and `SecretIncident.validity` no longer raise `marshmallow.exceptions.ValidationError` when the API returns a value added after this SDK version. Both now accept any string, falling back to the raw value, as `ScanStatus`, `SourceHealth` and the permission fields already did.
+
+- `PolicyBreak.diff_kind` and `APITokensResponse.type`/`.status` no longer raise `marshmallow.exceptions.ValidationError` when the API returns a value added after this SDK version. An unknown value now loads as the raw string. `diff_kind` matters most: it is nested in every scan result, so one unrecognized diff kind made the whole `ScanResult` fail to deserialize. These were the last response fields still validating against a closed enum.
+
 <a id='changelog-1.34.0'></a>
 
 ## 1.34.0 — 2026-08-19

@@ -3,7 +3,7 @@
 from .client import ContentTooLarge, GGClient, GGClientCallbacks
 
 
-__version__ = "1.34.0"
+__version__ = "1.35.0"
 GGClient._version = __version__
 
 __all__ = ["GGClient", "GGClientCallbacks", "ContentTooLarge"]
