@@ -19,12 +19,16 @@ from pygitguardian.models import (
     UpdateMember,
 )
 
+from .workspace import WORKSPACE_ID
+
 
 EMAIL_PREFIX = "qa-team-testing+gglibraries-"
 MANAGER_EMAIL = f"{EMAIL_PREFIX}manager@gitguardian.com"
 # The expendable one for test_delete_member, two for the create team member tests
 MIN_MEMBERS = 3
-SEED_COMMAND = "python manage.py seed_gglibraries_test_workspace --account-id 628984"
+SEED_COMMAND = (
+    f"python manage.py seed_gglibraries_test_workspace --account-id {WORKSPACE_ID}"
+)
 
 
 def members_parameters(**kwargs: Any) -> MembersParameters:
