@@ -4,8 +4,9 @@ This will allow the user to run tests without relying on cassettes, note that
 there are a few limitations due to actions that cannot be performed through
 the API, notably :
 - Create the workspace
-- We cannot create members, so there must exist a minimum amount of members in the workspace
-    - This also means deleted members cannot be brought back from the script
+- We cannot create members: the ones the tests alter are seeded by GIM's
+  `seed_gglibraries_test_workspace` command (see tests/fixture_members.py), and a
+  deleted one only comes back by running that command again
 - We cannot integrate a source entirely from the public API
     - There must exist a source in the workspace
 """
@@ -29,10 +30,10 @@ from pygitguardian.models import (
     Team,
     TeamMember,
     TeamsParameters,
-    UpdateMember,
     UpdateTeamSource,
 )
 from pygitguardian.models_utils import FromDictWithBase
+from tests.fixture_members import SEED_COMMAND, pool_problems, restorations
 from tests.utils import CursorPaginatedResponse
 
 
@@ -45,7 +46,6 @@ T = TypeVar("T")
 PaginatedDataType = TypeVar("PaginatedDataType", bound=FromDictWithBase)
 
 MIN_NB_TEAM = 2
-MIN_NB_MEMBER = 4  # 1 owner, 1 manager and at least two members
 MIN_NB_TEAM_MEMBER = 2
 # This is the team that is created in the tests, it should be deleted before we run the tests
 PYGITGUARDIAN_TEST_TEAM = "PyGitGuardian team"
@@ -68,46 +68,24 @@ def unwrap_paginated_response(
 
 def ensure_member_coherence():
     """
-    This function ensures that the workspace :
-    - Has no deactivated members
-        - If there are, they will be activated
-    - Has at most 1 admin / manager (excluding owner)
-        - It may demote some manager to member
-    - There is at least `MIN_NB_MEMBER`
+    Put the fixture members back in their seeded state (the manager active as
+    manager, the others active as members) and stop before any test runs when
+    the pool is too small. The other members are humans and are never touched.
     """
-
-    deactivated_members = unwrap_paginated_response(
-        client.list_members(MembersParameters(active=False))
-    )
-    for member in deactivated_members:
-        client.update_member(UpdateMember(member.id, AccessLevel.MEMBER, active=True))
-
-    admin_members = unwrap_paginated_response(
-        client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
+    members = unwrap_paginated_response(
+        client.list_members(MembersParameters(per_page=100))
     )
 
-    if len(admin_members) > 1:
-        for member in admin_members[1:]:
-            ensure_success(
-                client.update_member(UpdateMember(member.id, AccessLevel.MEMBER))
-            )
-    else:
-        members = unwrap_paginated_response(
-            client.list_members(MembersParameters(access_level=AccessLevel.MEMBER))
-        )
-        assert (
-            len(members) > 0
-        ), "There must be at least one member with access level member in the workspace"
-
-        ensure_success(
-            client.update_member(UpdateMember(members[0].id, AccessLevel.MANAGER))
+    problems = pool_problems(members)
+    if problems:
+        details = "".join(f"\n- {problem}" for problem in problems)
+        raise SystemExit(
+            f"The fixture pool of the test workspace is short:{details}\n"
+            f"Reseed it from a GIM pod: {SEED_COMMAND}"
         )
 
-    members = ensure_success(client.list_members(MembersParameters(per_page=5)))
-
-    assert (
-        len(members.data) >= MIN_NB_MEMBER
-    ), f"There must be at least {MIN_NB_MEMBER} members in the workspace"
+    for update in restorations(members):
+        ensure_success(client.update_member(update))
 
 
 def add_source_to_team(team: Team, available_sources: Iterable[Source] | None = None):
