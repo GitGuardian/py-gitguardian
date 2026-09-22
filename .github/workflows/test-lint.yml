@@ -35,7 +35,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade pdm pre-commit
-          pdm install -G dev --frozen-lockfile
+          pdm install -G dev
 
       - uses: actions/cache@v4
         with:
@@ -87,7 +87,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade pdm
-          pdm install --project . -G dev --frozen-lockfile
+          pdm install --project . -G dev
 
       - name: Test with pytest
         run: |
