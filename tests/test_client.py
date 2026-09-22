@@ -1,7 +1,6 @@
 import json
 import re
 import tarfile
-import uuid
 from datetime import date, datetime, timedelta, timezone
 from io import BytesIO
 from typing import Any, Dict, List, Optional, Tuple, Type
@@ -1884,6 +1883,42 @@ def test_delete_invitation(client: GGClient):
     assert result is None
 
 
+def make_ai_discovery(
+    *, machine_id: str, server: str, configuration: str, url: str, agent: str
+) -> AIDiscovery:
+    """One HTTP server configured for one agent whose hooks are installed."""
+    return AIDiscovery(
+        user=UserInfo(
+            user_email="toto@gitguardian.com",
+            hostname="toto-laptop",
+            username="toto",
+            machine_id=machine_id,
+        ),
+        discovery_duration=0.5,
+        servers=[
+            MCPServer(
+                name=server,
+                configurations=[
+                    MCPConfiguration(
+                        name=configuration,
+                        agent=agent,
+                        scope=MCPConfiguration.Scope.USER,
+                        transport=MCPConfiguration.Transport.HTTP,
+                        url=url,
+                    )
+                ],
+            )
+        ],
+        agents=[
+            AgentInfo(
+                name=agent,
+                hooks_installed=True,
+                hooks_command=f"ggshield hooks install {agent}",
+            )
+        ],
+    )
+
+
 @my_vcr.use_cassette("test_send_ai_discovery.yaml", ignore_localhost=False)
 def test_send_ai_discovery(client: GGClient):
     """
@@ -1893,35 +1928,12 @@ def test_send_ai_discovery(client: GGClient):
     """
 
     result = client.send_ai_discovery(
-        AIDiscovery(
-            user=UserInfo(
-                user_email="toto@gitguardian.com",
-                hostname="toto-laptop",
-                username="toto",
-                machine_id="1234567890",
-            ),
-            discovery_duration=0.5,
-            servers=[
-                MCPServer(
-                    name="mcp-server-1",
-                    configurations=[
-                        MCPConfiguration(
-                            name="mcp-configuration-1",
-                            agent="cursor",
-                            scope=MCPConfiguration.Scope.USER,
-                            transport=MCPConfiguration.Transport.HTTP,
-                            url="https://mcp-server-1.com",
-                        )
-                    ],
-                )
-            ],
-            agents=[
-                AgentInfo(
-                    name="cursor",
-                    hooks_installed=True,
-                    hooks_command="ggshield hooks install cursor",
-                )
-            ],
+        make_ai_discovery(
+            machine_id="1234567890",
+            server="mcp-server-1",
+            configuration="mcp-configuration-1",
+            url="https://mcp-server-1.com",
+            agent="cursor",
         )
     )
 
@@ -1965,28 +1977,43 @@ def test_log_mcp_activities_bulk_posts_to_correct_endpoint(
 ):
     """
     GIVEN a ggclient
+    AND an MCP inventory registered through a discovery
     WHEN calling log_mcp_activities_bulk with a list of MCPActivityRequest
     THEN a POST is made to the bulk endpoint
     AND an MCPActivityBulkResponse is returned with ingested/duplicate counts
     """
-    # Fresh, per-run-unique events so the cassette-less release run
-    # (`scripts/release run-tests`) always ingests them: a stale timestamp is
-    # rejected by the backfill window and repeated events are deduplicated.
-    # Cassette replay matches on method+url (see conftest.my_vcr), so the
-    # request body here does not affect recorded-cassette runs.
+    machine_id = "pygitguardian-bulk-machine"
+    server_url = "https://mcp-server-bulk.com"
+
+    # Bulk ingestion only accepts instances and servers already known from a
+    # discovery; a dedicated machine leaves the other tests' inventory untouched.
+    discovery = client.send_ai_discovery(
+        make_ai_discovery(
+            machine_id=machine_id,
+            server="mcp-server-bulk",
+            configuration="mcp-configuration-bulk",
+            url=server_url,
+            agent="claude-code",
+        )
+    )
+    assert isinstance(discovery, AIDiscovery), discovery
+
     recent = datetime.now(timezone.utc) - timedelta(hours=1)
     activities = [
         MCPActivityRequest(
-            user=UserInfo(hostname="h", username="u", machine_id=uuid.uuid4().hex),
-            tool="t",
-            server="s",
+            user=UserInfo(
+                hostname="toto-laptop", username="toto", machine_id=machine_id
+            ),
+            tool=tool,
+            # Servers are keyed by their URL, not by the name the discovery reported.
+            server=server_url,
             agent="claude-code",
             model="m",
             cwd="/tmp",
             input={},
             timestamp=recent,
         )
-        for _ in range(2)
+        for tool in ("read_file", "write_file")
     ]
 
     result = client.log_mcp_activities_bulk(activities)

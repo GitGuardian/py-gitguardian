@@ -1,11 +1,14 @@
 interactions:
   - request:
-      body: '{"activities": [{"user": {"hostname": "h", "username": "u", "machine_id":
-        "m", "user_email": null}, "tool": "t", "server": "s", "agent": "claude-code",
-        "model": "m", "cwd": "/tmp", "input": {}, "timestamp": "2026-04-01T09:00:00+00:00"},
-        {"user": {"hostname": "h", "username": "u", "machine_id": "m", "user_email":
-        null}, "tool": "t", "server": "s", "agent": "claude-code", "model": "m",
-        "cwd": "/tmp", "input": {}, "timestamp": "2026-04-01T09:00:00+00:00"}]}'
+      body: '{"user": {"hostname": "toto-laptop", "username": "toto", "machine_id":
+        "pygitguardian-bulk-machine", "user_email": "toto@gitguardian.com"}, "discovery_duration":
+        0.5, "servers": [{"name": "mcp-server-bulk", "display_name": null, "tools":
+        [], "resources": [], "prompts": [], "configurations": [{"name": "mcp-configuration-bulk",
+        "agent": "claude-code", "scope": "user", "transport": "http", "project": null,
+        "command": null, "args": [], "env": {}, "url": "https://mcp-server-bulk.com",
+        "headers": {}}]}], "agents": [{"name": "claude-code", "hooks_installed": true,
+        "hooks_command": "ggshield hooks install claude-code", "subscription_email":
+        null}]}'
       headers:
         Accept:
           - '*/*'
@@ -14,25 +17,132 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '458'
+          - '648'
         Content-Type:
           - application/json
         User-Agent:
-          - pygitguardian/1.30.0 (Linux;py3.11.15)
+          - pygitguardian/1.34.0 (Linux;py3.12.3)
+      method: POST
+      uri: https://api.gitguardian.com/v1/agent-activity/discovery
+    response:
+      body:
+        string:
+          '{"user":{"hostname":"toto-laptop","username":"toto","machine_id":"pygitguardian-bulk-machine","user_email":"toto@gitguardian.com"},"agents":[{"name":"claude-code","hooks_installed":true,"hooks_command":"ggshield
+          hooks install claude-code","subscription_email":null}],"servers":[{"name":"https://mcp-server-bulk.com","display_name":"","tools":[],"resources":[],"prompts":[],"configurations":[{"name":"mcp-configuration-bulk","agent":"claude-code","scope":"user","transport":"http","project":null,"command":null,"args":[],"env":{},"url":"https://mcp-server-bulk.com","headers":{}}]}],"discovery_duration":0.5}'
+      headers:
+        CF-RAY:
+          - a3f1c41bdbeef4ff-CDG
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 22 Sep 2026 13:48:14 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - POST, OPTIONS
+        cf-cache-status:
+          - DYNAMIC
+        content-length:
+          - '607'
+        content-security-policy:
+          - frame-ancestors 'none'
+        cross-origin-opener-policy:
+          - same-origin
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.657.0
+        x-content-type-options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '610'
+        x-frame-options:
+          - DENY
+        x-secrets-engine-version:
+          - 2.172.0
+        x-xss-protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: '{"activities": [{"user": {"hostname": "toto-laptop", "username": "toto",
+        "machine_id": "pygitguardian-bulk-machine", "user_email": null}, "tool": "read_file",
+        "server": "https://mcp-server-bulk.com", "agent": "claude-code", "model": "m",
+        "cwd": "/tmp", "input": {}, "timestamp": "2026-09-22T12:48:14.830298+00:00"},
+        {"user": {"hostname": "toto-laptop", "username": "toto", "machine_id": "pygitguardian-bulk-machine",
+        "user_email": null}, "tool": "write_file", "server": "https://mcp-server-bulk.com",
+        "agent": "claude-code", "model": "m", "cwd": "/tmp", "input": {}, "timestamp":
+        "2026-09-22T12:48:14.830298+00:00"}]}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '617'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.34.0 (Linux;py3.12.3)
       method: POST
       uri: https://api.gitguardian.com/v1/agent-activity/mcp-activity/bulk
     response:
       body:
-        string: '{"ingested": 2, "duplicates": 0, "skipped": 0}'
+        string: '{"ingested":2,"duplicates":0,"skipped":0}'
       headers:
-        Allow:
-          - POST, OPTIONS
+        CF-RAY:
+          - a3f1c420bcb4f4ff-CDG
         Connection:
           - keep-alive
         Content-Length:
-          - '46'
+          - '41'
         Content-Type:
           - application/json
+        Date:
+          - Tue, 22 Sep 2026 13:48:15 GMT
+        Server:
+          - cloudflare
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - POST, OPTIONS
+        cf-cache-status:
+          - DYNAMIC
+        content-security-policy:
+          - frame-ancestors 'none'
+        cross-origin-opener-policy:
+          - same-origin
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.657.0
+        x-content-type-options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '141'
+        x-frame-options:
+          - DENY
+        x-secrets-engine-version:
+          - 2.172.0
+        x-xss-protection:
+          - 1; mode=block
       status:
         code: 200
         message: OK
