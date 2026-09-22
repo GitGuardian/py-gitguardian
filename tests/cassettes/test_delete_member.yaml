@@ -11,12 +11,12 @@ interactions:
         User-Agent:
           - pygitguardian/1.18.0 (Darwin;py3.11.8)
       method: GET
-      uri: https://api.gitguardian.com/v1/members?cursor=&per_page=20&access_level=member
+      uri: https://api.gitguardian.com/v1/members?search=qa-team-testing%2Bgglibraries-&cursor=&per_page=20&access_level=member
     response:
       body:
         string:
-          '[{"id":16,"role":"member","access_level":"member","email":"henri.delateamsecretetducorealerting@gg.com","name":"Henri
-          De la team secret et du core alerting","created_at":"2024-12-12T16:54:17.568327Z","last_login":null,"active":true}]'
+          '[{"id":16,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member1@gitguardian.com","name":"GGLibraries
+          Fixture Member","created_at":"2024-12-12T16:54:17.568327Z","last_login":null,"active":true}]'
       headers:
         Access-Control-Expose-Headers:
           - X-App-Version
@@ -25,7 +25,7 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - '233'
+          - '224'
         Content-Type:
           - application/json
         Cross-Origin-Opener-Policy:
