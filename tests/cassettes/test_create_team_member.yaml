@@ -1,270 +1,272 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - pygitguardian/1.34.0 (Linux;py3.12.3)
-    method: GET
-    uri: https://api.gitguardian.com/v1/members?search=qa-team-testing%2Bgglibraries-&cursor=&per_page=20
-  response:
-    body:
-      string: '[{"id":1884193,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-manager@gitguardian.com","name":"GGLibraries
-        Fixture Manager","created_at":"2026-09-22T11:51:30.144402Z","last_login":null,"active":false},{"id":1884194,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member1@gitguardian.com","name":"GGLibraries
-        Fixture Member","created_at":"2026-09-22T11:51:30.195673Z","last_login":null,"active":true},{"id":1884195,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member2@gitguardian.com","name":"GGLibraries
-        Fixture Member","created_at":"2026-09-22T11:51:30.288651Z","last_login":null,"active":true},{"id":1884196,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member3@gitguardian.com","name":"GGLibraries
-        Fixture Member","created_at":"2026-09-22T11:51:30.333202Z","last_login":null,"active":true}]'
-    headers:
-      CF-RAY:
-      - a3f1a068ba8c6ec6-CDG
-      Connection:
-      - keep-alive
-      Content-Type:
-      - application/json
-      Date:
-      - Tue, 22 Sep 2026 13:23:52 GMT
-      Server:
-      - cloudflare
-      Transfer-Encoding:
-      - chunked
-      access-control-expose-headers:
-      - X-App-Version
-      allow:
-      - GET, HEAD, OPTIONS
-      cf-cache-status:
-      - DYNAMIC
-      content-length:
-      - '915'
-      content-security-policy:
-      - frame-ancestors 'none'
-      cross-origin-opener-policy:
-      - same-origin
-      link:
-      - ''
-      referrer-policy:
-      - strict-origin-when-cross-origin
-      strict-transport-security:
-      - max-age=31536000; includeSubDomains
-      vary:
-      - Cookie
-      x-app-version:
-      - v2.657.0
-      x-content-type-options:
-      - nosniff
-      x-envoy-upstream-service-time:
-      - '47'
-      x-frame-options:
-      - DENY
-      x-per-page:
-      - '20'
-      x-secrets-engine-version:
-      - 2.172.0
-      x-xss-protection:
-      - 1; mode=block
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - pygitguardian/1.34.0 (Linux;py3.12.3)
-    method: GET
-    uri: https://api.gitguardian.com/v1/teams?cursor=&per_page=20&is_global=False
-  response:
-    body:
-      string: '[{"id":1119853,"is_global":false,"name":"PyGitGuardian Team 1","description":"","gitguardian_url":"https://dashboard.gitguardian.com/workspace/628984/settings/user/teams/1119853","external_provider_id":null,"external_provider_type":null},{"id":1119854,"is_global":false,"name":"PyGitGuardian
-        team","description":"","gitguardian_url":"https://dashboard.gitguardian.com/workspace/628984/settings/user/teams/1119854","external_provider_id":null,"external_provider_type":null}]'
-    headers:
-      CF-RAY:
-      - a3f1a06a6888a8bd-CDG
-      Connection:
-      - keep-alive
-      Content-Type:
-      - application/json
-      Date:
-      - Tue, 22 Sep 2026 13:23:52 GMT
-      Server:
-      - cloudflare
-      Transfer-Encoding:
-      - chunked
-      access-control-expose-headers:
-      - X-App-Version
-      allow:
-      - GET, POST, HEAD, OPTIONS
-      cf-cache-status:
-      - DYNAMIC
-      content-length:
-      - '473'
-      content-security-policy:
-      - frame-ancestors 'none'
-      cross-origin-opener-policy:
-      - same-origin
-      link:
-      - ''
-      referrer-policy:
-      - strict-origin-when-cross-origin
-      strict-transport-security:
-      - max-age=31536000; includeSubDomains
-      vary:
-      - Cookie
-      x-app-version:
-      - v2.657.0
-      x-content-type-options:
-      - nosniff
-      x-envoy-upstream-service-time:
-      - '32'
-      x-frame-options:
-      - DENY
-      x-per-page:
-      - '20'
-      x-secrets-engine-version:
-      - 2.172.0
-      x-xss-protection:
-      - 1; mode=block
-    status:
-      code: 200
-      message: OK
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      User-Agent:
-      - pygitguardian/1.34.0 (Linux;py3.12.3)
-    method: GET
-    uri: https://api.gitguardian.com/v1/teams/1119853/team_memberships
-  response:
-    body:
-      string: '[{"id":1252366,"team_id":1119853,"member_id":1884193,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"full_access"},{"id":1252367,"team_id":1119853,"member_id":1884194,"is_team_leader":false,"team_permission":"cannot_manage","incident_permission":"full_access"}]'
-    headers:
-      CF-RAY:
-      - a3f1a06bee006ec6-CDG
-      Connection:
-      - keep-alive
-      Content-Type:
-      - application/json
-      Date:
-      - Tue, 22 Sep 2026 13:23:52 GMT
-      Server:
-      - cloudflare
-      Transfer-Encoding:
-      - chunked
-      access-control-expose-headers:
-      - X-App-Version
-      allow:
-      - GET, POST, HEAD, OPTIONS
-      cf-cache-status:
-      - DYNAMIC
-      content-length:
-      - '289'
-      content-security-policy:
-      - frame-ancestors 'none'
-      cross-origin-opener-policy:
-      - same-origin
-      link:
-      - ''
-      referrer-policy:
-      - strict-origin-when-cross-origin
-      strict-transport-security:
-      - max-age=31536000; includeSubDomains
-      vary:
-      - Cookie
-      x-app-version:
-      - v2.657.0
-      x-content-type-options:
-      - nosniff
-      x-envoy-upstream-service-time:
-      - '70'
-      x-frame-options:
-      - DENY
-      x-per-page:
-      - '20'
-      x-secrets-engine-version:
-      - 2.172.0
-      x-xss-protection:
-      - 1; mode=block
-    status:
-      code: 200
-      message: OK
-- request:
-    body: '{"member_id": 1884195, "is_team_leader": false, "incident_permission":
-      "full_access"}'
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '85'
-      Content-Type:
-      - application/json
-      User-Agent:
-      - pygitguardian/1.34.0 (Linux;py3.12.3)
-    method: POST
-    uri: https://api.gitguardian.com/v1/teams/1119853/team_memberships
-  response:
-    body:
-      string: '{"id":1252368,"team_id":1119853,"member_id":1884195,"is_team_leader":false,"team_permission":"cannot_manage","incident_permission":"full_access"}'
-    headers:
-      CF-RAY:
-      - a3f1a06d7fee6ec6-CDG
-      Connection:
-      - keep-alive
-      Content-Length:
-      - '145'
-      Content-Type:
-      - application/json
-      Date:
-      - Tue, 22 Sep 2026 13:23:53 GMT
-      Server:
-      - cloudflare
-      access-control-expose-headers:
-      - X-App-Version
-      allow:
-      - GET, POST, HEAD, OPTIONS
-      cf-cache-status:
-      - DYNAMIC
-      content-security-policy:
-      - frame-ancestors 'none'
-      cross-origin-opener-policy:
-      - same-origin
-      referrer-policy:
-      - strict-origin-when-cross-origin
-      strict-transport-security:
-      - max-age=31536000; includeSubDomains
-      vary:
-      - Cookie
-      x-app-version:
-      - v2.657.0
-      x-content-type-options:
-      - nosniff
-      x-envoy-upstream-service-time:
-      - '364'
-      x-frame-options:
-      - DENY
-      x-secrets-engine-version:
-      - 2.172.0
-      x-xss-protection:
-      - 1; mode=block
-    status:
-      code: 201
-      message: Created
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.34.0 (Linux;py3.12.3)
+      method: GET
+      uri: https://api.gitguardian.com/v1/members?search=qa-team-testing%2Bgglibraries-&cursor=&per_page=20
+    response:
+      body:
+        string:
+          '[{"id":1884193,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-manager@gitguardian.com","name":"GGLibraries
+          Fixture Manager","created_at":"2026-09-22T11:51:30.144402Z","last_login":null,"active":false},{"id":1884194,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member1@gitguardian.com","name":"GGLibraries
+          Fixture Member","created_at":"2026-09-22T11:51:30.195673Z","last_login":null,"active":true},{"id":1884195,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member2@gitguardian.com","name":"GGLibraries
+          Fixture Member","created_at":"2026-09-22T11:51:30.288651Z","last_login":null,"active":true},{"id":1884196,"role":"member","access_level":"member","email":"qa-team-testing+gglibraries-member3@gitguardian.com","name":"GGLibraries
+          Fixture Member","created_at":"2026-09-22T11:51:30.333202Z","last_login":null,"active":true}]'
+      headers:
+        CF-RAY:
+          - a3f1a068ba8c6ec6-CDG
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 22 Sep 2026 13:23:52 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - GET, HEAD, OPTIONS
+        cf-cache-status:
+          - DYNAMIC
+        content-length:
+          - '915'
+        content-security-policy:
+          - frame-ancestors 'none'
+        cross-origin-opener-policy:
+          - same-origin
+        link:
+          - ''
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.657.0
+        x-content-type-options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '47'
+        x-frame-options:
+          - DENY
+        x-per-page:
+          - '20'
+        x-secrets-engine-version:
+          - 2.172.0
+        x-xss-protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.34.0 (Linux;py3.12.3)
+      method: GET
+      uri: https://api.gitguardian.com/v1/teams?cursor=&per_page=20&is_global=False
+    response:
+      body:
+        string:
+          '[{"id":1119853,"is_global":false,"name":"PyGitGuardian Team 1","description":"","gitguardian_url":"https://dashboard.gitguardian.com/workspace/628984/settings/user/teams/1119853","external_provider_id":null,"external_provider_type":null},{"id":1119854,"is_global":false,"name":"PyGitGuardian
+          team","description":"","gitguardian_url":"https://dashboard.gitguardian.com/workspace/628984/settings/user/teams/1119854","external_provider_id":null,"external_provider_type":null}]'
+      headers:
+        CF-RAY:
+          - a3f1a06a6888a8bd-CDG
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 22 Sep 2026 13:23:52 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - GET, POST, HEAD, OPTIONS
+        cf-cache-status:
+          - DYNAMIC
+        content-length:
+          - '473'
+        content-security-policy:
+          - frame-ancestors 'none'
+        cross-origin-opener-policy:
+          - same-origin
+        link:
+          - ''
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.657.0
+        x-content-type-options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '32'
+        x-frame-options:
+          - DENY
+        x-per-page:
+          - '20'
+        x-secrets-engine-version:
+          - 2.172.0
+        x-xss-protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - pygitguardian/1.34.0 (Linux;py3.12.3)
+      method: GET
+      uri: https://api.gitguardian.com/v1/teams/1119853/team_memberships
+    response:
+      body:
+        string: '[{"id":1252366,"team_id":1119853,"member_id":1884193,"is_team_leader":true,"team_permission":"can_manage","incident_permission":"full_access"},{"id":1252367,"team_id":1119853,"member_id":1884194,"is_team_leader":false,"team_permission":"cannot_manage","incident_permission":"full_access"}]'
+      headers:
+        CF-RAY:
+          - a3f1a06bee006ec6-CDG
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 22 Sep 2026 13:23:52 GMT
+        Server:
+          - cloudflare
+        Transfer-Encoding:
+          - chunked
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - GET, POST, HEAD, OPTIONS
+        cf-cache-status:
+          - DYNAMIC
+        content-length:
+          - '289'
+        content-security-policy:
+          - frame-ancestors 'none'
+        cross-origin-opener-policy:
+          - same-origin
+        link:
+          - ''
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.657.0
+        x-content-type-options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '70'
+        x-frame-options:
+          - DENY
+        x-per-page:
+          - '20'
+        x-secrets-engine-version:
+          - 2.172.0
+        x-xss-protection:
+          - 1; mode=block
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: '{"member_id": 1884195, "is_team_leader": false, "incident_permission":
+        "full_access"}'
+      headers:
+        Accept:
+          - '*/*'
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '85'
+        Content-Type:
+          - application/json
+        User-Agent:
+          - pygitguardian/1.34.0 (Linux;py3.12.3)
+      method: POST
+      uri: https://api.gitguardian.com/v1/teams/1119853/team_memberships
+    response:
+      body:
+        string: '{"id":1252368,"team_id":1119853,"member_id":1884195,"is_team_leader":false,"team_permission":"cannot_manage","incident_permission":"full_access"}'
+      headers:
+        CF-RAY:
+          - a3f1a06d7fee6ec6-CDG
+        Connection:
+          - keep-alive
+        Content-Length:
+          - '145'
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 22 Sep 2026 13:23:53 GMT
+        Server:
+          - cloudflare
+        access-control-expose-headers:
+          - X-App-Version
+        allow:
+          - GET, POST, HEAD, OPTIONS
+        cf-cache-status:
+          - DYNAMIC
+        content-security-policy:
+          - frame-ancestors 'none'
+        cross-origin-opener-policy:
+          - same-origin
+        referrer-policy:
+          - strict-origin-when-cross-origin
+        strict-transport-security:
+          - max-age=31536000; includeSubDomains
+        vary:
+          - Cookie
+        x-app-version:
+          - v2.657.0
+        x-content-type-options:
+          - nosniff
+        x-envoy-upstream-service-time:
+          - '364'
+        x-frame-options:
+          - DENY
+        x-secrets-engine-version:
+          - 2.172.0
+        x-xss-protection:
+          - 1; mode=block
+      status:
+        code: 201
+        message: Created
 version: 1
