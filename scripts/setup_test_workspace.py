@@ -20,20 +20,22 @@ from pygitguardian.models import (
     CreateInvitation,
     CreateTeam,
     CreateTeamInvitation,
-    CreateTeamMember,
     Detail,
     IncidentPermission,
     InvitationParameters,
-    Member,
-    MembersParameters,
     Source,
     Team,
-    TeamMember,
     TeamsParameters,
     UpdateTeamSource,
 )
 from pygitguardian.models_utils import FromDictWithBase
-from tests.fixture_members import SEED_COMMAND, pool_problems, restorations
+from tests.fixture_members import (
+    SEED_COMMAND,
+    members_parameters,
+    pool_problems,
+    restorations,
+    team_plan,
+)
 from tests.utils import CursorPaginatedResponse
 
 
@@ -46,7 +48,6 @@ T = TypeVar("T")
 PaginatedDataType = TypeVar("PaginatedDataType", bound=FromDictWithBase)
 
 MIN_NB_TEAM = 2
-MIN_NB_TEAM_MEMBER = 2
 # This is the team that is created in the tests, it should be deleted before we run the tests
 PYGITGUARDIAN_TEST_TEAM = "PyGitGuardian team"
 
@@ -73,7 +74,7 @@ def ensure_member_coherence():
     the pool is too small. The other members are humans and are never touched.
     """
     members = unwrap_paginated_response(
-        client.list_members(MembersParameters(per_page=100))
+        client.list_members(members_parameters(per_page=100))
     )
 
     problems = pool_problems(members)
@@ -99,72 +100,6 @@ def add_source_to_team(team: Team, available_sources: Iterable[Source] | None = 
     )
 
 
-def add_team_members(
-    team: Team,
-    team_members: Iterable[TeamMember],
-    nb_members: int,
-    available_members: Iterable[Member] | None = None,
-):
-    assert nb_members > 0, "We should add at least one member"
-    if available_members is None:
-        available_members = unwrap_paginated_response(client.list_members())
-
-    # Every manager is by default a team leader
-    has_admin = any(team_member.is_team_leader for team_member in team_members)
-
-    if not has_admin:
-        admin_member = next(
-            (
-                member
-                for member in available_members
-                if member.access_level == AccessLevel.MANAGER
-            ),
-            None,
-        )
-        assert admin_member is not None, "There should be at least one admin member"
-
-        ensure_success(
-            client.create_team_member(
-                team.id,
-                CreateTeamMember(
-                    admin_member.id,
-                    is_team_leader=True,
-                    incident_permission=IncidentPermission.FULL_ACCESS,
-                ),
-            )
-        )
-        nb_members -= 1
-
-    team_member_ids = {team_member.member_id for team_member in team_members}
-    for _ in range(nb_members):
-        to_add_member = next(
-            (
-                member
-                for member in available_members
-                if member.id not in team_member_ids
-                and member.access_level not in {AccessLevel.OWNER, AccessLevel.MANAGER}
-            ),
-            None,
-        )
-        assert to_add_member is not None, "There is not enough members in the workspace"
-        is_team_leader = False
-        permissions = IncidentPermission.FULL_ACCESS
-
-        if to_add_member.access_level == AccessLevel.MANAGER:
-            is_team_leader = True
-
-        ensure_success(
-            client.create_team_member(
-                team.id,
-                CreateTeamMember(
-                    to_add_member.id,
-                    is_team_leader=is_team_leader,
-                    incident_permission=permissions,
-                ),
-            )
-        )
-
-
 def ensure_team_coherence():
     """
     This function ensures that the workspace :
@@ -173,8 +108,8 @@ def ensure_team_coherence():
         - If not they will be created
     - Every team has at least one source
         - If possible, it will try to add at least one source
-    - Every team has at least 2 members, an admin and a member
-        - If possible, it will try to add those members
+    - Every team is in its seeded state: the fixture manager leads it and the
+      first fixture member belongs to it, the other fixtures stay out
     """
 
     pygitguardian_teams = []
@@ -202,14 +137,16 @@ def ensure_team_coherence():
             )
             teams.append(new_team)
 
-    # Ensure every team has:
-    # - At least one source
-    # - At least two members, one with admin access and one with member access
+    fixtures = unwrap_paginated_response(
+        client.list_members(members_parameters(per_page=100))
+    )
     for team in teams:
         team_members = unwrap_paginated_response(client.list_team_members(team.id))
-        nb_team_members = len(team_members)
-        if nb_team_members < MIN_NB_TEAM_MEMBER:
-            add_team_members(team, team_members, MIN_NB_TEAM_MEMBER - nb_team_members)
+        plan = team_plan(team_members, fixtures)
+        for create in plan.add:
+            ensure_success(client.create_team_member(team.id, create))
+        for team_member in plan.remove:
+            ensure_success(client.delete_team_member(team.id, team_member.id))
 
         team_sources = unwrap_paginated_response(client.list_team_sources(team.id))
         nb_team_sources = len(team_sources)

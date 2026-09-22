@@ -75,6 +75,7 @@ from .fixture_members import (
     MANAGER_EMAIL,
     fixture_manager,
     fixture_members,
+    members_parameters,
 )
 from .utils import get_source, get_team
 
@@ -1377,7 +1378,7 @@ def test_update_member(client: GGClient):
     WHEN calling PATCH /members/{id} endpoint with a payload
     THEN it returns the updated member
     """
-    members = client.list_members(MembersParameters(access_level=AccessLevel.MANAGER))
+    members = client.list_members(members_parameters(access_level=AccessLevel.MANAGER))
     assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
     manager = fixture_manager(members.data)
@@ -1401,7 +1402,7 @@ def test_delete_member(client: GGClient):
     WHEN calling DELETE /members/{id} endpoint
     THEN the member is deleted
     """
-    members = client.list_members(MembersParameters(access_level=AccessLevel.MEMBER))
+    members = client.list_members(members_parameters(access_level=AccessLevel.MEMBER))
     assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
     candidates = fixture_members(members.data)
@@ -1633,28 +1634,24 @@ def test_search_team_members(client: GGClient):
 @my_vcr.use_cassette("test_create_team_member.yaml", ignore_localhost=False)
 def test_create_team_member(client: GGClient):
     """
-    GIVEN a client
+    GIVEN a fixture member outside the first team
     WHEN calling POST /teams/{id}/members endpoint
     THEN a member is created
     """
-
-    all_members = client.list_members()
-    assert isinstance(
-        all_members, CursorPaginatedResponse
-    ), "Could not fetch members from GitGuardian"
+    members = client.list_members(members_parameters())
+    assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
     team = get_team()
     team_members = client.list_team_members(team.id)
     assert isinstance(
         team_members, CursorPaginatedResponse
     ), "Could not fetch team members from GitGuardian"
-    team_members_ids = {team_member.member_id for team_member in team_members.data}
+    in_team = {team_member.member_id for team_member in team_members.data}
 
-    # This assumes there is at least one member in the first page of team members that
-    # does not belong to the retrieved team
-    member_to_add = next(
-        member for member in all_members.data if member.id not in team_members_ids
-    )
+    candidates = [m for m in fixture_members(members.data) if m.id not in in_team]
+    if not candidates:
+        pytest.skip("Every fixture member is in the team, run the setup script")
+    member_to_add = candidates[0]
 
     result = client.create_team_member(
         team.id,
@@ -1669,28 +1666,24 @@ def test_create_team_member(client: GGClient):
 @my_vcr.use_cassette("test_create_team_member_parameters.yaml", ignore_localhost=False)
 def test_create_team_member_without_mail(client: GGClient):
     """
-    GIVEN a client
+    GIVEN a fixture member outside the first team
     WHEN calling POST /teams/{id}/members endpoint
     THEN a member is created
     """
-
-    all_members = client.list_members()
-    assert isinstance(
-        all_members, CursorPaginatedResponse
-    ), "Could not fetch members from GitGuardian"
+    members = client.list_members(members_parameters())
+    assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
 
     team = get_team()
     team_members = client.list_team_members(team.id)
     assert isinstance(
         team_members, CursorPaginatedResponse
     ), "Could not fetch team members from GitGuardian"
-    team_members_ids = {team_member.member_id for team_member in team_members.data}
+    in_team = {team_member.member_id for team_member in team_members.data}
 
-    # This assumes there is at least one member in the first page of team members that
-    # does not belong to the retrieved team
-    member_to_add = next(
-        member for member in all_members.data if member.id not in team_members_ids
-    )
+    candidates = [m for m in fixture_members(members.data) if m.id not in in_team]
+    if not candidates:
+        pytest.skip("Every fixture member is in the team, run the setup script")
+    member_to_add = candidates[0]
 
     result = client.create_team_member(
         team.id,
@@ -1704,15 +1697,13 @@ def test_create_team_member_without_mail(client: GGClient):
 @my_vcr.use_cassette("test_delete_team_member.yaml", ignore_localhost=False)
 def test_delete_team_member(client: GGClient):
     """
-    GIVEN a client
+    GIVEN a fixture member of the first team
     WHEN calling DELETE /teams/{id}/members/{id} endpoint
     THEN a member is deleted
     """
-
-    all_members = client.list_members()
-    assert isinstance(
-        all_members, CursorPaginatedResponse
-    ), "Could not fetch members from GitGuardian"
+    members = client.list_members(members_parameters())
+    assert isinstance(members, CursorPaginatedResponse), "Could not fetch members"
+    fixture_ids = {member.id for member in fixture_members(members.data)}
 
     team = get_team()
     team_members = client.list_team_members(
@@ -1722,8 +1713,10 @@ def test_delete_team_member(client: GGClient):
         team_members, CursorPaginatedResponse
     ), "Could not fetch team members from GitGuardian"
 
-    team_member = team_members.data[0]
-    result = client.delete_team_member(team.id, team_member.id)
+    candidates = [tm for tm in team_members.data if tm.member_id in fixture_ids]
+    if not candidates:
+        pytest.skip("No fixture member in the team, run the setup script")
+    result = client.delete_team_member(team.id, candidates[0].id)
 
     assert result is None
 
