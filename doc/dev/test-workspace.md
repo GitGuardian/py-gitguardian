@@ -22,7 +22,7 @@ Each full live run deletes one member: reseed before the next one.
 
 A service account token of the workspace, Manager access level, with the scopes
 `scan`, `members:write`, `teams:write`, `sources:read` and `ai-discover:send`.
-It is in the Endpoints vault of the password manager. `scripts/release run-tests`
+It is in the team password manager. `scripts/release run-tests`
 checks it before touching anything.
 
 ## Running the live suite
