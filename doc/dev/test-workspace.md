@@ -1,7 +1,7 @@
 # The test workspace
 
-The live tests run against the workspace "PyGitGuardian Tests [internal]"
-(id 628984). CI only replays `tests/cassettes` and never reaches it.
+The live tests run against the workspace "PyGitGuardian Tests [internal]".
+CI only replays `tests/cassettes` and never reaches it.
 
 ## Fixture accounts
 
@@ -13,7 +13,7 @@ The API cannot create members, so a GitGuardian engineer with production access
 seeds them:
 
 ```
-python manage.py seed_gglibraries_test_workspace --account-id 628984
+python manage.py seed_gglibraries_test_workspace --account-id <workspace id>
 ```
 
 Each full live run deletes one member: reseed before the next one.
