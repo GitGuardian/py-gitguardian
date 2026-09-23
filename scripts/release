@@ -2,12 +2,13 @@
 """
 A multi-command tool to automate steps of the release process
 """
+import os
 import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, List, NoReturn, Union
 
 import click
 
@@ -50,7 +51,7 @@ def log_error(message: str) -> None:
     click.secho(f"{prefix} {message}", err=True)
 
 
-def fail(message: str) -> None:
+def fail(message: str) -> NoReturn:
     log_error(message)
     sys.exit(1)
 
@@ -108,6 +109,43 @@ def setup_test_workspace():
         fail(f"There was an error setting up the test workspace :\n{exc.stderr}")
 
 
+def preflight() -> None:
+    """Stop before the cassettes are wiped when the token cannot run the live suite"""
+    # tests.workspace is imported from the repository, like the setup script does
+    sys.path.insert(0, str(ROOT_DIR))
+    from pygitguardian.client import GGClient
+    from pygitguardian.models import Detail
+    from tests.workspace import (
+        REQUIRED_SCOPES,
+        WORKSPACE_ID,
+        WORKSPACE_NAME,
+        token_problems,
+    )
+
+    api_key = os.environ.get("GITGUARDIAN_API_KEY")
+    if not api_key:
+        fail(
+            "GITGUARDIAN_API_KEY is not set. Load the service account token of the "
+            f"{WORKSPACE_NAME} workspace into it, see the release checklist."
+        )
+
+    log_progress("Checking the token")
+    token = GGClient(api_key=api_key).api_tokens()
+    if isinstance(token, Detail):
+        fail(f"GitGuardian rejected the token ({token.status_code}): {token.detail}")
+
+    problems = token_problems(token)
+    if problems:
+        details = "".join(f"\n- {problem}" for problem in problems)
+        fail(
+            f"The token cannot run the live tests:{details}\n"
+            f"Create a service account token as Manager in the {WORKSPACE_NAME} "
+            f"workspace ({WORKSPACE_ID}) with the scopes "
+            f"{', '.join(sorted(REQUIRED_SCOPES))}, see the release checklist."
+        )
+    log_progress(f"Using token '{token.name}' of workspace {WORKSPACE_NAME}")
+
+
 @main.command()
 def run_tests() -> None:
     """Run all tests.
@@ -115,6 +153,7 @@ def run_tests() -> None:
     Unit-tests are run without cassettes. This ensures the recorded cassettes
     still match production reality.
     """
+    preflight()
 
     try:
         # If CASSETTES_DIR does not exist, tests fail, so recreate it

@@ -32,6 +32,8 @@ Pygitguardian testing is done with `pytest`. You should make sure your changes d
 make test
 ```
 
+The tests replay the recorded cassettes; to run them against the live test workspace, see [doc/dev/test-workspace.md](doc/dev/test-workspace.md).
+
 ## Conventions
 
 pygitguardian follows conventional commit messages [link](https://www.conventionalcommits.org/).
