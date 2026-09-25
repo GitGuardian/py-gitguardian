@@ -110,9 +110,16 @@ jobs:
     needs: [lint, build]
     if: github.event_name == 'push' && startsWith(github.event.ref, 'refs/tags')
 
-    # This is required for `gh release create` to work
+    # Must match the environment configured in the PyPI trusted publisher
+    environment:
+      name: pypi
+      url: https://pypi.org/p/pygitguardian
+
     permissions:
+      # This is required for `gh release create` to work
       contents: write
+      # This is required for PyPI trusted publishing
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -137,9 +144,6 @@ jobs:
 
       - name: Publish distribution 📦 to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
 
       - name: Create Release
         id: create_release
