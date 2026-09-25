@@ -112,7 +112,7 @@ jobs:
 
     # Must match the environment configured in the PyPI trusted publisher
     environment:
-      name: pypi
+      name: release
       url: https://pypi.org/p/pygitguardian
 
     permissions:
