@@ -787,6 +787,8 @@ class TokenScope(str, Enum):
     SOURCES_WRITE = "sources:write"
     NHI_WRITE_VAULT = "nhi:write-vault"
     NHI_SEND_INVENTORY = "nhi:send-inventory"
+    NHI_READ = "nhi:read"
+    NHI_WRITE = "nhi:write"
     ENDPOINTS_SEND = "endpoints:send"
     AI_DISCOVER_SEND = "ai-discover:send"
     CUSTOM_TAGS_READ = "custom_tags:read"
