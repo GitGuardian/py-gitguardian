@@ -12,7 +12,7 @@ from marshmallow import ValidationError
 from responses import matchers
 
 from pygitguardian import GGClient
-from pygitguardian.client import GGClientCallbacks, is_ok, load_detail
+from pygitguardian.client import GGClientCallbacks, is_create_ok, is_ok, load_detail
 from pygitguardian.config import (
     DEFAULT_BASE_URI,
     DEFAULT_PRE_COMMIT_MESSAGE,
@@ -1251,6 +1251,56 @@ def make_tar_bytes(files: List[Tuple[str, str]]) -> bytes:
             tar_file.addfile(info, BytesIO(raw_content))
     buffer.seek(0)
     return buffer.getvalue()
+
+
+JSON_CONTENT_TYPES = [
+    pytest.param("application/json; charset=utf-8", id="charset"),
+    pytest.param("Application/JSON", id="case"),
+    pytest.param("application/json ; charset=UTF-8", id="spaces"),
+]
+
+
+@pytest.mark.parametrize("content_type", JSON_CONTENT_TYPES)
+def test_json_content_type_with_parameters(content_type: str):
+    """
+    GIVEN a JSON response whose content type has parameters or another case,
+    as a proxy or gateway may send
+    WHEN is_ok(), is_create_ok() and load_detail() are called
+    THEN the response is read as JSON
+    """
+    resp = Mock()
+    resp.headers = {"content-type": content_type}
+    resp.json.return_value = {"detail": "Invalid API key."}
+    resp.text = '{"detail": "Invalid API key."}'
+
+    resp.status_code = 200
+    assert is_ok(resp)
+    resp.status_code = 201
+    assert is_create_ok(resp)
+    resp.status_code = 401
+    assert load_detail(resp).detail == "Invalid API key."
+
+
+@responses.activate
+@pytest.mark.parametrize("content_type", JSON_CONTENT_TYPES)
+def test_multi_content_scan_json_content_type_with_parameters(
+    client: GGClient, content_type: str
+):
+    """
+    GIVEN a scan result sent with a JSON content type that has parameters
+    WHEN the client scans content
+    THEN it returns the scan result, not a Detail
+    """
+    responses.post(
+        url=client._url_from_endpoint("multiscan", "v1"),
+        status=200,
+        body='[{"policy_break_count": 0, "policies": [], "policy_breaks": []}]',
+        content_type=content_type,
+    )
+
+    obj = client.multi_content_scan([{"document": "some content"}])
+
+    assert isinstance(obj, MultiScanResult)
 
 
 def test_is_ok_bad_response():

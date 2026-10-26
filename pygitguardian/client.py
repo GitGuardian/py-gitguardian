@@ -94,6 +94,12 @@ class Versions:
 VERSIONS = Versions()
 
 
+def _is_json(resp: Response) -> bool:
+    # Proxies and gateways may add parameters, such as "; charset=utf-8"
+    media_type = resp.headers.get("content-type", "").split(";")[0]
+    return media_type.strip().lower() == "application/json"
+
+
 def load_detail(resp: Response) -> Detail:
     """
     load_detail loads a Detail from a response
@@ -105,7 +111,7 @@ def load_detail(resp: Response) -> Detail:
     :rtype: Detail
     """
     data: Any = None
-    if resp.headers.get("content-type") == "application/json":
+    if _is_json(resp):
         try:
             data = resp.json()
         except ValueError:
@@ -123,10 +129,7 @@ def is_ok(resp: Response) -> bool:
     is_ok returns True is the API responded with 200
     and the content type is JSON.
     """
-    return (
-        resp.headers.get("content-type") == "application/json"
-        and resp.status_code == codes.ok
-    )
+    return _is_json(resp) and resp.status_code == codes.ok
 
 
 def is_create_ok(resp: Response) -> bool:
@@ -134,10 +137,7 @@ def is_create_ok(resp: Response) -> bool:
     is_create_ok returns True if the API returns code 201
     and the content type is JSON.
     """
-    return (
-        resp.headers.get("content-type") == "application/json"
-        and resp.status_code == codes.created
-    )
+    return _is_json(resp) and resp.status_code == codes.created
 
 
 def is_delete_ok(resp: Response) -> bool:
