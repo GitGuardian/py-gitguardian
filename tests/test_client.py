@@ -487,6 +487,11 @@ def test_assert_content_type():
         ),
         pytest.param('["Forbidden"]', '["Forbidden"]', id="list"),
         pytest.param("<html>Forbidden</html>", "<html>Forbidden</html>", id="not-json"),
+        pytest.param('{"detail": null}', '{"detail": null}', id="detail-null"),
+        pytest.param('{"detail": ["x"]}', '{"detail": ["x"]}', id="detail-list"),
+        pytest.param(
+            '{"error": {"code": 401}}', '{"error": {"code": 401}}', id="error-object"
+        ),
     ],
 )
 def test_load_detail_json_error_body(client: GGClient, body: str, expected_detail: str):
@@ -1301,6 +1306,25 @@ def test_multi_content_scan_json_content_type_with_parameters(
     obj = client.multi_content_scan([{"document": "some content"}])
 
     assert isinstance(obj, MultiScanResult)
+
+
+@pytest.mark.parametrize(
+    "content_type",
+    ["application/problem+json", "application/json-seq", "text/json", "", None],
+)
+def test_other_content_types_are_not_json(content_type: Optional[str]):
+    """
+    GIVEN a 200 or 201 response whose content type is not JSON
+    WHEN is_ok() and is_create_ok() are called
+    THEN they return False
+    """
+    resp = Mock()
+    resp.headers = {"content-type": content_type}
+
+    resp.status_code = 200
+    assert not is_ok(resp)
+    resp.status_code = 201
+    assert not is_create_ok(resp)
 
 
 def test_is_ok_bad_response():

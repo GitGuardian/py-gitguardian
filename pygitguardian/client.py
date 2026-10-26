@@ -96,7 +96,7 @@ VERSIONS = Versions()
 
 def _is_json(resp: Response) -> bool:
     # Proxies and gateways may add parameters, such as "; charset=utf-8"
-    media_type = resp.headers.get("content-type", "").split(";")[0]
+    media_type = (resp.headers.get("content-type") or "").split(";")[0]
     return media_type.strip().lower() == "application/json"
 
 
@@ -117,11 +117,19 @@ def load_detail(resp: Response) -> Detail:
         except ValueError:
             pass
 
-    # Proxies and gateways can send JSON errors in their own format
-    if not (isinstance(data, dict) and ("detail" in data or "error" in data)):
-        data = {"detail": resp.text}
-
-    return Detail.from_dict(data)
+    # Proxies and gateways can send JSON errors in their own format, where "detail"
+    # or "error" may not be a string
+    message = None
+    if isinstance(data, dict):
+        message = next(
+            (
+                data[key]
+                for key in ("error", "detail")
+                if isinstance(data.get(key), str)
+            ),
+            None,
+        )
+    return Detail.from_dict({"detail": resp.text if message is None else message})
 
 
 def is_ok(resp: Response) -> bool:
