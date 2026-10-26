@@ -476,6 +476,39 @@ def test_assert_content_type():
     assert str(obj).startswith("200:"), str(obj)
 
 
+@responses.activate
+@pytest.mark.parametrize(
+    "body, expected_detail",
+    [
+        pytest.param('{"detail": "Invalid API key."}', "Invalid API key.", id="detail"),
+        pytest.param('{"error": "Forbidden"}', "Forbidden", id="error"),
+        pytest.param(
+            '{"message": "Forbidden"}', '{"message": "Forbidden"}', id="other"
+        ),
+        pytest.param('["Forbidden"]', '["Forbidden"]', id="list"),
+        pytest.param("<html>Forbidden</html>", "<html>Forbidden</html>", id="not-json"),
+    ],
+)
+def test_load_detail_json_error_body(client: GGClient, body: str, expected_detail: str):
+    """
+    GIVEN a 403 labelled as JSON, as a proxy may send
+    WHEN the client scans content
+    THEN it returns a Detail, using the response text when there is no detail key
+    """
+    responses.post(
+        url=client._url_from_endpoint("scan", "v1"),
+        status=403,
+        body=body,
+        content_type="application/json",
+    )
+
+    obj = client.content_scan("some content")
+
+    assert isinstance(obj, Detail)
+    assert obj.status_code == 403
+    assert obj.detail == expected_detail
+
+
 @pytest.mark.parametrize(
     "session_headers, extra_headers, expected_headers",
     [

@@ -104,9 +104,15 @@ def load_detail(resp: Response) -> Detail:
     :return: detail object of response
     :rtype: Detail
     """
+    data: Any = None
     if resp.headers.get("content-type") == "application/json":
-        data = resp.json()
-    else:
+        try:
+            data = resp.json()
+        except ValueError:
+            pass
+
+    # Proxies and gateways can send JSON errors in their own format
+    if not (isinstance(data, dict) and ("detail" in data or "error" in data)):
         data = {"detail": resp.text}
 
     return Detail.from_dict(data)
