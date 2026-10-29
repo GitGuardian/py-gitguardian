@@ -1,5 +1,17 @@
 # Changelog
 
+<a id='changelog-1.36.0'></a>
+
+## 1.36.0 — 2026-10-29
+
+### Fixed
+
+- `load_detail` no longer raises when an error response is labelled JSON but has no `detail` or `error` key, is not an object, or does not parse, as a proxy or gateway may send. The response text becomes the detail.
+
+- A response whose JSON content type has parameters or another case, such as `application/json; charset=utf-8` from a proxy or gateway, is now read as JSON. Before, a result was taken for an error, and an error showed its raw JSON instead of its detail.
+
+- `load_detail` no longer raises when a JSON error has a `detail` that is not a string, such as `null` or a list, and no longer shows an `error` object as a Python dict. The response text becomes the detail.
+
 <a id='changelog-1.35.0'></a>
 
 ## 1.35.0 — 2026-09-22
