@@ -18,7 +18,7 @@ repos:
     hooks:
       - id: pyright
         name: pyright
-        entry: 'pdm run pyright'
+        entry: 'uv run pyright'
         language: system
         types: [python]
         # do not pass filenames, otherwise Pyright might scan files we don't want it to scan

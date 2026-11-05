@@ -41,7 +41,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/GitGuardian/py-gitguardian"
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 dev = [
     "black==24.3.0",
     "coverage",

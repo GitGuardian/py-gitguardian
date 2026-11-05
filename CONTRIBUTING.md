@@ -17,11 +17,11 @@ When submitting a bug report be sure that:
 ## Dev environment
 
 ```bash
-pdm install -G dev
-pdm run pre-commit install -f --hook-type commit-msg --hook-type pre-commit
+uv sync
+uv run pre-commit install -f --hook-type commit-msg --hook-type pre-commit
 ```
 
-py-gitguardian is a library, so no `pdm.lock` is committed and `pdm install` resolves
+py-gitguardian is a library, so no `uv.lock` is committed and `uv sync` resolves
 dependencies fresh each time (see [#107](https://github.com/GitGuardian/py-gitguardian/pull/107)).
 
 ## Testing
@@ -53,6 +53,6 @@ Line length in the one enforced by Black: 88 characters.
 
 ### Changelog
 
-We use [scriv](https://github.com/nedbat/scriv) to manage our changelog. It is automatically installed by `pdm install -G dev`.
+We use [scriv](https://github.com/nedbat/scriv) to manage our changelog. It is automatically installed by `uv sync`.
 
 All user visible changes must be documented in a changelog fragment. You can create one with `scriv create`. If your pull request only contains non-visible changes (such as refactors or fixes for regressions introduced _after_ the latest release), then apply the `skip-changelog` label to the pull request.

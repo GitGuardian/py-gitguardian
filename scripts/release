@@ -103,7 +103,7 @@ def setup_test_workspace():
     log_progress("Setting up workspace")
     try:
         check_run(
-            ["pdm", "run", SETUP_WORKSPACE_SCRIPT], cwd=ROOT_DIR, stderr=subprocess.PIPE
+            ["uv", "run", SETUP_WORKSPACE_SCRIPT], cwd=ROOT_DIR, stderr=subprocess.PIPE
         )
     except subprocess.CalledProcessError as exc:
         fail(f"There was an error setting up the test workspace :\n{exc.stderr}")

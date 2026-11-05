@@ -27,8 +27,10 @@ checks it before touching anything.
 
 ## Running the live suite
 
+Put it in `.env` (see `.env.example`), then:
+
 ```
-scripts/release run-tests
+uv run --env-file .env scripts/release run-tests
 ```
 
 To record a single test, delete its cassette and run it with
