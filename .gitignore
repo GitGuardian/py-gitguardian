@@ -127,7 +127,5 @@ secrets
 dist/
 .cache_ggshield
 
-#pdm
-.pdm-python
 # Library, not an app: no lockfile is committed (see #107)
-pdm.lock
+uv.lock

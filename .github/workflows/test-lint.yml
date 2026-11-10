@@ -32,11 +32,11 @@ jobs:
         with:
           python-version: '3.10'
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade pdm pre-commit
-          pdm install -G dev
+        run: uv sync
 
       - uses: actions/cache@v4
         with:
@@ -44,7 +44,7 @@ jobs:
           key: pre-commit|${{ env.pythonLocation }}|${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Install pre-commit hooks
-        run: pre-commit install --install-hooks
+        run: uv run pre-commit install --install-hooks
 
       - name: Skip ggshield hooks when running from a fork
         # See note about steps requiring the GITGUARDIAN_API at the top of this file
@@ -53,7 +53,7 @@ jobs:
           echo "SKIP=ggshield" >> $GITHUB_ENV
 
       - name: Run pre-commit checks
-        run: pre-commit run --show-diff-on-failure --all-files
+        run: uv run pre-commit run --show-diff-on-failure --all-files
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
@@ -87,17 +87,19 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade pdm
-          pdm install --project . -G dev
+        run: uv sync
 
       - name: Test with pytest
         run: |
-          pdm run coverage run --source pygitguardian -m pytest
-          pdm run coverage report --fail-under=80
-          pdm run coverage xml
+          uv run coverage run --source pygitguardian -m pytest
+          uv run coverage report --fail-under=80
+          uv run coverage xml
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
