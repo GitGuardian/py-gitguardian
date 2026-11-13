@@ -35,7 +35,6 @@ dependencies = [
     "requests>=2, <3",
     "marshmallow-dataclass >=8.7, <8.8",
     "typing-extensions",
-    "setuptools>=70.1.0",
 ]
 
 [project.urls]
